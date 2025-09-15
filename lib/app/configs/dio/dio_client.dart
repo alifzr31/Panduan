@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:panduan/app/utils/app_strings.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:panduan/app/configs/dio/interceptors.dart';
+import 'package:panduan/app/utils/app_env.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 abstract class DioClient {
   late Dio dio;
@@ -13,7 +13,7 @@ abstract class DioClient {
   }
 
   void configureDio() async {
-    dio.options.baseUrl = AppStrings.baseUrl;
+    dio.options.baseUrl = AppEnv.baseUrl;
     dio.options.headers = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
