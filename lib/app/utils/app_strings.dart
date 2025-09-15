@@ -1,3 +1,5 @@
 class AppStrings {
-  static const String baseUrl = "https://127.0.0.1:8000/v1";
+  static const String assetsImages = 'assets/images';
+  static const String assetsLotties = 'assets/lotties';
+  static const String errorApiMessage = 'Ups sepertinya terjadi kesalahan';
 }
