@@ -12,6 +12,7 @@ import 'package:panduan/app/configs/router/app_router.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/app_strings.dart';
 import 'package:panduan/app/views/splash/splash_page.dart';
 
 void main() async {
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Lottie.asset(
-                'assets/lotties/panduan-logo-loader.json',
+                '${AppStrings.assetsLotties}/panduan-logo-loader.json',
                 width: 80,
               ),
             ),

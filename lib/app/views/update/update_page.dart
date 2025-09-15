@@ -1,3 +1,4 @@
+import 'package:panduan/app/utils/app_strings.dart';
 import 'package:panduan/app/views/update/widgets/update_footer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -37,7 +38,7 @@ class UpdatePage extends StatelessWidget {
             children: [
               Expanded(
                 child: SvgPicture.asset(
-                  'assets/images/panduan-logo.svg',
+                  '${AppStrings.assetsImages}/panduan-logo.svg',
                   width: 180,
                 ),
               ),

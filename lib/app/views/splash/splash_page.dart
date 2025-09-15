@@ -12,6 +12,7 @@ import 'package:panduan/app/configs/firebase/remoteconfig_service.dart';
 import 'package:panduan/app/configs/secure_storage/secure_storage.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/app_strings.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/views/update/update_page.dart';
 import 'package:panduan/app/widgets/base_button.dart';
@@ -173,28 +174,6 @@ class _SplashPageState extends State<SplashPage> {
       } else {
         _showBiometricsAlert(isLoggedIn: isLoggedIn);
       }
-      // if (biometricsEnabled) {
-      //   if (canAuthenticate) {
-      //     final didAuthFingerprint = await _authBiometrics();
-
-      //     setState(() {
-      //       hasAuth = didAuthFingerprint;
-      //     });
-
-      //     if (hasAuth ?? false) {
-      //       _navigatePage(isLoggedIn: isLoggedIn);
-      //     }
-      //   } else {
-      //     if (hasBiometricsHardware) {
-      //       _showBiometricsAlert(isLoggedIn: isLoggedIn);
-      //     } else {
-      //       _navigatePage(isLoggedIn: isLoggedIn);
-      //     }
-      //     _navigatePage(isLoggedIn: isLoggedIn);
-      //   }
-      // } else {
-      //   _navigatePage(isLoggedIn: isLoggedIn);
-      // }
     } else {
       _navigatePage(isLoggedIn: isLoggedIn);
     }
@@ -287,7 +266,9 @@ class _SplashPageState extends State<SplashPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SvgPicture.asset('assets/images/panduan-logo.svg'),
+                        SvgPicture.asset(
+                          '${AppStrings.assetsImages}/panduan-logo.svg',
+                        ),
                         if (hasAuth != null && hasAuth == false) ...{
                           const SizedBox(height: 16),
                           BaseButtonIcon(
