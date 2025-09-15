@@ -9,6 +9,7 @@ import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/widgets/base_listtile.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:toastification/toastification.dart';
 
 class DashboardEndDrawer extends StatelessWidget {
@@ -86,10 +87,8 @@ class DashboardEndDrawer extends StatelessWidget {
                       color: AppColors.blueColor,
                     ),
                     title: 'Info Aplikasi',
-                    onTap: () {
-                      // AppSettings.openAppSettings(
-                      //   type: AppSettingsType.settings,
-                      // );
+                    onTap: () async {
+                      await openAppSettings();
                     },
                   ),
                   if (hasBiometricsHardware) ...{
