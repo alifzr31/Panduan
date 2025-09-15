@@ -17,6 +17,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  final _dashboardKey = GlobalKey<ScaffoldState>();
   final LocalAuthentication _localAuthentication = LocalAuthentication();
   bool _hasBiometricsHardware = false;
   List<BiometricType> _availableBiometrics = const [];
@@ -110,30 +111,43 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Dashboard',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-        ),
-      ),
-      endDrawer: DashboardEndDrawer(
-        appName: _appName,
-        appVersion: _appVersion,
-        hasBiometricsHardware: _hasBiometricsHardware,
-        biometricsEnabled: _biometricsEnabled,
-        availableBiometrics: _availableBiometrics,
-        onChangedBiometrics: (value) {
-          if (_biometricsEnabled) {
-            _setBiometrics(value);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          if (_dashboardKey.currentState?.isEndDrawerOpen ?? false) {
+            _dashboardKey.currentState?.closeEndDrawer();
           } else {
-            _authBiometrics().then((didAuth) {
-              if (didAuth) {
-                _setBiometrics(value);
-              }
-            });
+            SystemChannels.platform.invokeMethod('SystemNavigator.pop');
           }
-        },
+        }
+      },
+      child: Scaffold(
+        key: _dashboardKey,
+        appBar: AppBar(
+          title: const Text(
+            'Dashboard',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+          ),
+        ),
+        endDrawer: DashboardEndDrawer(
+          appName: _appName,
+          appVersion: _appVersion,
+          hasBiometricsHardware: _hasBiometricsHardware,
+          biometricsEnabled: _biometricsEnabled,
+          availableBiometrics: _availableBiometrics,
+          onChangedBiometrics: (value) {
+            if (_biometricsEnabled) {
+              _setBiometrics(value);
+            } else {
+              _authBiometrics().then((didAuth) {
+                if (didAuth) {
+                  _setBiometrics(value);
+                }
+              });
+            }
+          },
+        ),
       ),
     );
   }
