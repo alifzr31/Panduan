@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:panduan/app/utils/app_colors.dart';
 
 class BaseButton extends StatelessWidget {
   const BaseButton({
-    super.key,
     required this.label,
     this.labelSize,
     this.onPressed,
-    this.bgColor,
+    this.bgColor = AppColors.primaryColor,
     this.fgColor,
+    super.key,
   });
 
   final String label;
   final double? labelSize;
   final void Function()? onPressed;
-  final Color? bgColor;
+  final Color bgColor;
   final Color? fgColor;
 
   @override
@@ -44,18 +45,18 @@ class BaseButton extends StatelessWidget {
 
 class BaseOutlineButton extends StatelessWidget {
   const BaseOutlineButton({
-    super.key,
     required this.label,
     this.labelSize,
     this.onPressed,
-    this.borderColor,
+    this.borderColor = AppColors.primaryColor,
     this.fgColor,
+    super.key,
   });
 
   final String label;
   final double? labelSize;
   final void Function()? onPressed;
-  final Color? borderColor;
+  final Color borderColor;
   final Color? fgColor;
 
   @override
@@ -63,7 +64,7 @@ class BaseOutlineButton extends StatelessWidget {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         foregroundColor: fgColor,
-        side: BorderSide(width: 1.3, color: borderColor ?? Colors.black),
+        side: BorderSide(width: 1.3, color: borderColor),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(horizontal: 10),
         minimumSize: Size.zero,
@@ -86,23 +87,23 @@ class BaseOutlineButton extends StatelessWidget {
 
 class BaseButtonIcon extends StatelessWidget {
   const BaseButtonIcon({
-    super.key,
-    this.bgColor,
-    this.fgColor,
-    this.onPressed,
-    this.labelSize,
-    this.iconSize,
     required this.icon,
     required this.label,
+    this.iconSize,
+    this.labelSize,
+    this.bgColor = AppColors.primaryColor,
+    this.fgColor,
+    this.onPressed,
+    super.key,
   });
 
-  final Color? bgColor;
-  final Color? fgColor;
-  final void Function()? onPressed;
-  final double? labelSize;
-  final double? iconSize;
   final IconData icon;
   final String label;
+  final double? iconSize;
+  final double? labelSize;
+  final Color bgColor;
+  final Color? fgColor;
+  final void Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -139,22 +140,22 @@ class BaseButtonIcon extends StatelessWidget {
 
 class BaseOutlineButtonIcon extends StatelessWidget {
   const BaseOutlineButtonIcon({
-    super.key,
-    this.fgColor,
-    this.borderColor,
-    this.labelSize,
-    this.iconSize,
     required this.icon,
     required this.label,
+    this.iconSize,
+    this.labelSize,
+    this.borderColor = AppColors.primaryColor,
+    this.fgColor,
     this.onPressed,
+    super.key,
   });
 
-  final Color? fgColor;
-  final Color? borderColor;
-  final double? iconSize;
-  final double? labelSize;
   final IconData icon;
   final String label;
+  final double? iconSize;
+  final double? labelSize;
+  final Color borderColor;
+  final Color? fgColor;
   final void Function()? onPressed;
 
   @override
@@ -165,7 +166,7 @@ class BaseOutlineButtonIcon extends StatelessWidget {
         iconColor: WidgetStatePropertyAll(fgColor),
         overlayColor: WidgetStatePropertyAll(fgColor?.withValues(alpha: 0.1)),
         side: WidgetStatePropertyAll(
-          BorderSide(width: 1.3, color: borderColor ?? Colors.black),
+          BorderSide(width: 1.3, color: borderColor),
         ),
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
