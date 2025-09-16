@@ -1,15 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
+import 'package:open_settings_plus/core/open_settings_plus.dart';
+import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/widgets/base_listtile.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:toastification/toastification.dart';
 
 class DashboardEndDrawer extends StatelessWidget {
@@ -87,8 +89,15 @@ class DashboardEndDrawer extends StatelessWidget {
                       color: AppColors.blueColor,
                     ),
                     title: 'Info Aplikasi',
-                    onTap: () async {
-                      await openAppSettings();
+                    onTap: () {
+                      switch (OpenSettingsPlus.shared) {
+                        case OpenSettingsPlusAndroid openSettingsPlusAndroid:
+                          openSettingsPlusAndroid.applicationDetails();
+                        case OpenSettingsPlusIOS openSettingsPlusIOS:
+                          openSettingsPlusIOS.appSettings();
+                        default:
+                          if (kDebugMode) print('Platform not supported');
+                      }
                     },
                   ),
                   if (hasBiometricsHardware) ...{
@@ -147,9 +156,9 @@ class DashboardEndDrawer extends StatelessWidget {
                         );
                         showCustomToast(
                           context,
-                          type: ToastificationType.warning,
-                          title: 'Berhasil',
-                          description: 'Blablabla telah berhasil',
+                          type: ToastificationType.success,
+                          title: 'Keluar Berhasil',
+                          description: 'Sampai jumpa kembali!',
                         );
 
                         context.read<AuthCubit>().resetState();
