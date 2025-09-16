@@ -60,6 +60,7 @@ dependencies:
   string_validator: ^1.2.0
   toastification: ^3.0.3
   skeletonizer: ^2.1.0+1
+  open_settings_plus: ^0.4.0
 
 dev_dependencies:
   flutter_test:
