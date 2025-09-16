@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/dio/interceptors.dart';
 import 'package:panduan/app/utils/app_env.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 abstract class DioClient {
@@ -12,12 +13,9 @@ abstract class DioClient {
     configureDio();
   }
 
-  void configureDio() async {
+  void configureDio() {
     dio.options.baseUrl = AppEnv.baseUrl;
-    dio.options.headers = {
-      'Content-type': 'application/json',
-      'Accept': 'application/json',
-    };
+    dio.options.headers = AppHelpers.addOnHeaders();
     dio.options.connectTimeout = const Duration(minutes: 5);
     dio.options.receiveTimeout = const Duration(minutes: 5);
     dio.interceptors.add(DioInterceptors());

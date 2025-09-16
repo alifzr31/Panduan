@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:panduan/app/configs/dio/exceptions.dart';
+import 'package:panduan/app/configs/secure_storage/secure_storage.dart';
+import 'package:panduan/app/utils/app_strings.dart';
 
 class DioInterceptors extends InterceptorsWrapper {
   @override
@@ -56,8 +58,14 @@ class DioInterceptors extends InterceptorsWrapper {
     // print("--> ${options.method} ${options.uri}");
     // print("Headers: ${options.headers}");
     // print("Body: ${options.data}");
-    // options.headers['Authorization'] =
-    //     'Bearer NnVDNTV3eGUwR2lNbVluOFQwcGp1M0tQSHNmMG50c09NbVlzWlMzTWRURVJHVXBhY1RVTFVDNkVZWUo1bmJKMmJqRXJQYWozQ1BYTEs3Mm9vVkNwUU53MDlCQ1cwbmtkaWNnQg==';
+    String? accessToken = await SecureStorage.readStorage(
+      key: AppStrings.accessToken,
+    );
+
+    if (accessToken != null) {
+      final authHeader = {'Authorization': 'Bearer $accessToken'};
+      options.headers.addEntries(authHeader.entries);
+    }
 
     handler.next(options);
   }
