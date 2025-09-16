@@ -66,7 +66,9 @@ class MyApp extends StatelessWidget {
           title: 'Panduan',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.amberColor),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.primaryColor,
+            ),
             scaffoldBackgroundColor: AppColors.backgroundColor,
             fontFamily: 'Jost',
             useMaterial3: true,
