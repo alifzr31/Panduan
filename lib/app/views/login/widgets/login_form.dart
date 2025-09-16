@@ -3,12 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
-import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/views/dashboard/dashboard_page.dart';
 import 'package:panduan/app/widgets/base_button.dart';
 import 'package:panduan/app/widgets/base_formfield.dart';
 import 'package:panduan/app/widgets/base_iconbutton.dart';
+import 'package:panduan/app/widgets/show_customtoast.dart';
 import 'package:string_validator/string_validator.dart';
+import 'package:toastification/toastification.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -30,21 +31,23 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         children: [
           BaseFormGroupField(
-            label: 'Email',
-            hint: 'Masukkan email anda',
+            label: 'Username/Email',
+            hint: 'Masukkan username atau email anda',
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             prefixIcon: const Icon(
-              MingCute.at_fill,
+              MingCute.user_1_fill,
               size: 18,
               color: Colors.black,
             ),
             validator: (value) {
               if (value!.isEmpty) {
-                return 'Silakan masukkan email anda';
+                return 'Silakan masukkan username atau email anda';
               } else {
-                if (!isEmail(value)) {
-                  return 'Email yang anda masukkan tidak benar';
+                if (value.matches('@')) {
+                  if (!isEmail(value)) {
+                    return 'Email yang anda masukkan tidak benar';
+                  }
                 }
               }
 
@@ -65,7 +68,6 @@ class _LoginFormState extends State<LoginForm> {
             suffixIcon: BaseIconButton(
               icon: _obscurePass ? MingCute.eye_fill : MingCute.eye_close_line,
               size: 18,
-              color: AppColors.blueColor,
               onPressed: () {
                 setState(() {
                   _obscurePass = !_obscurePass;
@@ -95,18 +97,30 @@ class _LoginFormState extends State<LoginForm> {
                   context,
                   DashboardPage.routeName,
                 );
+                showCustomToast(
+                  context,
+                  type: ToastificationType.success,
+                  title: 'Masuk Berhasil',
+                  description: 'Selamat datang!',
+                );
               }
 
               if (state.loginStatus == LoginStatus.error) {
                 context.loaderOverlay.hide();
+                showCustomToast(
+                  context,
+                  type: ToastificationType.error,
+                  title: 'Masuk Gagal',
+                  description: state.loginError,
+                );
               }
             },
             child: SizedBox(
               width: double.infinity,
-              child: BaseButton(
-                bgColor: AppColors.pinkColor,
+              child: BaseButtonIcon(
                 fgColor: Colors.white,
                 label: 'Masuk',
+                icon: MingCute.entrance_line,
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     context.read<AuthCubit>().login(
