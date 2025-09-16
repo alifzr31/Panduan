@@ -76,7 +76,7 @@ class BaseFormField extends StatelessWidget {
         errorStyle: TextStyle(fontSize: 12, color: Colors.red.shade600),
         counterText: '',
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+        contentPadding: const EdgeInsets.all(10),
         prefixIcon: prefixIcon == null
             ? null
             : Padding(
@@ -252,10 +252,7 @@ class BaseFormGroupField extends StatelessWidget {
               minWidth: 30,
             ),
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 8,
-              horizontal: 10,
-            ),
+            contentPadding: const EdgeInsets.all(10),
             border: const OutlineInputBorder(
               borderSide: BorderSide.none,
               borderRadius: BorderRadius.all(Radius.circular(8)),

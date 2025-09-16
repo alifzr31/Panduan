@@ -28,7 +28,7 @@ class BaseButton extends StatelessWidget {
       ),
       onPressed: onPressed,
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         child: Text(
           label,
           style: TextStyle(
@@ -70,7 +70,7 @@ class BaseOutlineButton extends StatelessWidget {
       ),
       onPressed: onPressed,
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         child: Text(
           label,
           style: TextStyle(
@@ -123,7 +123,7 @@ class BaseButtonIcon extends StatelessWidget {
       onPressed: onPressed,
       icon: Icon(icon, size: iconSize),
       label: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: Text(
           label,
           style: TextStyle(
@@ -178,7 +178,7 @@ class BaseOutlineButtonIcon extends StatelessWidget {
       onPressed: onPressed,
       icon: Icon(icon, size: iconSize),
       label: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: Text(
           label,
           style: TextStyle(
