@@ -12,4 +12,8 @@ class AppHelpers {
   static double getBottomViewPaddingDevice(BuildContext context) {
     return MediaQuery.of(context).viewPadding.bottom;
   }
+
+  static Map<String, dynamic> addOnHeaders() {
+    return {'Content-type': 'application/json', 'Accept': 'application/json'};
+  }
 }
