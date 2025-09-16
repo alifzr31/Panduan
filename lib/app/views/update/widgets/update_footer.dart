@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:panduan/app/utils/app_colors.dart';
+import 'package:panduan/app/views/dashboard/dashboard_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
-// import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/widgets/base_button.dart';
-// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -134,7 +133,7 @@ class UpdateFooter extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacementNamed(
                   context,
-                  isLoggedIn ? '' : LoginPage.routeName,
+                  isLoggedIn ? DashboardPage.routeName : LoginPage.routeName,
                 );
               },
             ),
