@@ -7,12 +7,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
+import 'package:open_settings_plus/core/open_settings_plus.dart';
+import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:panduan/app/configs/firebase/remoteconfig_service.dart';
 import 'package:panduan/app/configs/secure_storage/secure_storage.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/views/dashboard/dashboard_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/views/update/update_page.dart';
 import 'package:panduan/app/widgets/base_button.dart';
@@ -30,16 +33,39 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   Timer? _timer;
+  bool _isLoggedIn = false;
   final LocalAuthentication _localAuthentication = LocalAuthentication();
-  bool? hasAuth;
+  bool? _hasAuth;
+  String? _appName;
+  String? _appVersion;
 
-  void _initTimer() {
-    _timer = Timer(const Duration(milliseconds: 1500), _initRemoteConfig);
+  void _initTimer() async {
+    final packageInfo = await _getPackageInfo();
+    final isLoggedIn = await _checkLoggedIn();
+
+    setState(() {
+      _isLoggedIn = isLoggedIn;
+    });
+
+    _timer = Timer(const Duration(milliseconds: 1500), () async {
+      try {
+        await _initRemoteConfig(isLoggedIn, packageInfo);
+      } catch (e) {
+        if (kDebugMode) print(e);
+      }
+    });
   }
 
   Future<PackageInfo> _getPackageInfo() async {
     try {
-      return await PackageInfo.fromPlatform();
+      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+      setState(() {
+        _appName = packageInfo.appName;
+        _appVersion = packageInfo.version;
+      });
+
+      return packageInfo;
     } catch (e) {
       if (kDebugMode) print(e);
       rethrow;
@@ -48,7 +74,9 @@ class _SplashPageState extends State<SplashPage> {
 
   Future<bool> _checkLoggedIn() async {
     try {
-      final accessToken = await SecureStorage.readStorage(key: 'accessToken');
+      final accessToken = await SecureStorage.readStorage(
+        key: AppStrings.accessToken,
+      );
 
       if (accessToken != null) {
         return true;
@@ -60,10 +88,13 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
-  void _initRemoteConfig() async {
-    await RemoteConfigService.instance.init().then((value) async {
-      final isLoggedIn = await _checkLoggedIn();
-      final packageInfo = await _getPackageInfo();
+  Future<void> _initRemoteConfig(
+    bool isLoggedIn,
+    PackageInfo packageInfo,
+  ) async {
+    try {
+      await RemoteConfigService.instance.init();
+
       final packageName = packageInfo.packageName;
       final currentVersion = packageInfo.version;
       final currentBuildNumber = int.tryParse(packageInfo.buildNumber) ?? 0;
@@ -93,7 +124,9 @@ class _SplashPageState extends State<SplashPage> {
       } else {
         _didBiometricsAuth(isLoggedIn: isLoggedIn);
       }
-    });
+    } catch (e) {
+      if (kDebugMode) print(e);
+    }
   }
 
   Future<bool> _checkBiometricsHardware() async {
@@ -156,23 +189,27 @@ class _SplashPageState extends State<SplashPage> {
     final biometricsEnabled =
         sharedPreferences.getBool('biometrics_enabled') ?? false;
 
-    if (hasBiometricsHardware) {
-      if (canAuthenticate) {
-        if (biometricsEnabled) {
-          final didAuthFingerprint = await _authBiometrics();
+    if (isLoggedIn) {
+      if (hasBiometricsHardware) {
+        if (canAuthenticate) {
+          if (biometricsEnabled) {
+            final didAuthFingerprint = await _authBiometrics();
 
-          setState(() {
-            hasAuth = didAuthFingerprint;
-          });
+            setState(() {
+              _hasAuth = didAuthFingerprint;
+            });
 
-          if (hasAuth ?? false) {
+            if (_hasAuth ?? false) {
+              _navigatePage(isLoggedIn: isLoggedIn);
+            }
+          } else {
             _navigatePage(isLoggedIn: isLoggedIn);
           }
         } else {
-          _navigatePage(isLoggedIn: isLoggedIn);
+          _showBiometricsAlert(isLoggedIn: isLoggedIn);
         }
       } else {
-        _showBiometricsAlert(isLoggedIn: isLoggedIn);
+        _navigatePage(isLoggedIn: isLoggedIn);
       }
     } else {
       _navigatePage(isLoggedIn: isLoggedIn);
@@ -182,9 +219,17 @@ class _SplashPageState extends State<SplashPage> {
   void _navigatePage({bool isLoggedIn = false}) {
     if (mounted) {
       if (isLoggedIn) {
-        Navigator.pushReplacementNamed(context, '');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          DashboardPage.routeName,
+          (route) => false,
+        );
       } else {
-        Navigator.pushReplacementNamed(context, LoginPage.routeName);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          LoginPage.routeName,
+          (route) => false,
+        );
       }
     }
   }
@@ -220,7 +265,16 @@ class _SplashPageState extends State<SplashPage> {
                 size: 14,
                 text: 'Atur Sekarang',
                 color: AppColors.blueColor,
-                onPressed: () {},
+                onPressed: () {
+                  switch (OpenSettingsPlus.shared) {
+                    case OpenSettingsPlusAndroid openSettingsPlusAndroid:
+                      openSettingsPlusAndroid.biometricEnroll();
+                    case OpenSettingsPlusIOS openSettingsPlusIOS:
+                      openSettingsPlusIOS.faceIDAndPasscode();
+                    default:
+                      if (kDebugMode) print('Platform not supported');
+                  }
+                },
               ),
               const SizedBox(width: 6),
               BaseTextButton(
@@ -269,13 +323,14 @@ class _SplashPageState extends State<SplashPage> {
                         SvgPicture.asset(
                           '${AppStrings.assetsImages}/panduan-logo.svg',
                         ),
-                        if (hasAuth != null && hasAuth == false) ...{
+                        if (_hasAuth != null && _hasAuth == false) ...{
                           const SizedBox(height: 16),
                           BaseButtonIcon(
-                            bgColor: AppColors.pinkColor,
                             label: 'Masuk',
                             icon: MingCute.fingerprint_line,
-                            onPressed: _didBiometricsAuth,
+                            onPressed: () {
+                              _didBiometricsAuth(isLoggedIn: _isLoggedIn);
+                            },
                           ),
                         },
                       ],
@@ -288,7 +343,7 @@ class _SplashPageState extends State<SplashPage> {
                     child: Column(
                       children: [
                         Text(
-                          'Panduan Versi 1.0.0',
+                          '$_appName Versi $_appVersion',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
