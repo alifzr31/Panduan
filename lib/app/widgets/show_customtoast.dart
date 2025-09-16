@@ -26,7 +26,7 @@ void showCustomToast(
             overflow: TextOverflow.ellipsis,
             style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
           ),
-    alignment: Alignment.bottomCenter,
+    alignment: Alignment.topCenter,
     autoCloseDuration: const Duration(seconds: 5),
     borderRadius: BorderRadius.circular(10),
     boxShadow: lowModeShadow,
