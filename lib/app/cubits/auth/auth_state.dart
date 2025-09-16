@@ -9,6 +9,7 @@ class AuthState extends Equatable {
   final Response? loginResponse;
   final String? loginError;
   final LogoutStatus logoutStatus;
+  final Response? logoutResponse;
   final String? logoutError;
 
   const AuthState({
@@ -16,6 +17,7 @@ class AuthState extends Equatable {
     this.loginResponse,
     this.loginError,
     this.logoutStatus = LogoutStatus.initial,
+    this.logoutResponse,
     this.logoutError,
   });
 
@@ -24,6 +26,7 @@ class AuthState extends Equatable {
     Response? loginResponse,
     String? loginError,
     LogoutStatus? logoutStatus,
+    Response? logoutResponse,
     String? logoutError,
   }) {
     return AuthState(
@@ -31,6 +34,7 @@ class AuthState extends Equatable {
       loginResponse: loginResponse,
       loginError: loginError,
       logoutStatus: logoutStatus ?? this.logoutStatus,
+      logoutResponse: loginResponse,
       logoutError: logoutError,
     );
   }
@@ -41,6 +45,7 @@ class AuthState extends Equatable {
     loginResponse,
     loginError,
     logoutStatus,
+    logoutResponse,
     logoutError,
   ];
 }
