@@ -60,6 +60,7 @@ class LoginPage extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
+                        fontWeight: FontWeight.w500,
                         color: Colors.grey.shade600,
                       ),
                     ),
