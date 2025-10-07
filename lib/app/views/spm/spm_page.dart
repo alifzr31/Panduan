@@ -90,7 +90,7 @@ class _SpmPageState extends State<SpmPage> {
           status: widget.status,
         )
         .then((value) {
-          // _spmScrollController.addListener(_onScrollSpm);
+          _spmScrollController.addListener(_onScrollSpm);
         });
     super.initState();
   }
