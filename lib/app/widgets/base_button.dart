@@ -6,7 +6,7 @@ class BaseButton extends StatelessWidget {
     required this.label,
     this.labelSize,
     this.onPressed,
-    this.bgColor = AppColors.primaryColor,
+    this.bgColor = AppColors.blueColor,
     this.fgColor,
     super.key,
   });
@@ -48,8 +48,8 @@ class BaseOutlineButton extends StatelessWidget {
     required this.label,
     this.labelSize,
     this.onPressed,
-    this.borderColor = AppColors.primaryColor,
-    this.fgColor,
+    this.borderColor = AppColors.blueColor,
+    this.fgColor = AppColors.blueColor,
     super.key,
   });
 
@@ -57,7 +57,7 @@ class BaseOutlineButton extends StatelessWidget {
   final double? labelSize;
   final void Function()? onPressed;
   final Color borderColor;
-  final Color? fgColor;
+  final Color fgColor;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +91,7 @@ class BaseButtonIcon extends StatelessWidget {
     required this.label,
     this.iconSize,
     this.labelSize,
-    this.bgColor = AppColors.primaryColor,
+    this.bgColor = AppColors.blueColor,
     this.fgColor,
     this.onPressed,
     super.key,
@@ -144,8 +144,8 @@ class BaseOutlineButtonIcon extends StatelessWidget {
     required this.label,
     this.iconSize,
     this.labelSize,
-    this.borderColor = AppColors.primaryColor,
-    this.fgColor,
+    this.borderColor = AppColors.blueColor,
+    this.fgColor = AppColors.blueColor,
     this.onPressed,
     super.key,
   });
@@ -155,7 +155,7 @@ class BaseOutlineButtonIcon extends StatelessWidget {
   final double? iconSize;
   final double? labelSize;
   final Color borderColor;
-  final Color? fgColor;
+  final Color fgColor;
   final void Function()? onPressed;
 
   @override
@@ -164,7 +164,7 @@ class BaseOutlineButtonIcon extends StatelessWidget {
       style: ButtonStyle(
         foregroundColor: WidgetStatePropertyAll(fgColor),
         iconColor: WidgetStatePropertyAll(fgColor),
-        overlayColor: WidgetStatePropertyAll(fgColor?.withValues(alpha: 0.1)),
+        overlayColor: WidgetStatePropertyAll(fgColor.withValues(alpha: 0.1)),
         side: WidgetStatePropertyAll(
           BorderSide(width: 1.3, color: borderColor),
         ),

@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/dio/interceptors.dart';
-import 'package:panduan/app/utils/app_env.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 abstract class DioClient {
   late Dio dio;
+  String get baseUrl;
 
   DioClient() {
     dio = Dio();
@@ -14,10 +14,10 @@ abstract class DioClient {
   }
 
   void configureDio() {
-    dio.options.baseUrl = AppEnv.baseUrl;
-    dio.options.headers = AppHelpers.addOnHeaders();
+    dio.options.baseUrl = baseUrl;
     dio.options.connectTimeout = const Duration(minutes: 5);
     dio.options.receiveTimeout = const Duration(minutes: 5);
+    dio.options.headers.addAll(AppHelpers.addOnHeaders());
     dio.interceptors.add(DioInterceptors());
     if (kDebugMode) {
       dio.interceptors.add(
@@ -92,12 +92,32 @@ abstract class DioClient {
     }
   }
 
-  Future<Response> downloadFile(
+  Future<Response> delete(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParams,
+    Map<String, dynamic>? headers,
+  }) async {
+    try {
+      final response = await dio.delete(
+        path,
+        data: data,
+        queryParameters: queryParams,
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<Response> download(
     String urlPath,
     String savedPath, {
     Map<String, dynamic>? queryParams,
     Map<String, dynamic>? headers,
-    Function? progressCallback,
+    void Function(int count, int total)? onReceiveProgress,
   }) async {
     try {
       final response = await dio.download(
@@ -105,9 +125,7 @@ abstract class DioClient {
         savedPath,
         queryParameters: queryParams,
         options: Options(headers: headers),
-        onReceiveProgress: (count, total) {
-          progressCallback!(count, total);
-        },
+        onReceiveProgress: onReceiveProgress,
       );
 
       return response;

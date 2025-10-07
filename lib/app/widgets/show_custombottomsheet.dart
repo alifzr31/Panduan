@@ -57,18 +57,18 @@ void showCustomBottomSheet(
   );
 }
 
-void showDynamicHeightBottomSheet(
+Future<Object?> showDynamicHeightBottomSheet(
   BuildContext context, {
   bool enableDrag = true,
-  Widget? child,
+  required Widget child,
 }) {
-  showModalBottomSheet(
+  return showModalBottomSheet(
     clipBehavior: Clip.antiAlias,
     elevation: 2,
     isDismissible: false,
     isScrollControlled: true,
     enableDrag: enableDrag,
-    backgroundColor: AppColors.backgroundColor,
+    backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(10),
@@ -106,7 +106,10 @@ void showDynamicHeightBottomSheet(
                   padding: const EdgeInsets.only(top: 16),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxHeight: maxHeight),
-                    child: child,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: SafeArea(top: false, child: child),
+                    ),
                   ),
                 ),
               ],

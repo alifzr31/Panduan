@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -23,6 +24,25 @@ class _LoginFormState extends State<LoginForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePass = true;
+
+  @override
+  void initState() {
+    if (kDebugMode) {
+      // _emailController.text = 'superadmin160925@diskominfo.com';
+      // _passwordController.text = 'D16Sk0m09In25FO';
+      // _emailController.text = 'Posyandukebongedangaster';
+      // _passwordController.text = 'DuA11@!9';
+      // _emailController.text = 'kelurahan.kebongedang';
+      // _passwordController.text = 'DIna4pe#';
+      // _emailController.text = 'kecamatan.batununggal';
+      // _passwordController.text = 'CIreBON@';
+      // _emailController.text = 'opd.disdik';
+      // _passwordController.text = '@entanG2';
+      _emailController.text = 'walikota@posyandu.com';
+      _passwordController.text = 'walikota123';
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

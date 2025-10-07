@@ -11,6 +11,7 @@ import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/widgets/base_listtile.dart';
+import 'package:panduan/app/widgets/base_skeletonizer.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
 import 'package:toastification/toastification.dart';
 
@@ -50,32 +51,112 @@ class DashboardEndDrawer extends StatelessWidget {
             DrawerHeader(
               padding: const EdgeInsets.all(16),
               margin: EdgeInsets.zero,
-              decoration: const BoxDecoration(color: AppColors.greenColor),
+              decoration: const BoxDecoration(color: AppColors.blueColor),
               child: SizedBox(
                 width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hai,',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade100,
-                      ),
-                    ),
-                    const Text(
-                      'Pengguna Panduan',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                child: BlocBuilder<AuthCubit, AuthState>(
+                  builder: (context, state) {
+                    switch (state.profileStatus) {
+                      case ProfileStatus.success:
+                        return Row(
+                          children: [
+                            const Icon(
+                              MingCute.user_4_fill,
+                              size: 66,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Selamat Datang!',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    state.profile?.name ?? '',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    state.profile?.email ?? '',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      default:
+                        return Row(
+                          children: [
+                            const Icon(
+                              MingCute.user_4_fill,
+                              size: 66,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Selamat Datang!',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const BaseSkeletonizer(
+                                    child: Text(
+                                      'xxxxxxxxxxxxxx',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  BaseSkeletonizer(
+                                    child: Text(
+                                      'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                    }
+                  },
                 ),
               ),
             ),
@@ -121,12 +202,12 @@ class DashboardEndDrawer extends StatelessWidget {
                           : Transform.scale(
                               scale: 0.6,
                               child: Switch(
-                                activeThumbColor: const Color(0xFFE2E6FC),
-                                activeTrackColor: AppColors.blueColor,
-                                inactiveThumbColor: AppColors.blueColor,
-                                inactiveTrackColor: const Color(0xFFE2E6FC),
+                                activeThumbColor: AppColors.softPinkColor,
+                                activeTrackColor: AppColors.pinkColor,
+                                inactiveThumbColor: AppColors.pinkColor,
+                                inactiveTrackColor: AppColors.softPinkColor,
                                 trackOutlineColor: const WidgetStatePropertyAll(
-                                  AppColors.blueColor,
+                                  AppColors.pinkColor,
                                 ),
                                 value: biometricsEnabled,
                                 onChanged: onChangedBiometrics,

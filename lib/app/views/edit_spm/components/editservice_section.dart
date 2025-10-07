@@ -1,0 +1,98 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
+import 'package:panduan/app/models/service_type.dart';
+import 'package:panduan/app/widgets/base_dropdownfield.dart';
+import 'package:panduan/app/widgets/base_formfield.dart';
+
+class EditServiceSection extends StatelessWidget {
+  const EditServiceSection({
+    required this.selectedServiceCategory,
+    required this.onSelectedServiceCategory,
+    required this.serviceTypes,
+    required this.selectedServiceType,
+    required this.onSelectedServiceType,
+    required this.reportDescriptionController,
+    super.key,
+  });
+
+  final String? selectedServiceCategory;
+  final void Function(Object?)? onSelectedServiceCategory;
+  final List<ServiceType> serviceTypes;
+  final String? selectedServiceType;
+  final void Function(Object?)? onSelectedServiceType;
+  final TextEditingController reportDescriptionController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        BlocBuilder<EditSpmCubit, EditSpmState>(
+          builder: (context, state) {
+            return BaseDropdownGroupField(
+              label: 'Kategori Layanan',
+              hint: state.serviceCategoryStatus == ServiceCategoryStatus.success
+                  ? 'Pilih kategori layanan'
+                  : 'Mohon tunggu...',
+              mandatory: true,
+              value: selectedServiceCategory,
+              items:
+                  state.serviceCategoryStatus == ServiceCategoryStatus.success
+                  ? state.serviceCategories.map((e) {
+                      return DropdownMenuItem(
+                        value: e.uuid,
+                        child: Text(e.name ?? ''),
+                      );
+                    }).toList()
+                  : const [],
+              onChanged: onSelectedServiceCategory,
+              validator: (value) {
+                if (selectedServiceCategory == null) {
+                  return 'Silahkan pilih kategori layanan';
+                }
+
+                return null;
+              },
+            );
+          },
+        ),
+        const SizedBox(height: 10),
+        BaseDropdownGroupField(
+          label: 'Jenis Pelayanan',
+          hint: 'Pilih jenis pelayanan',
+          mandatory: true,
+          value: selectedServiceType,
+          items: serviceTypes.map((e) {
+            return DropdownMenuItem(
+              value: e.nameEnglish,
+              child: Text(e.nameIndonesian ?? ''),
+            );
+          }).toList(),
+          onChanged: onSelectedServiceType,
+          validator: (value) {
+            if (selectedServiceType == null) {
+              return 'Silahkan pilih jenis pelayanan';
+            }
+
+            return null;
+          },
+        ),
+        const SizedBox(height: 10),
+        BaseFormGroupField(
+          label: 'Keluhan/Usulan/Pengaduan',
+          hint: 'Masukkan keluhan/usulan/pengaduan',
+          mandatory: true,
+          controller: reportDescriptionController,
+          maxLines: 4,
+          validator: (value) {
+            if (value!.isEmpty) {
+              return 'Silahkan masukkan keluhan/usulan/pengaduan';
+            }
+
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+}

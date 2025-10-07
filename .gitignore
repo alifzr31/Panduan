@@ -47,3 +47,4 @@ app.*.map.json
 # Custom Ignore
 command_list.txt
 /lib/app/utils/app_env.dart
+/lib/tes_page.dart

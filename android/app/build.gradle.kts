@@ -72,9 +72,10 @@ flutter {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("com.google.android.material:material:1.13.0")
-    implementation("androidx.window:window:1.4.0")
-    implementation("androidx.window:window-java:1.4.0")
+    implementation("androidx.window:window:1.5.0")
+    implementation("androidx.window:window-java:1.5.0")
     implementation("androidx.multidex:multidex:2.0.1")
-    implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging")
 }

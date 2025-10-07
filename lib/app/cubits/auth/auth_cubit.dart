@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/secure_storage/secure_storage.dart';
+import 'package:panduan/app/models/profile.dart';
 import 'package:panduan/app/repositories/auth_repository.dart';
 import 'package:panduan/app/utils/app_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,17 +15,23 @@ class AuthCubit extends Cubit<AuthState> {
 
   final AuthRepository _repository;
 
-  void resetState() {
-    emit(
-      state.copyWith(
-        loginStatus: LoginStatus.initial,
-        loginResponse: null,
-        loginError: null,
-        logoutStatus: LogoutStatus.initial,
-        logoutResponse: null,
-        logoutError: null,
-      ),
-    );
+  void resetState() async {
+    await Future.delayed(const Duration(milliseconds: 500), () {
+      emit(
+        state.copyWith(
+          authStatus: AuthStatus.initial,
+          loginStatus: LoginStatus.initial,
+          loginResponse: null,
+          loginError: null,
+          profileStatus: ProfileStatus.initial,
+          profile: null,
+          profileError: null,
+          logoutStatus: LogoutStatus.initial,
+          logoutResponse: null,
+          logoutError: null,
+        ),
+      );
+    });
   }
 
   void login({String? email, String? password}) async {
@@ -71,10 +79,107 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> fetchProfile() async {
+    emit(state.copyWith(profileStatus: ProfileStatus.loading));
+
+    try {
+      final profile = await _repository.fetchProfile();
+
+      emit(
+        state.copyWith(
+          authStatus: AuthStatus.authorized,
+          profileStatus: ProfileStatus.success,
+          profile: profile,
+          userPermissions: profile?.permissions?.map((e) {
+            return e.name ?? '';
+          }).toList(),
+        ),
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        refreshToken();
+      } else {
+        emit(
+          state.copyWith(
+            profileStatus: ProfileStatus.error,
+            profileError:
+                e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          ),
+        );
+      }
+    }
+  }
+
+  void refetchProfile() async {
+    emit(
+      state.copyWith(
+        profileStatus: ProfileStatus.initial,
+        profile: null,
+        userPermissions: const [],
+        profileError: null,
+      ),
+    );
+
+    await fetchProfile();
+  }
+
+  Future<void> refreshProfile() async {
+    await Future.delayed(const Duration(milliseconds: 2500), refetchProfile);
+  }
+
+  void refreshToken() async {
+    emit(state.copyWith(authStatus: AuthStatus.loading));
+
+    try {
+      final response = await _repository.refreshToken();
+
+      if (response.data['status']) {
+        await Future.wait([
+          SecureStorage.writeStorage(
+            key: AppStrings.accessToken,
+            value: response.data['data']['access_token'],
+          ),
+          SecureStorage.writeStorage(
+            key: AppStrings.refreshToken,
+            value: response.data['data']['refresh_token'],
+          ),
+        ]);
+        emit(state.copyWith(authStatus: AuthStatus.authorized));
+        refetchProfile();
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        logoutSession();
+      } else {
+        if (kDebugMode) print(e.response?.data);
+      }
+    }
+  }
+
+  void logoutSession() async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+
+    await Future.wait([
+      SecureStorage.deleteStorage(key: AppStrings.accessToken),
+      SecureStorage.deleteStorage(key: AppStrings.refreshToken),
+      sharedPreferences.setBool('biometrics_enabled', false),
+    ]);
+    await sharedPreferences.reload();
+
+    emit(state.copyWith(authStatus: AuthStatus.unauthorized));
+  }
+
   void logout() async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
-    emit(state.copyWith(logoutStatus: LogoutStatus.loading));
+    emit(
+      state.copyWith(
+        profile: state.profile,
+        userPermissions: state.userPermissions,
+        logoutStatus: LogoutStatus.loading,
+      ),
+    );
 
     try {
       final response = await _repository.logout();
@@ -89,6 +194,8 @@ class AuthCubit extends Cubit<AuthState> {
 
         emit(
           state.copyWith(
+            profile: state.profile,
+            userPermissions: state.userPermissions,
             logoutStatus: LogoutStatus.success,
             logoutResponse: response,
           ),
@@ -96,6 +203,8 @@ class AuthCubit extends Cubit<AuthState> {
       } else {
         emit(
           state.copyWith(
+            profile: state.profile,
+            userPermissions: state.userPermissions,
             logoutStatus: LogoutStatus.error,
             logoutError: response.data['message'],
           ),
@@ -104,6 +213,8 @@ class AuthCubit extends Cubit<AuthState> {
     } on DioException catch (e) {
       emit(
         state.copyWith(
+          profile: state.profile,
+          userPermissions: state.userPermissions,
           logoutStatus: LogoutStatus.error,
           logoutError:
               e.response?.data['message'] ?? AppStrings.errorApiMessage,

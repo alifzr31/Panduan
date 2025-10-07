@@ -10,6 +10,7 @@ class BaseFormField extends StatelessWidget {
     this.focusNode,
     this.prefixIcon,
     this.suffixIcon,
+    this.expands = false,
     this.obscureText = false,
     this.keyboardType,
     this.textInputAction,
@@ -23,7 +24,7 @@ class BaseFormField extends StatelessWidget {
     this.readOnly = false,
     this.isDate = false,
     this.hintColor,
-    this.borderColor,
+    this.fillColor = AppColors.greyFormField,
     this.initialValue,
     this.inputFormatters,
   });
@@ -33,6 +34,7 @@ class BaseFormField extends StatelessWidget {
   final FocusNode? focusNode;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final bool expands;
   final bool obscureText;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
@@ -47,7 +49,7 @@ class BaseFormField extends StatelessWidget {
   final bool readOnly;
   final bool isDate;
   final Color? hintColor;
-  final Color? borderColor;
+  final Color fillColor;
   final void Function()? onTap;
 
   @override
@@ -57,7 +59,7 @@ class BaseFormField extends StatelessWidget {
       focusNode: focusNode,
       maxLines: maxLines,
       maxLength: maxLength,
-      cursorColor: AppColors.amberColor,
+      cursorColor: AppColors.blueColor,
       style: TextStyle(
         fontSize: 14,
         color: readOnly ? Colors.grey.shade500 : null,
@@ -106,7 +108,7 @@ class BaseFormField extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: AppColors.blueColor),
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
         errorBorder: OutlineInputBorder(
@@ -114,8 +116,9 @@ class BaseFormField extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(8)),
         ),
         filled: true,
-        fillColor: AppColors.greyFormField,
+        fillColor: fillColor,
       ),
+      expands: expands,
       obscureText: obscureText,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
@@ -139,6 +142,7 @@ class BaseFormGroupField extends StatelessWidget {
     this.focusNode,
     this.prefixIcon,
     this.suffixIcon,
+    this.expands = false,
     this.obscureText = false,
     this.keyboardType,
     this.textInputAction,
@@ -147,6 +151,7 @@ class BaseFormGroupField extends StatelessWidget {
     this.validator,
     this.helperText,
     this.helperTextColor,
+    this.fillColor = AppColors.greyFormField,
     this.onChanged,
     this.onTap,
     this.readOnly = false,
@@ -162,6 +167,7 @@ class BaseFormGroupField extends StatelessWidget {
   final FocusNode? focusNode;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final bool expands;
   final bool obscureText;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
@@ -170,6 +176,7 @@ class BaseFormGroupField extends StatelessWidget {
   final String? Function(String?)? validator;
   final String? helperText;
   final Color? helperTextColor;
+  final Color fillColor;
   final void Function(String?)? onChanged;
   final String? initialValue;
   final List<TextInputFormatter>? inputFormatters;
@@ -213,7 +220,7 @@ class BaseFormGroupField extends StatelessWidget {
           focusNode: focusNode,
           maxLines: maxLines,
           maxLength: maxLength,
-          cursorColor: AppColors.amberColor,
+          cursorColor: AppColors.blueColor,
           style: TextStyle(
             fontSize: 14,
             color: readOnly ? Colors.grey.shade500 : null,
@@ -262,7 +269,7 @@ class BaseFormGroupField extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(color: AppColors.blueColor),
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             errorBorder: OutlineInputBorder(
@@ -270,8 +277,9 @@ class BaseFormGroupField extends StatelessWidget {
               borderRadius: const BorderRadius.all(Radius.circular(8)),
             ),
             filled: true,
-            fillColor: AppColors.greyFormField,
+            fillColor: fillColor,
           ),
+          expands: expands,
           obscureText: obscureText,
           keyboardType: keyboardType,
           textInputAction: textInputAction,

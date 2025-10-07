@@ -1,8 +1,8 @@
 ##############################################
 ## Project-specific keep rules
 ##############################################
--keep class com.example.dbdtbc.** { *; }
--keep class com.example.dbdtbc.models.** { *; }
+-keep class gov.bdg.panduan.** { *; }
+-keep class gov.bdg.panduan.models.** { *; }
 
 ##############################################
 ## Android core
@@ -113,6 +113,36 @@
 ## Toastification
 ##############################################
 -keep class com.toastification.** { *; }
+
+##############################################
+## image_picker
+##############################################
+-keep class io.flutter.plugins.imagepicker.** { *; }
+
+##############################################
+## file_picker
+##############################################
+-keep class com.mr.flutter.plugin.filepicker.** { *; }
+
+##############################################
+## webview_flutter
+##############################################
+# Keep WebView related classes
+-keep class android.webkit.WebView { *; }
+-keep class android.webkit.WebViewClient { *; }
+-keep class android.webkit.WebChromeClient { *; }
+-keep class android.webkit.WebResourceRequest { *; }
+-keep class android.webkit.WebResourceResponse { *; }
+
+# Keep JavaScript interfaces
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+# Prevent stripping of console logs / JS bridge
+-keepclassmembers class * extends android.webkit.WebChromeClient {
+    public void onConsoleMessage(...);
+}
 
 ##############################################
 ## Misc

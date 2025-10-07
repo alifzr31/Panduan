@@ -63,8 +63,10 @@ class DioInterceptors extends InterceptorsWrapper {
     );
 
     if (accessToken != null) {
-      final authHeader = {'Authorization': 'Bearer $accessToken'};
-      options.headers.addEntries(authHeader.entries);
+      if (options.path != '/refresh-token') {
+        final authHeader = {'Authorization': 'Bearer $accessToken'};
+        options.headers.addEntries(authHeader.entries);
+      }
     }
 
     handler.next(options);
