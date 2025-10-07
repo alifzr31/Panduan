@@ -64,7 +64,12 @@ class _NotificationPageState extends State<NotificationPage> {
         actionsPadding: const EdgeInsets.only(right: 16),
         actions:
             context.watch<NotificationCubit>().state.listStatus ==
-                ListStatus.success
+                    ListStatus.success &&
+                context
+                    .watch<NotificationCubit>()
+                    .state
+                    .notifications
+                    .isNotEmpty
             ? [
                 BlocListener<NotificationCubit, NotificationState>(
                   listenWhen: (previous, current) =>
@@ -153,34 +158,48 @@ class _NotificationPageState extends State<NotificationPage> {
                             ? state.notifications.length + 1
                             : state.notifications.length,
                         itemBuilder: (context, index) {
-                          return index >= state.notifications.length
-                              ? const BaseLoadScroll()
-                              : NotificationCard(
-                                  title:
-                                      state.notifications[index].data?.title ??
-                                      '',
-                                  description:
-                                      state.notifications[index].data?.body ??
-                                      '',
-                                  readAt: state.notifications[index].readAt,
-                                  createdAt:
-                                      state.notifications[index].createdAt ??
-                                      DateTime(0000),
-                                  numbering:
-                                      state.notifications[index].numbering ?? 0,
-                                  index: index,
-                                  dataLength: state.notifications.length,
-                                  onTap: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      DetailSpmPage.routeName,
-                                      arguments: state
-                                          .notifications[index]
-                                          .data
-                                          ?.featureableUuid,
-                                    );
-                                  },
-                                );
+                          return SafeArea(
+                            top: false,
+                            bottom: state.hasMoreNotification
+                                ? index == state.notifications.length
+                                      ? true
+                                      : false
+                                : index == state.notifications.length - 1
+                                ? true
+                                : false,
+                            child: index >= state.notifications.length
+                                ? const BaseLoadScroll()
+                                : NotificationCard(
+                                    title:
+                                        state
+                                            .notifications[index]
+                                            .data
+                                            ?.title ??
+                                        '',
+                                    description:
+                                        state.notifications[index].data?.body ??
+                                        '',
+                                    readAt: state.notifications[index].readAt,
+                                    createdAt:
+                                        state.notifications[index].createdAt ??
+                                        DateTime(0000),
+                                    numbering:
+                                        state.notifications[index].numbering ??
+                                        0,
+                                    index: index,
+                                    dataLength: state.notifications.length,
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        DetailSpmPage.routeName,
+                                        arguments: state
+                                            .notifications[index]
+                                            .data
+                                            ?.featureableUuid,
+                                      );
+                                    },
+                                  ),
+                          );
                         },
                       ),
                     );
