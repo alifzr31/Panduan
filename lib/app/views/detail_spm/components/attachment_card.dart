@@ -8,8 +8,9 @@ class AttachmentCard extends StatelessWidget {
   const AttachmentCard({
     required this.title,
     required this.fileName,
+    required this.filePath,
     required this.checklist,
-    this.onPressedDownload,
+    this.onPressedShowFile,
     this.index,
     this.dataLength,
     super.key,
@@ -17,8 +18,9 @@ class AttachmentCard extends StatelessWidget {
 
   final String title;
   final String fileName;
+  final String? filePath;
   final bool checklist;
-  final void Function()? onPressedDownload;
+  final void Function()? onPressedShowFile;
   final int? index;
   final int? dataLength;
 
@@ -33,67 +35,88 @@ class AttachmentCard extends StatelessWidget {
         side: BorderSide(color: Colors.grey.shade300),
         borderRadius: BorderRadiusGeometry.circular(8),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            const Icon(MingCute.attachment_2_line, size: 22),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppHelpers.showSpmAttachmentLabel(key: title),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+      child: InkWell(
+        onTap: filePath == null ? null : onPressedShowFile,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              const Icon(MingCute.attachment_2_line, size: 22),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppHelpers.showSpmAttachmentLabel(key: title),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  Text(
-                    checklist
-                        ? 'Anda memberi tanda ceklis pada file ini'
-                        : fileName,
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
-                ],
+                    if (checklist)
+                      Text(
+                        filePath == null ? 'File tidak tersedia' : fileName,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            if (checklist) ...{
-              Container(
+              const SizedBox(width: 8),
+              Ink(
                 padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  color: AppColors.softGreenColor,
+                decoration: BoxDecoration(
+                  color: checklist
+                      ? AppColors.softGreenColor
+                      : AppColors.softRedColor,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  MingCute.checkbox_fill,
+                child: Icon(
+                  checklist
+                      ? MingCute.checkbox_fill
+                      : MingCute.close_circle_fill,
                   size: 18,
-                  color: AppColors.greenColor,
+                  color: checklist ? AppColors.greenColor : AppColors.redColor,
                 ),
               ),
-            } else ...{
-              CupertinoButton(
-                alignment: Alignment.center,
-                minimumSize: Size.zero,
-                padding: EdgeInsets.zero,
-                onPressed: onPressedDownload,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: AppColors.softBlueColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    MingCute.eye_2_fill,
-                    size: 18,
-                    color: AppColors.blueColor,
-                  ),
-                ),
-              ),
-            },
-          ],
+              // if (checklist) ...{
+              //   Container(
+              //     padding: const EdgeInsets.all(6),
+              //     decoration: const BoxDecoration(
+              //       color: AppColors.softGreenColor,
+              //       shape: BoxShape.circle,
+              //     ),
+              //     child: const Icon(
+              //       MingCute.checkbox_fill,
+              //       size: 18,
+              //       color: AppColors.greenColor,
+              //     ),
+              //   ),
+              // } else ...{
+              //   CupertinoButton(
+              //     alignment: Alignment.center,
+              //     minimumSize: Size.zero,
+              //     padding: EdgeInsets.zero,
+              //     onPressed: onPressedShowFile,
+              //     child: Container(
+              //       padding: const EdgeInsets.all(6),
+              //       decoration: const BoxDecoration(
+              //         color: AppColors.softBlueColor,
+              //         shape: BoxShape.circle,
+              //       ),
+              //       child: const Icon(
+              //         MingCute.eye_2_fill,
+              //         size: 18,
+              //         color: AppColors.blueColor,
+              //       ),
+              //     ),
+              //   ),
+              // },
+            ],
+          ),
         ),
       ),
     );

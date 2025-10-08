@@ -246,10 +246,11 @@ class ReportSection extends StatelessWidget {
                   return AttachmentCard(
                     title: attachment.title ?? '',
                     fileName: attachment.nameFile ?? '',
+                    filePath: attachment.path,
                     checklist: attachment.checklist ?? false,
                     index: index,
                     dataLength: attachments.length,
-                    onPressedDownload: () {
+                    onPressedShowFile: () {
                       Navigator.pushNamed(
                         context,
                         WebviewPage.routeName,
