@@ -56,7 +56,7 @@ class LoginPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Pelayanan 6 SPM Bidang Pelayanan Posyandu Kota Bandung',
+                      'Pelayanan 6 SPM Posyandu Kota Bandung',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
