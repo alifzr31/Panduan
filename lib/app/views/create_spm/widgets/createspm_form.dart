@@ -340,7 +340,7 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                           !_checkListAttachments[index];
                     });
 
-                    if (_checkListAttachments[index] &&
+                    if (!_checkListAttachments[index] &&
                         _attachmentPaths.isNotEmpty) {
                       _attachmentPaths.remove(_spmAttachments[index].key);
                       _attachmentControllers[index].clear();
@@ -353,6 +353,7 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                       _attachmentControllers[index].text = file.name;
                       _attachmentPaths[_spmAttachments[index].key ?? ''] =
                           filePath ?? '';
+                      _checkListAttachments[index] = true;
                     });
                   },
                 ),

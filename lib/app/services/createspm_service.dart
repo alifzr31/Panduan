@@ -117,9 +117,8 @@ class CreateSpmService extends DioClient {
             'file[$i]': await MultipartFile.fromFile(
               attachmentPaths?[attachments[i].key] ?? '',
             ),
-          } else ...{
-            'checklist[$i]': (checklistAttachments?[i] ?? false) ? 1 : 0,
           },
+          'checklist[$i]': (checklistAttachments?[i] ?? false) ? 1 : 0,
         },
       },
     });

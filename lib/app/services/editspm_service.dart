@@ -85,9 +85,8 @@ class EditSpmService extends DioClient {
             'file[$i]': await MultipartFile.fromFile(
               attachmentPaths?[spmAttachments[i].key] ?? '',
             ),
-          } else ...{
-            'checklist[$i]': (checklistAttachments?[i] ?? false) ? 1 : 0,
           },
+          'checklist[$i]': (checklistAttachments?[i] ?? false) ? 1 : 0,
         },
       },
     });

@@ -97,18 +97,6 @@ class SecondSection extends StatelessWidget {
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  if (!(spmAttachments[index].label?.contains(
-                                        'jika ada',
-                                      ) ??
-                                      false))
-                                    TextSpan(
-                                      text: '*',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.red.shade700,
-                                      ),
-                                    ),
                                 ],
                               ),
                             ),
@@ -118,83 +106,55 @@ class SecondSection extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: BaseFormField(
-                                  hint: checkListAttachments[index]
-                                      ? 'Terpenuhi'
-                                      : spmAttachments[index].key ==
-                                            'location_coordinates'
+                                  hint:
+                                      spmAttachments[index].key ==
+                                          'location_coordinates'
                                       ? 'Tentukan tiitk koordinat lokasi'
                                       : 'Pilih file (jpg, jpeg, png, pdf)',
                                   controller: attachmentControllers[index],
                                   isDate: true,
-                                  onTap: checkListAttachments[index]
-                                      ? null
-                                      : () async {
-                                          if (spmAttachments[index].key ==
-                                              'location_coordinates') {
-                                            final result =
-                                                await Navigator.pushNamed(
-                                                  context,
-                                                  MapCoordinatePage.routeName,
-                                                  arguments:
-                                                      latitude == null &&
-                                                          longitude == null
-                                                      ? null
-                                                      : {
-                                                          'latitude': latitude,
-                                                          'longitude':
-                                                              longitude,
-                                                        },
-                                                );
+                                  onTap: () async {
+                                    if (spmAttachments[index].key ==
+                                        'location_coordinates') {
+                                      final result = await Navigator.pushNamed(
+                                        context,
+                                        MapCoordinatePage.routeName,
+                                        arguments:
+                                            latitude == null &&
+                                                longitude == null
+                                            ? null
+                                            : {
+                                                'latitude': latitude,
+                                                'longitude': longitude,
+                                              },
+                                      );
 
-                                            if (result != null) {
-                                              final coordinate =
-                                                  result as LatLng;
+                                      if (result != null) {
+                                        final coordinate = result as LatLng;
 
-                                              onSelectedCoordinate(
-                                                coordinate,
-                                                index,
-                                              );
-                                            }
-                                          } else {
-                                            final pickedFile = await FilePicker
-                                                .platform
-                                                .pickFiles(
-                                                  type: FileType.custom,
-                                                  allowedExtensions: [
-                                                    'jpg',
-                                                    'jpeg',
-                                                    'png',
-                                                    'pdf',
-                                                  ],
-                                                );
+                                        onSelectedCoordinate(coordinate, index);
+                                      }
+                                    } else {
+                                      final pickedFile = await FilePicker
+                                          .platform
+                                          .pickFiles(
+                                            type: FileType.custom,
+                                            allowedExtensions: [
+                                              'jpg',
+                                              'jpeg',
+                                              'png',
+                                              'pdf',
+                                            ],
+                                          );
 
-                                            if (pickedFile != null) {
-                                              onPickedFile(
-                                                pickedFile.files.single,
-                                                index,
-                                              );
-                                            }
-                                          }
-                                        },
-                                  validator:
-                                      spmAttachments[index].label?.contains(
-                                            'jika ada',
-                                          ) ??
-                                          false
-                                      ? null
-                                      : (value) {
-                                          if (!checkListAttachments[index]) {
-                                            if (value!.isEmpty) {
-                                              return spmAttachments[index]
-                                                          .key ==
-                                                      'location_coordinates'
-                                                  ? 'Silahkan tentukan ${spmAttachments[index].label}'
-                                                  : 'Silahkan pilih file ${spmAttachments[index].label}';
-                                            }
-                                          }
-
-                                          return null;
-                                        },
+                                      if (pickedFile != null) {
+                                        onPickedFile(
+                                          pickedFile.files.single,
+                                          index,
+                                        );
+                                      }
+                                    }
+                                  },
                                 ),
                               ),
                               if (spmAttachments[index].key !=

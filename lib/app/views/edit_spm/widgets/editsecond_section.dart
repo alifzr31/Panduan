@@ -125,78 +125,71 @@ class EditSecondSection extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: BaseFormField(
-                                      hint: checkListAttachments[index]
-                                          ? 'Terpenuhi'
-                                          : spmAttachments
-                                                    .where((element) {
-                                                      return element.key !=
-                                                          'location_coordinates';
-                                                    })
-                                                    .toList()[index]
-                                                    .key ==
-                                                'location_coordinates'
+                                      hint:
+                                          spmAttachments
+                                                  .where((element) {
+                                                    return element.key !=
+                                                        'location_coordinates';
+                                                  })
+                                                  .toList()[index]
+                                                  .key ==
+                                              'location_coordinates'
                                           ? 'Tentukan tiitk koordinat lokasi'
                                           : 'Pilih file (jpg, jpeg, png, pdf)',
                                       controller: attachmentControllers[index],
                                       isDate: true,
-                                      onTap: checkListAttachments[index]
-                                          ? null
-                                          : () async {
-                                              if (spmAttachments
-                                                      .where((element) {
-                                                        return element.key !=
-                                                            'location_coordinates';
-                                                      })
-                                                      .toList()[index]
-                                                      .key ==
-                                                  'location_coordinates') {
-                                                final result =
-                                                    await Navigator.pushNamed(
-                                                      context,
-                                                      MapCoordinatePage
-                                                          .routeName,
-                                                      arguments:
-                                                          latitude == null &&
-                                                              longitude == null
-                                                          ? null
-                                                          : {
-                                                              'latitude':
-                                                                  latitude,
-                                                              'longitude':
-                                                                  longitude,
-                                                            },
-                                                    );
+                                      onTap: () async {
+                                        if (spmAttachments
+                                                .where((element) {
+                                                  return element.key !=
+                                                      'location_coordinates';
+                                                })
+                                                .toList()[index]
+                                                .key ==
+                                            'location_coordinates') {
+                                          final result =
+                                              await Navigator.pushNamed(
+                                                context,
+                                                MapCoordinatePage.routeName,
+                                                arguments:
+                                                    latitude == null &&
+                                                        longitude == null
+                                                    ? null
+                                                    : {
+                                                        'latitude': latitude,
+                                                        'longitude': longitude,
+                                                      },
+                                              );
 
-                                                if (result != null) {
-                                                  final coordinate =
-                                                      result as LatLng;
+                                          if (result != null) {
+                                            final coordinate = result as LatLng;
 
-                                                  onSelectedCoordinate(
-                                                    coordinate,
-                                                    index,
-                                                  );
-                                                }
-                                              } else {
-                                                final pickedFile =
-                                                    await FilePicker.platform
-                                                        .pickFiles(
-                                                          type: FileType.custom,
-                                                          allowedExtensions: [
-                                                            'jpg',
-                                                            'jpeg',
-                                                            'png',
-                                                            'pdf',
-                                                          ],
-                                                        );
+                                            onSelectedCoordinate(
+                                              coordinate,
+                                              index,
+                                            );
+                                          }
+                                        } else {
+                                          final pickedFile = await FilePicker
+                                              .platform
+                                              .pickFiles(
+                                                type: FileType.custom,
+                                                allowedExtensions: [
+                                                  'jpg',
+                                                  'jpeg',
+                                                  'png',
+                                                  'pdf',
+                                                ],
+                                              );
 
-                                                if (pickedFile != null) {
-                                                  onPickedFile(
-                                                    pickedFile.files.single,
-                                                    index,
-                                                  );
-                                                }
-                                              }
-                                            },
+                                          if (pickedFile != null) {
+                                            onPickedFile(
+                                              pickedFile.files.single,
+                                              index,
+                                            );
+                                          }
+                                        }
+                                      },
                                     ),
                                   ),
                                   if (spmAttachments
@@ -219,7 +212,7 @@ class EditSecondSection extends StatelessWidget {
                                   },
                                 ],
                               ),
-                              if (!(attachments[index].checklist ?? false)) ...{
+                              if (attachments[index].path != null) ...{
                                 const SizedBox(height: 4),
                                 Align(
                                   alignment: Alignment.centerLeft,
