@@ -36,14 +36,19 @@ class SpmCounterSection extends StatelessWidget {
                         icon: MingCute.user_add_2_line,
                         iconColor: AppColors.amberColor,
                         bgIconColor: AppColors.softAmberColor,
-                        title: 'Diterima',
+                        title:
+                            AppHelpers.hasPermission(
+                              context.read<AuthCubit>().state.userPermissions,
+                              permissionName: 'level-kecamatan',
+                            )
+                            ? 'Butuh Verifikasi'
+                            : 'Diproses',
                         count:
                             AppHelpers.hasPermission(
                               context.read<AuthCubit>().state.userPermissions,
                               permissionName: 'level-opd',
                             )
-                            ? state.spmCount?.needVerificationOpd?.toString() ??
-                                  ''
+                            ? state.spmCount?.processByOpd?.toString() ?? ''
                             : AppHelpers.hasPermission(
                                 context.read<AuthCubit>().state.userPermissions,
                                 permissionName: 'level-kecamatan',
@@ -51,7 +56,7 @@ class SpmCounterSection extends StatelessWidget {
                             ? state.spmCount?.needApprovalDistrict
                                       ?.toString() ??
                                   ''
-                            : state.spmCount?.needVerificationSubDistrict
+                            : state.spmCount?.processBySubDistrict
                                       ?.toString() ??
                                   '',
                       ),
@@ -63,13 +68,30 @@ class SpmCounterSection extends StatelessWidget {
                   children: [
                     Expanded(
                       child: CounterCard(
-                        icon: MingCute.mail_send_line,
+                        icon:
+                            AppHelpers.hasPermission(
+                              context.read<AuthCubit>().state.userPermissions,
+                              permissionName: 'level-opd',
+                            )
+                            ? MingCute.check_circle_line
+                            : MingCute.mail_send_line,
                         iconColor: AppColors.greenColor,
                         bgIconColor: AppColors.softGreenColor,
-                        title: 'Diteruskan',
+                        title:
+                            AppHelpers.hasPermission(
+                              context.read<AuthCubit>().state.userPermissions,
+                              permissionName: 'level-opd',
+                            )
+                            ? 'Diselesaikan'
+                            : 'Diteruskan ke OPD',
                         count:
-                            state.spmCount?.needVerificationOpd?.toString() ??
-                            '',
+                            AppHelpers.hasPermission(
+                              context.read<AuthCubit>().state.userPermissions,
+                              permissionName: 'level-opd',
+                            )
+                            ? state.spmCount?.finishByOpd?.toString() ?? ''
+                            : state.spmCount?.needVerificationOpd?.toString() ??
+                                  '',
                       ),
                     ),
                     const SizedBox(width: 10),

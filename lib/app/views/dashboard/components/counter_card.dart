@@ -31,7 +31,7 @@ class CounterCard extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: bgIconColor,
                 shape: BoxShape.circle,
