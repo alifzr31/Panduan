@@ -82,39 +82,6 @@ class AttachmentCard extends StatelessWidget {
                   color: checklist ? AppColors.greenColor : AppColors.redColor,
                 ),
               ),
-              // if (checklist) ...{
-              //   Container(
-              //     padding: const EdgeInsets.all(6),
-              //     decoration: const BoxDecoration(
-              //       color: AppColors.softGreenColor,
-              //       shape: BoxShape.circle,
-              //     ),
-              //     child: const Icon(
-              //       MingCute.checkbox_fill,
-              //       size: 18,
-              //       color: AppColors.greenColor,
-              //     ),
-              //   ),
-              // } else ...{
-              //   CupertinoButton(
-              //     alignment: Alignment.center,
-              //     minimumSize: Size.zero,
-              //     padding: EdgeInsets.zero,
-              //     onPressed: onPressedShowFile,
-              //     child: Container(
-              //       padding: const EdgeInsets.all(6),
-              //       decoration: const BoxDecoration(
-              //         color: AppColors.softBlueColor,
-              //         shape: BoxShape.circle,
-              //       ),
-              //       child: const Icon(
-              //         MingCute.eye_2_fill,
-              //         size: 18,
-              //         color: AppColors.blueColor,
-              //       ),
-              //     ),
-              //   ),
-              // },
             ],
           ),
         ),
