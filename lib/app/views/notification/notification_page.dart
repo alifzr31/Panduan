@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:panduan/app/cubits/notification/notification_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
-import 'package:panduan/app/views/detail_spm/detailspm_page.dart';
+import 'package:panduan/app/views/detail_notification/detailnotification_page.dart';
 import 'package:panduan/app/views/notification/components/notification_card.dart';
 import 'package:panduan/app/views/notification/components/notificationcard_loading.dart';
 import 'package:panduan/app/widgets/base_handlestate.dart';
@@ -69,7 +69,14 @@ class _NotificationPageState extends State<NotificationPage> {
                     .watch<NotificationCubit>()
                     .state
                     .notifications
-                    .isNotEmpty
+                    .isNotEmpty &&
+                context
+                    .watch<NotificationCubit>()
+                    .state
+                    .notifications
+                    .map((element) => element.readAt != null)
+                    .toList()
+                    .isEmpty
             ? [
                 BlocListener<NotificationCubit, NotificationState>(
                   listenWhen: (previous, current) =>
@@ -188,15 +195,27 @@ class _NotificationPageState extends State<NotificationPage> {
                                         0,
                                     index: index,
                                     dataLength: state.notifications.length,
-                                    onTap: () {
-                                      Navigator.pushNamed(
+                                    onTap: () async {
+                                      final result = await Navigator.pushNamed(
                                         context,
-                                        DetailSpmPage.routeName,
-                                        arguments: state
-                                            .notifications[index]
-                                            .data
-                                            ?.featureableUuid,
+                                        DetailNotificationPage.routeName,
+                                        arguments: {
+                                          'notificationCubit': context
+                                              .read<NotificationCubit>(),
+                                          'notificationUuid':
+                                              state.notifications[index].id,
+                                        },
                                       );
+
+                                      if (result != null) {
+                                        if (result == 'readed-notification') {
+                                          if (context.mounted) {
+                                            context
+                                                .read<NotificationCubit>()
+                                                .refetchNotifications();
+                                          }
+                                        }
+                                      }
                                     },
                                   ),
                           );

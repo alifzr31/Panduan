@@ -4,6 +4,8 @@ enum ListStatus { initial, loading, success, error }
 
 enum ReadAllStatus { initial, loading, success, error }
 
+enum DetailStatus { initial, loading, success, error }
+
 class NotificationState extends Equatable {
   final ListStatus listStatus;
   final bool hasMoreNotification;
@@ -12,6 +14,9 @@ class NotificationState extends Equatable {
   final ReadAllStatus readAllStatus;
   final Response? readAllResponse;
   final String? readAllError;
+  final DetailStatus detailStatus;
+  final Notification? detailNotification;
+  final String? detailError;
 
   const NotificationState({
     this.listStatus = ListStatus.initial,
@@ -21,6 +26,9 @@ class NotificationState extends Equatable {
     this.readAllStatus = ReadAllStatus.initial,
     this.readAllResponse,
     this.readAllError,
+    this.detailStatus = DetailStatus.initial,
+    this.detailNotification,
+    this.detailError,
   });
 
   NotificationState copyWith({
@@ -31,6 +39,9 @@ class NotificationState extends Equatable {
     ReadAllStatus? readAllStatus,
     Response? readAllResponse,
     String? readAllError,
+    DetailStatus? detailStatus,
+    Notification? detailNotification,
+    String? detailError,
   }) {
     return NotificationState(
       listStatus: listStatus ?? this.listStatus,
@@ -40,6 +51,9 @@ class NotificationState extends Equatable {
       readAllStatus: readAllStatus ?? this.readAllStatus,
       readAllResponse: readAllResponse,
       readAllError: readAllError,
+      detailStatus: detailStatus ?? this.detailStatus,
+      detailNotification: detailNotification,
+      detailError: detailError,
     );
   }
 
@@ -52,5 +66,8 @@ class NotificationState extends Equatable {
     readAllStatus,
     readAllResponse,
     readAllError,
+    detailStatus,
+    detailNotification,
+    detailError,
   ];
 }

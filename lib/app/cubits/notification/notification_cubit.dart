@@ -58,6 +58,43 @@ class NotificationCubit extends Cubit<NotificationState> {
     await fetchNotifications();
   }
 
+  Future<void> fetchDetailNotification({String? notificationUuid}) async {
+    emit(state.copyWith(detailStatus: DetailStatus.loading));
+
+    try {
+      final detailNotification = await _repository.fetchDetailNotification(
+        notificationUuid: notificationUuid,
+      );
+
+      emit(
+        state.copyWith(
+          detailStatus: DetailStatus.success,
+          detailNotification: detailNotification,
+        ),
+      );
+    } on DioException catch (e) {
+      emit(
+        state.copyWith(
+          detailStatus: DetailStatus.error,
+          detailError:
+              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+        ),
+      );
+    }
+  }
+
+  void refetchDetailNotification({String? notificationUuid}) async {
+    emit(
+      state.copyWith(
+        detailStatus: DetailStatus.initial,
+        detailNotification: null,
+        detailError: null,
+      ),
+    );
+
+    await fetchDetailNotification(notificationUuid: notificationUuid);
+  }
+
   void readAllNotification() async {
     emit(state.copyWith(readAllStatus: ReadAllStatus.loading));
 

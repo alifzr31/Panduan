@@ -26,6 +26,21 @@ class NotificationService extends DioClient {
     }
   }
 
+  Future<Notification?> fetchDetailNotification({
+    String? notificationUuid,
+  }) async {
+    try {
+      final response = await get('/notification/$notificationUuid');
+
+      return await compute(
+        (message) => message == null ? null : notificationFromJson(message),
+        response.data['data'],
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<Response> readAllNotification() async {
     try {
       final response = await get('/notification/read-all');

@@ -11,6 +11,7 @@ import 'package:panduan/app/cubits/notification/notification_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
 import 'package:panduan/app/views/create_spm/createspm_page.dart';
 import 'package:panduan/app/views/dashboard/dashboard_page.dart';
+import 'package:panduan/app/views/detail_notification/detailnotification_page.dart';
 import 'package:panduan/app/views/detail_spm/detailspm_page.dart';
 import 'package:panduan/app/views/edit_spm/editspm_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
@@ -69,6 +70,21 @@ class AppRouter {
           child: BlocProvider(
             create: (context) => sl<NotificationCubit>(),
             child: const NotificationPage(),
+          ),
+        );
+      case DetailNotificationPage.routeName:
+        final args = settings.arguments as Map<String, dynamic>?;
+        final notificationCubit =
+            args?['notificationCubit'] as NotificationCubit;
+
+        return customPageRouteBuilder(
+          settings,
+          bottomSafeArea: false,
+          child: BlocProvider.value(
+            value: notificationCubit,
+            child: DetailNotificationPage(
+              notificationUuid: args?['notificationUuid'],
+            ),
           ),
         );
       case SpmPage.routeName:
