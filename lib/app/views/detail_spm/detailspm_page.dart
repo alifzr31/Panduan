@@ -371,7 +371,7 @@ class _DetailSpmPageState extends State<DetailSpmPage> {
                                       const SizedBox(width: 6),
                                       BaseTextButton(
                                         size: 14,
-                                        text: 'Batsl',
+                                        text: 'Batal',
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
