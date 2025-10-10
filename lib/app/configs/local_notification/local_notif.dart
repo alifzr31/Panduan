@@ -45,8 +45,8 @@ class LocalNotif {
 
     const AndroidNotificationChannel androidNotificationChannel =
         AndroidNotificationChannel(
-          'global_notification',
-          'Global Notification',
+          'notifikasi_umum',
+          'Notifikasi Umum',
           importance: Importance.max,
           enableLights: true,
           enableVibration: true,
@@ -77,8 +77,8 @@ class LocalNotif {
     try {
       AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
-            'global_notification',
-            'Global Notification',
+            'notifikasi_umum',
+            'Notifikasi Umum',
             importance: Importance.max,
             priority: Priority.high,
             ticker: 'ticker',
