@@ -40,7 +40,7 @@ class _DashboardPageState extends State<DashboardPage> {
   String? _appName;
   String? _appVersion;
   List<DateTime> _selectedRangeDates = [
-    DateTime.now().subtract(const Duration(days: 14)),
+    DateTime(DateTime.now().year, 1, 1),
     DateTime.now(),
   ];
   final _rangeDateController = TextEditingController();
@@ -125,8 +125,20 @@ class _DashboardPageState extends State<DashboardPage> {
     await _getPackageInfo();
     await _checkBiometricsHardware();
     await _checkBiometricsEnabled();
-    _rangeDateController.text =
-        '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
+
+    final isFirstYear =
+        _selectedRangeDates.first.day == _selectedRangeDates.last.day &&
+        _selectedRangeDates.first.month == _selectedRangeDates.last.month &&
+        _selectedRangeDates.first.year == _selectedRangeDates.last.year;
+
+    if (isFirstYear) {
+      _rangeDateController.text = AppHelpers.rangeDateFormat(
+        _selectedRangeDates.first,
+      );
+    } else {
+      _rangeDateController.text =
+          '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
+    }
   }
 
   @override
