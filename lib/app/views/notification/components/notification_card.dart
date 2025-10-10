@@ -77,7 +77,7 @@ class NotificationCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               description,
-                              maxLines: 3,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontSize: 14),
                             ),
@@ -109,7 +109,7 @@ class NotificationCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  numbering.toString(),
+                  '#$numbering',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
