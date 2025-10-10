@@ -8,7 +8,7 @@ abstract class SpmRepository {
     String? keyword,
     int? month,
     int? year,
-    String? status,
+    Set<String>? statuses,
   });
   Future<List<SpmField>> fetchSpmFields();
 }
@@ -24,14 +24,14 @@ class SpmRepositoryImpl implements SpmRepository {
     String? keyword,
     int? month,
     int? year,
-    String? status,
+    Set<String>? statuses,
   }) async {
     return await _service.fetchSpm(
       page: page,
       keyword: keyword,
       month: month,
       year: year,
-      status: status,
+      statuses: statuses,
     );
   }
 

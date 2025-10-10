@@ -18,7 +18,7 @@ class SpmCubit extends Cubit<SpmState> {
     String? keyword,
     int? month,
     int? year,
-    String? status,
+    Set<String>? statuses,
   }) async {
     if (currentSpmPage == 1) {
       emit(state.copyWith(spmStatus: SpmStatus.loading));
@@ -30,7 +30,7 @@ class SpmCubit extends Cubit<SpmState> {
         keyword: keyword,
         month: month,
         year: year,
-        status: status,
+        statuses: statuses,
       );
 
       if (spm.length < 10) {
@@ -58,7 +58,7 @@ class SpmCubit extends Cubit<SpmState> {
     String? keyword,
     int? month,
     int? year,
-    String? status,
+    Set<String>? statuses,
   }) async {
     currentSpmPage = 1;
     emit(
@@ -70,7 +70,12 @@ class SpmCubit extends Cubit<SpmState> {
       ),
     );
 
-    await fetchSpm(keyword: keyword, month: month, year: year, status: status);
+    await fetchSpm(
+      keyword: keyword,
+      month: month,
+      year: year,
+      statuses: statuses,
+    );
   }
 
   Future<void> refreshSpm() async {

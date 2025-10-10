@@ -28,6 +28,7 @@ class _SpmPageState extends State<SpmPage> {
   final _searchSpmController = TextEditingController();
   String? _spmKeyword;
   Timer? _spmDebounce;
+  final Set<String> _selectedFilterStatus = {};
   final _years = List.generate(3, (index) {
     return DateTime.now().year - index;
   });
@@ -58,7 +59,7 @@ class _SpmPageState extends State<SpmPage> {
         context.read<SpmCubit>().fetchSpm(
           year: _selectedYear,
           month: _selectedMonth,
-          status: widget.status,
+          statuses: _selectedFilterStatus,
         );
       }
     }
@@ -75,19 +76,25 @@ class _SpmPageState extends State<SpmPage> {
         keyword: _spmKeyword,
         month: _selectedMonth,
         year: _selectedYear,
-        status: widget.status,
+        statuses: _selectedFilterStatus,
       );
     });
   }
 
   @override
   void initState() {
+    if (widget.status != null) {
+      setState(() {
+        _selectedFilterStatus.add(widget.status ?? '');
+      });
+    }
+
     context
         .read<SpmCubit>()
         .fetchSpm(
           year: _selectedYear,
           month: _selectedMonth,
-          status: widget.status,
+          statuses: _selectedFilterStatus,
         )
         .then((value) {
           _spmScrollController.addListener(_onScrollSpm);
@@ -138,6 +145,23 @@ class _SpmPageState extends State<SpmPage> {
           SpmHeader(
             searchSpmController: _searchSpmController,
             onSearchSpm: _onSearchSpm,
+            selectedFilterStatus: _selectedFilterStatus,
+            onSelectedFilterStatus: (selectedStatus) {
+              setState(() {
+                _selectedFilterStatus
+                  ..removeWhere((element) {
+                    return !selectedStatus.contains(element);
+                  })
+                  ..addAll(selectedStatus);
+              });
+
+              context.read<SpmCubit>().refetchSpm(
+                keyword: _spmKeyword,
+                month: _selectedMonth,
+                year: _selectedYear,
+                statuses: _selectedFilterStatus,
+              );
+            },
             months: _months,
             selectedMonth: _selectedMonth,
             onSelectedMonth: (value) {
@@ -149,7 +173,7 @@ class _SpmPageState extends State<SpmPage> {
                 keyword: _spmKeyword,
                 month: _selectedMonth,
                 year: _selectedYear,
-                status: widget.status,
+                statuses: _selectedFilterStatus,
               );
             },
             onRemoveMonth: () {
@@ -161,7 +185,7 @@ class _SpmPageState extends State<SpmPage> {
                 keyword: _spmKeyword,
                 month: _selectedMonth,
                 year: _selectedYear,
-                status: widget.status,
+                statuses: _selectedFilterStatus,
               );
             },
             years: _years,
@@ -175,7 +199,7 @@ class _SpmPageState extends State<SpmPage> {
                 keyword: _spmKeyword,
                 month: _selectedMonth,
                 year: _selectedYear,
-                status: widget.status,
+                statuses: _selectedFilterStatus,
               );
             },
           ),
@@ -183,7 +207,7 @@ class _SpmPageState extends State<SpmPage> {
             selectedYear: _selectedYear,
             selectedMonth: _selectedMonth,
             spmKeyword: _spmKeyword,
-            spmStatus: widget.status,
+            spmStatuses: _selectedFilterStatus,
             spmScrollController: _spmScrollController,
             onRefreshSpm: () {
               _searchSpmController.clear();
@@ -196,7 +220,7 @@ class _SpmPageState extends State<SpmPage> {
                 context.read<SpmCubit>().refetchSpm(
                   year: _selectedYear,
                   month: _selectedMonth,
-                  status: widget.status,
+                  statuses: _selectedFilterStatus,
                 );
               }
             },

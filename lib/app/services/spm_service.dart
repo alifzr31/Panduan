@@ -13,7 +13,7 @@ class SpmService extends DioClient {
     String? keyword,
     int? month,
     int? year,
-    String? status,
+    Set<String>? statuses,
   }) async {
     try {
       final response = await get(
@@ -24,7 +24,9 @@ class SpmService extends DioClient {
           if (keyword != null || (keyword?.isNotEmpty ?? false)) 'q': keyword,
           if (month != null) 'month': month,
           'year': year,
-          if (status != null) 'status': status,
+          if (statuses?.isNotEmpty ?? false) ...{
+            'statuses': statuses?.join(','),
+          },
           'order': 'date',
           'sort': 'desc',
         },

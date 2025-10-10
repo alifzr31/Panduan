@@ -12,7 +12,7 @@ class SpmBody extends StatelessWidget {
     required this.selectedYear,
     required this.selectedMonth,
     required this.spmKeyword,
-    required this.spmStatus,
+    required this.spmStatuses,
     required this.spmScrollController,
     required this.onRefreshSpm,
     super.key,
@@ -21,7 +21,7 @@ class SpmBody extends StatelessWidget {
   final int? selectedYear;
   final int? selectedMonth;
   final String? spmKeyword;
-  final String? spmStatus;
+  final Set<String>? spmStatuses;
   final ScrollController spmScrollController;
   final void Function() onRefreshSpm;
 
@@ -40,7 +40,7 @@ class SpmBody extends StatelessWidget {
                     year: selectedYear,
                     month: selectedMonth,
                     keyword: spmKeyword,
-                    status: spmStatus,
+                    statuses: spmStatuses,
                   );
                 },
               );
@@ -54,7 +54,7 @@ class SpmBody extends StatelessWidget {
                           year: selectedYear,
                           month: selectedMonth,
                           keyword: spmKeyword,
-                          status: spmStatus,
+                          statuses: spmStatuses,
                         );
                       },
                     )
@@ -116,7 +116,7 @@ class SpmBody extends StatelessWidget {
                                               year: selectedYear,
                                               month: selectedMonth,
                                               keyword: spmKeyword,
-                                              status: spmStatus,
+                                              statuses: spmStatuses,
                                             );
                                           }
                                         }
