@@ -26,7 +26,7 @@ class AppHelpers {
   }
 
   static String rangeDateFormat(DateTime date) {
-    return DateFormat('dd MMM yyyy').format(date);
+    return DateFormat('dd MMMM yyyy').format(date);
   }
 
   static String formDateFormat(DateTime date) {
@@ -101,6 +101,24 @@ class AppHelpers {
             )
             .nameIndonesian ??
         'Jenis Pelayanan Tidak Ditemukan';
+  }
+
+  static List<String> listStatus() {
+    return const [
+      'NEED_VERIFICATION_SUB_DISTRICT',
+      'NEED_VERIFICATION_OPD',
+      'NEED_APPROVAL_DISTRICT',
+      'VERIFICATION_SUB_DISTRICT',
+      'PROCESS_BY_SUB_DISTRICT',
+      'PROCESS_BY_OPD',
+      'FORWARD_TO_OPD',
+      'FORWARD_TO_DISTRICT',
+      'FINISH_BY_SUB_DISTRICT',
+      'FINISH_BY_OPD',
+      'DECLINE_BY_SUB_DISTRICT',
+      'DECLINE_BY_DISTRICT',
+      'DECLINE_BY_OPD',
+    ];
   }
 
   static String statusLabel(String status) {
