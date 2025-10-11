@@ -1,12 +1,9 @@
-import 'dart:io';
+import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:intl/intl.dart';
 import 'package:panduan/app/models/service_type.dart';
 import 'package:panduan/app/models/spm_attachment.dart';
-import 'package:path_provider/path_provider.dart';
 
 class AppHelpers {
   static double getHeightDevice(BuildContext context) {
@@ -19,6 +16,67 @@ class AppHelpers {
 
   static double getBottomViewPaddingDevice(BuildContext context) {
     return MediaQuery.of(context).viewPadding.bottom;
+  }
+
+  static bool isTablet(BuildContext context) {
+    try {
+      final mediaQuery = MediaQuery.maybeOf(context);
+      if (mediaQuery == null) return false;
+
+      final size = mediaQuery.size;
+      final diagonal = sqrt(
+        (size.width * size.width) + (size.height * size.height),
+      );
+
+      return (diagonal / mediaQuery.devicePixelRatio) > 1100;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static bool isPhone(BuildContext context) {
+    return !isTablet(context);
+  }
+
+  static bool isFoldable(BuildContext context) {
+    try {
+      final mediaQuery = MediaQuery.maybeOf(context);
+      if (mediaQuery == null) return false;
+
+      final size = mediaQuery.size;
+      final ratio = size.width / size.height;
+
+      final isWide = ratio > 1.8;
+      final isTall = ratio < 0.55;
+      final physicalWidth = size.width / mediaQuery.devicePixelRatio;
+
+      final notTablet = !isTablet(context);
+
+      return notTablet && (isWide || isTall) && physicalWidth > 700;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static bool isFlipable(BuildContext context) {
+    try {
+      final mediaQuery = MediaQuery.maybeOf(context);
+      if (mediaQuery == null) return false;
+
+      final size = mediaQuery.size;
+      final ratio = size.height / size.width;
+      final diagonal = sqrt(
+        size.width * size.width + size.height * size.height,
+      );
+      final physicalDiagonal = diagonal / mediaQuery.devicePixelRatio;
+
+      final isTall = ratio > 2.2;
+      final isNotTablet = physicalDiagonal < 1100;
+
+      return isTall && isNotTablet;
+    } catch (_) {
+      return false;
+    }
   }
 
   static Map<String, dynamic> addOnHeaders() {
@@ -43,37 +101,6 @@ class AppHelpers {
 
   static String dmyhmDateFormat(DateTime date) {
     return DateFormat('dd MMMM yyyy HH:mm').format(date);
-  }
-
-  static double convertFileSizeByteToKb(int size) {
-    return size / 1024;
-  }
-
-  static double convertFileSizeByteToMb(int size) {
-    return size / (1024 * 1024);
-  }
-
-  static Future<File?> compressImage({
-    required String path,
-    int quality = 60,
-  }) async {
-    try {
-      final Directory appDir = await getApplicationDocumentsDirectory();
-      final String targetPath =
-          "${appDir.path}/picked_${DateTime.now().millisecondsSinceEpoch}.jpg";
-
-      final XFile? compressedFile =
-          await FlutterImageCompress.compressAndGetFile(
-            path,
-            targetPath,
-            quality: quality,
-          );
-
-      return File(compressedFile?.path ?? '');
-    } catch (e) {
-      if (kDebugMode) print("Error pick/compress: $e");
-      return null;
-    }
   }
 
   static bool hasPermission(
