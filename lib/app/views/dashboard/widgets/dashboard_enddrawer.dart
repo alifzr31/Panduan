@@ -7,6 +7,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:open_settings_plus/core/open_settings_plus.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
+import 'package:panduan/app/configs/local_notification/local_notif.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/views/login/login_page.dart';
@@ -181,6 +182,27 @@ class DashboardEndDrawer extends StatelessWidget {
                       }
                     },
                   ),
+                  if (kDebugMode) ...{
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(height: 1, color: Colors.grey.shade300),
+                    ),
+                    BaseListTile(
+                      leading: const Icon(
+                        MingCute.notification_line,
+                        size: 22,
+                        color: AppColors.blueColor,
+                      ),
+                      title: 'Tes Notifikasi',
+                      onTap: () async {
+                        await LocalNotif().showNotifications(
+                          id: 1,
+                          title: 'Tes Notifikasi',
+                          body: 'Deskripsi tes notifikasi',
+                        );
+                      },
+                    ),
+                  },
                   if (hasBiometricsHardware) ...{
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
