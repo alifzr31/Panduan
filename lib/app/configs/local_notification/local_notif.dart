@@ -40,8 +40,20 @@ class LocalNotif {
     const AndroidInitializationSettings androidInitializationSettings =
         AndroidInitializationSettings('@mipmap/ic_notification');
 
+    const DarwinInitializationSettings darwinInitializationSettings =
+        DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+          requestProvisionalPermission: false,
+          requestCriticalPermission: false,
+        );
+
     const InitializationSettings initializationSettings =
-        InitializationSettings(android: androidInitializationSettings);
+        InitializationSettings(
+          android: androidInitializationSettings,
+          iOS: darwinInitializationSettings,
+        );
 
     const AndroidNotificationChannel androidNotificationChannel =
         AndroidNotificationChannel(
@@ -106,8 +118,26 @@ class LocalNotif {
                     hideExpandedLargeIcon: true,
                   ),
           );
+
+      DarwinNotificationDetails darwinNotificationDetails =
+          DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+            attachments: imageUrl == null
+                ? null
+                : [
+                    DarwinNotificationAttachment(
+                      await Image.saveImage(
+                        await Image.downloadImage(imageUrl),
+                      ),
+                    ),
+                  ],
+          );
+
       NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
+        iOS: darwinNotificationDetails,
       );
 
       await _flutterLocalNotificationsPlugin.show(

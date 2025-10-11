@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:panduan/app/configs/local_notification/local_notif.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -82,7 +84,18 @@ class FirebaseNotif {
   }
 
   Future<String?> getDeviceToken() async {
-    return await messaging.getToken();
+    try {
+      if (Platform.isAndroid) {
+        return await messaging.getToken();
+      } else if (Platform.isIOS) {
+        return await messaging.getAPNSToken();
+      }
+
+      return null;
+    } catch (e) {
+      if (kDebugMode) print(e);
+      return null;
+    }
   }
 
   void isTokenRefresh() async {
