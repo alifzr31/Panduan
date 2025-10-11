@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -209,15 +211,21 @@ class DashboardEndDrawer extends StatelessWidget {
                       child: Divider(height: 1, color: Colors.grey.shade300),
                     ),
                     BaseListTile(
-                      leading: const Icon(
-                        MingCute.fingerprint_line,
+                      leading: Icon(
+                        Platform.isAndroid
+                            ? MingCute.fingerprint_line
+                            : MingCute.faceid_line,
                         size: 22,
                         color: AppColors.blueColor,
                       ),
-                      title: 'Sidik Jari',
+                      title: Platform.isAndroid
+                          ? 'Sidik Jari'
+                          : 'Deteksi Wajah',
                       subtitle: availableBiometrics.isNotEmpty
                           ? null
-                          : 'Tidak ada sidik jari terdaftar diperangkat anda',
+                          : Platform.isAndroid
+                          ? 'Tidak ada sidik jari terdaftar diperangkat anda'
+                          : 'Tidak ada deteksi wajah terdaftar diperangkat anda',
                       subtitleColor: Colors.red.shade600,
                       trailing: availableBiometrics.isEmpty
                           ? null
