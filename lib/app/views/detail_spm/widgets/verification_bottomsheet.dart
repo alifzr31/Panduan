@@ -230,6 +230,13 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                     mandatory: true,
                     controller: _coordinateController,
                     isDate: true,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Silahkan tentukan titik koordinat lokasi';
+                      }
+
+                      return null;
+                    },
                     onTap: () async {
                       final result = await Navigator.pushNamed(
                         context,
