@@ -9,6 +9,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/app_strings.dart';
 import 'package:panduan/app/views/dashboard/widgets/dashboard_body_kecamatan.dart';
 import 'package:panduan/app/views/dashboard/widgets/dashboard_body_kelurahan.dart';
 import 'package:panduan/app/views/dashboard/widgets/dashboard_body_opd.dart';
@@ -16,7 +17,9 @@ import 'package:panduan/app/views/dashboard/widgets/dashboard_body_posyandu.dart
 import 'package:panduan/app/views/dashboard/widgets/dashboard_body_walikota.dart';
 import 'package:panduan/app/views/dashboard/widgets/dashboard_enddrawer.dart';
 import 'package:panduan/app/views/dashboard/widgets/dashboard_header.dart';
+import 'package:panduan/app/views/dashboard/widgets/daterangepicker_section.dart';
 import 'package:panduan/app/views/login/login_page.dart';
+import 'package:panduan/app/widgets/base_handlestate.dart';
 import 'package:panduan/app/widgets/base_skeletonizer.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -246,191 +249,141 @@ class _DashboardPageState extends State<DashboardPage> {
                       },
                     );
                   },
-                  child: BlocBuilder<AuthCubit, AuthState>(
-                    builder: (context, state) {
-                      switch (state.profileStatus) {
-                        case ProfileStatus.success || ProfileStatus.error:
-                          if (AppHelpers.hasPermission(
-                            state.userPermissions,
-                            permissionName: 'level-superadmin',
-                          )) {
-                            return const Center(child: Text('Superadmin'));
-                          } else if (AppHelpers.hasPermission(
-                            state.userPermissions,
-                            permissionName: 'level-walikota',
-                          )) {
-                            return DashboardBodyWalikota(
-                              rangeDateController: _rangeDateController,
-                              selectedRangeDates: _selectedRangeDates,
-                              onSelectedRangeDate: (dates) {
-                                setState(() {
-                                  _selectedRangeDates = dates;
-                                });
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      if (context.watch<AuthCubit>().state.profileStatus ==
+                          ProfileStatus.success) ...{
+                        DateRangePickerSection(
+                          rangeDateController: _rangeDateController,
+                          selectedRangeDates: _selectedRangeDates,
+                          onSelectedRangeDate: (dates) {
+                            setState(() {
+                              _selectedRangeDates = dates;
+                            });
 
-                                _rangeDateController.text =
-                                    '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
+                            _rangeDateController.text =
+                                '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
 
-                                context
-                                    .read<DashboardCubit>()
-                                    .refetchDataByLevel(
-                                      userPermissions: context
-                                          .read<AuthCubit>()
-                                          .state
-                                          .userPermissions,
-                                      startDate: _selectedRangeDates.first,
-                                      endDate: _selectedRangeDates.last,
-                                    );
-                              },
+                            context.read<DashboardCubit>().refetchDataByLevel(
+                              userPermissions: context
+                                  .read<AuthCubit>()
+                                  .state
+                                  .userPermissions,
+                              startDate: _selectedRangeDates.first,
+                              endDate: _selectedRangeDates.last,
                             );
-                          } else if (AppHelpers.hasPermission(
-                            state.userPermissions,
-                            permissionName: 'level-opd',
-                          )) {
-                            return DashboardBodyOpd(
-                              rangeDateController: _rangeDateController,
-                              selectedRangeDates: _selectedRangeDates,
-                              onSelectedRangeDate: (dates) {
-                                setState(() {
-                                  _selectedRangeDates = dates;
-                                });
-
-                                _rangeDateController.text =
-                                    '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
-
-                                context
-                                    .read<DashboardCubit>()
-                                    .refetchDataByLevel(
-                                      userPermissions: context
-                                          .read<AuthCubit>()
-                                          .state
-                                          .userPermissions,
-                                      startDate: _selectedRangeDates.first,
-                                      endDate: _selectedRangeDates.last,
-                                    );
-                              },
-                            );
-                          } else if (AppHelpers.hasPermission(
-                            state.userPermissions,
-                            permissionName: 'level-kecamatan',
-                          )) {
-                            return DashboardBodyKecamatan(
-                              rangeDateController: _rangeDateController,
-                              selectedRangeDates: _selectedRangeDates,
-                              onSelectedRangeDate: (dates) {
-                                setState(() {
-                                  _selectedRangeDates = dates;
-                                });
-
-                                _rangeDateController.text =
-                                    '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
-
-                                context
-                                    .read<DashboardCubit>()
-                                    .refetchDataByLevel(
-                                      userPermissions: context
-                                          .read<AuthCubit>()
-                                          .state
-                                          .userPermissions,
-                                      startDate: _selectedRangeDates.first,
-                                      endDate: _selectedRangeDates.last,
-                                    );
-                              },
-                            );
-                          } else if (AppHelpers.hasPermission(
-                            state.userPermissions,
-                            permissionName: 'level-kelurahan',
-                          )) {
-                            return DashboardBodyKelurahan(
-                              rangeDateController: _rangeDateController,
-                              selectedRangeDates: _selectedRangeDates,
-                              onSelectedRangeDate: (dates) {
-                                setState(() {
-                                  _selectedRangeDates = dates;
-                                });
-
-                                _rangeDateController.text =
-                                    '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
-
-                                context
-                                    .read<DashboardCubit>()
-                                    .refetchDataByLevel(
-                                      userPermissions: context
-                                          .read<AuthCubit>()
-                                          .state
-                                          .userPermissions,
-                                      startDate: _selectedRangeDates.first,
-                                      endDate: _selectedRangeDates.last,
-                                    );
-                              },
-                            );
-                          } else if (AppHelpers.hasPermission(
-                            state.userPermissions,
-                            permissionName: 'level-puskesmas',
-                          )) {
-                            return const Center(child: Text('Puskesmas'));
-                          } else if (AppHelpers.hasPermission(
-                            state.userPermissions,
-                            permissionName: 'level-posyandu',
-                          )) {
-                            return DashboardBodyPosyandu(
-                              rangeDateController: _rangeDateController,
-                              selectedRangeDates: _selectedRangeDates,
-                              onSelectedRangeDate: (dates) {
-                                setState(() {
-                                  _selectedRangeDates = dates;
-                                });
-
-                                _rangeDateController.text =
-                                    '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
-
-                                context
-                                    .read<DashboardCubit>()
-                                    .refetchDataByLevel(
-                                      userPermissions: context
-                                          .read<AuthCubit>()
-                                          .state
-                                          .userPermissions,
-                                      startDate: _selectedRangeDates.first,
-                                      endDate: _selectedRangeDates.last,
-                                    );
-                              },
-                            );
-                          } else {
-                            return const Center(
-                              child: Text(
-                                'Level Tidak Ditemukan',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                      },
+                      BlocBuilder<AuthCubit, AuthState>(
+                        builder: (context, state) {
+                          switch (state.profileStatus) {
+                            case ProfileStatus.error:
+                              return SizedBox(
+                                height:
+                                    AppHelpers.getHeightDevice(context) -
+                                    (200 +
+                                        AppHelpers.getBottomViewPaddingDevice(
+                                          context,
+                                        )),
+                                width: double.infinity,
+                                child: BaseHandleState(
+                                  handleType: HandleType.error,
+                                  errorMessage:
+                                      state.profileError ??
+                                      AppStrings.errorApiMessage,
+                                  onRefetch: () {
+                                    context.read<AuthCubit>().refetchProfile();
+                                  },
                                 ),
-                              ),
-                            );
-                          }
-                        default:
-                          return BaseSkeletonizer(
-                            child: ListView(
-                              padding: const EdgeInsets.all(16),
-                              physics: const NeverScrollableScrollPhysics(),
-                              children: List.generate(10, (index) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: Material(
-                                    elevation: 1,
-                                    borderRadius: BorderRadius.circular(10),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Container(
-                                      height: 220,
-                                      width: double.infinity,
-                                      color: Colors.white,
+                              );
+                            case ProfileStatus.success:
+                              if (AppHelpers.hasPermission(
+                                state.userPermissions,
+                                permissionName: 'level-superadmin',
+                              )) {
+                                return const Center(child: Text('Superadmin'));
+                              } else if (AppHelpers.hasPermission(
+                                state.userPermissions,
+                                permissionName: 'level-walikota',
+                              )) {
+                                return DashboardBodyWalikota(
+                                  selectedRangeDates: _selectedRangeDates,
+                                );
+                              } else if (AppHelpers.hasPermission(
+                                state.userPermissions,
+                                permissionName: 'level-opd',
+                              )) {
+                                return DashboardBodyOpd(
+                                  selectedRangeDates: _selectedRangeDates,
+                                );
+                              } else if (AppHelpers.hasPermission(
+                                state.userPermissions,
+                                permissionName: 'level-kecamatan',
+                              )) {
+                                return DashboardBodyKecamatan(
+                                  selectedRangeDates: _selectedRangeDates,
+                                );
+                              } else if (AppHelpers.hasPermission(
+                                state.userPermissions,
+                                permissionName: 'level-kelurahan',
+                              )) {
+                                return DashboardBodyKelurahan(
+                                  selectedRangeDates: _selectedRangeDates,
+                                );
+                              } else if (AppHelpers.hasPermission(
+                                state.userPermissions,
+                                permissionName: 'level-puskesmas',
+                              )) {
+                                return const Center(child: Text('Puskesmas'));
+                              } else if (AppHelpers.hasPermission(
+                                state.userPermissions,
+                                permissionName: 'level-posyandu',
+                              )) {
+                                return DashboardBodyPosyandu(
+                                  selectedRangeDates: _selectedRangeDates,
+                                );
+                              } else {
+                                return const Center(
+                                  child: Text(
+                                    'Level Tidak Ditemukan',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 );
-                              }),
-                            ),
-                          );
-                      }
-                    },
+                              }
+                            default:
+                              return BaseSkeletonizer(
+                                child: Column(
+                                  children: List.generate(10, (index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 16,
+                                      ),
+                                      child: Material(
+                                        elevation: 1,
+                                        borderRadius: BorderRadius.circular(10),
+                                        clipBehavior: Clip.antiAlias,
+                                        child: Container(
+                                          height: 220,
+                                          width: double.infinity,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              );
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -1,35 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:panduan/app/views/dashboard/components/action_card.dart';
-import 'package:panduan/app/views/dashboard/widgets/daterangepicker_section.dart';
 import 'package:panduan/app/views/dashboard/widgets/recapitulation_section.dart';
 import 'package:panduan/app/views/spm/spm_page.dart';
 import 'package:panduan/app/views/spm_field/spmfield_page.dart';
 
 class DashboardBodyPosyandu extends StatelessWidget {
-  const DashboardBodyPosyandu({
-    required this.rangeDateController,
-    required this.selectedRangeDates,
-    required this.onSelectedRangeDate,
-    super.key,
-  });
+  const DashboardBodyPosyandu({required this.selectedRangeDates, super.key});
 
-  final TextEditingController rangeDateController;
   final List<DateTime> selectedRangeDates;
-  final void Function(List<DateTime>) onSelectedRangeDate;
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+    return Column(
       children: [
-        DateRangePickerSection(
-          rangeDateController: rangeDateController,
-          selectedRangeDates: selectedRangeDates,
-          onSelectedRangeDate: onSelectedRangeDate,
-        ),
-        const SizedBox(height: 16),
         const Row(
           children: [
             Expanded(
