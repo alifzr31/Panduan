@@ -85,7 +85,13 @@ class LocalNotif {
         ?.createNotificationChannel(androidNotificationChannel);
   }
 
-  Future<void> showNotifications({id, title, body, payload, imageUrl}) async {
+  Future<void> showNotifications({
+    required int id,
+    String? title,
+    String? body,
+    dynamic payload,
+    String? imageUrl,
+  }) async {
     try {
       AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
