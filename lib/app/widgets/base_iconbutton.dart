@@ -20,7 +20,7 @@ class BaseIconButton extends StatelessWidget {
     return CupertinoButton(
       alignment: Alignment.center,
       minimumSize: Size.zero,
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.all(2),
       onPressed: onPressed,
       child: Icon(icon, size: size, color: color),
     );
