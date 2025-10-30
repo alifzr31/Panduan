@@ -13,8 +13,8 @@ class DetailSpmService extends DioClient {
       final response = await get('/user-submission/$uuid');
 
       return await compute(
-        (message) => message.isEmpty ? null : spmFromJson(message),
-        response.data['data'] as Map<String, dynamic>,
+        (message) => spmFromJson(message),
+        response.data['data'],
       );
     } catch (e) {
       rethrow;

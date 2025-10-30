@@ -123,10 +123,6 @@ class AuthCubit extends Cubit<AuthState> {
     await fetchProfile();
   }
 
-  Future<void> refreshProfile() async {
-    await Future.delayed(const Duration(milliseconds: 2500), refetchProfile);
-  }
-
   void refreshToken() async {
     emit(state.copyWith(authStatus: AuthStatus.loading));
 
@@ -144,7 +140,7 @@ class AuthCubit extends Cubit<AuthState> {
             value: response.data['data']['refresh_token'],
           ),
         ]);
-        emit(state.copyWith(authStatus: AuthStatus.authorized));
+
         refetchProfile();
       }
     } on DioException catch (e) {
