@@ -143,6 +143,7 @@ class AppRouter {
           bottomSafeArea: false,
           child: MultiBlocProvider(
             providers: [
+              BlocProvider(create: (context) => sl<SpmCubit>()),
               BlocProvider(create: (context) => sl<LocationCubit>()),
               BlocProvider(create: (context) => sl<EditSpmCubit>()),
             ],
