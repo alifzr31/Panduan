@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/views/dashboard/components/spmhpcountcard_loading.dart';
 import 'package:panduan/app/views/dashboard/components/spmsubdistrictcount_card.dart';
 import 'package:panduan/app/widgets/base_handlestate.dart';
@@ -36,7 +39,12 @@ class SubDistrictSection extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Data SPM tingkat kelurahan di Kota Bandung',
+                      AppHelpers.hasPermission(
+                            context.read<AuthCubit>().state.userPermissions,
+                            permissionName: 'level-walikota',
+                          )
+                          ? 'Data SPM tingkat kelurahan di Kota Bandung'
+                          : 'Data SPM tingkat kelurahan di Kecamatan ${context.read<AuthCubit>().state.profile?.district?.name?.capitalize()}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,

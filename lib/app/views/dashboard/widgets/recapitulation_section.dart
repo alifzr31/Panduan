@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/views/dashboard/components/spmfieldcount_card.dart';
 import 'package:panduan/app/views/dashboard/components/spmfieldcountcard_loading.dart';
 import 'package:panduan/app/widgets/base_handlestate.dart';
@@ -37,7 +39,27 @@ class RecapitulationSection extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Data SPM di ${context.read<AuthCubit>().state.profile?.name}',
+                      AppHelpers.hasPermission(
+                            context.read<AuthCubit>().state.userPermissions,
+                            permissionName: 'level-walikota',
+                          )
+                          ? 'Data SPM berdasarkan bidang di Kota Bandung'
+                          : AppHelpers.hasPermission(
+                              context.read<AuthCubit>().state.userPermissions,
+                              permissionName: 'level-opd',
+                            )
+                          ? 'Data SPM berdasarkan bidang di ${context.read<AuthCubit>().state.profile?.opd?.name}'
+                          : AppHelpers.hasPermission(
+                              context.read<AuthCubit>().state.userPermissions,
+                              permissionName: 'level-kecamatan',
+                            )
+                          ? 'Data SPM berdasarkan bidang di Kecamatan ${context.read<AuthCubit>().state.profile?.district?.name?.capitalize()}'
+                          : AppHelpers.hasPermission(
+                              context.read<AuthCubit>().state.userPermissions,
+                              permissionName: 'level-kelurahan',
+                            )
+                          ? 'Data SPM berdasarkan bidang di Kelurahan ${context.read<AuthCubit>().state.profile?.subDistrict?.name?.capitalize()}'
+                          : 'Data SPM berdasarkan bidang di Posyandu ${context.read<AuthCubit>().state.profile?.healthPost?.name?.capitalize()}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,

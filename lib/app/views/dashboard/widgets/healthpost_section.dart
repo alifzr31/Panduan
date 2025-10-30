@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
+import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/views/dashboard/components/spmhpcount_card.dart';
 import 'package:panduan/app/views/dashboard/components/spmhpcountcard_loading.dart';
 import 'package:panduan/app/widgets/base_handlestate.dart';
@@ -36,7 +38,7 @@ class HealthPostSection extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Data SPM tingkat posyandu di Kota Bandung',
+                      'Data SPM tingkat posyandu di Kelurahan ${context.read<AuthCubit>().state.profile?.subDistrict?.name?.capitalize()}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,

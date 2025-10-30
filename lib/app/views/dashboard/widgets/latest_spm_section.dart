@@ -37,7 +37,7 @@ class LatestSpmSection extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Data SPM terkini',
+                      'Data SPM terbaru di tahun ini',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
