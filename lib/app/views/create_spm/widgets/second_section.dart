@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -6,6 +5,7 @@ import 'package:panduan/app/models/spm_attachment.dart';
 import 'package:panduan/app/views/map_coordinate/mapcoordinate_page.dart';
 import 'package:panduan/app/widgets/base_formfield.dart';
 import 'package:panduan/app/widgets/base_iconbutton.dart';
+import 'package:panduan/app/widgets/show_filesourcebottomsheet.dart';
 
 class SecondSection extends StatelessWidget {
   const SecondSection({
@@ -31,7 +31,7 @@ class SecondSection extends StatelessWidget {
   final void Function(LatLng coordinate, int index) onSelectedCoordinate;
   final List<bool> checkListAttachments;
   final void Function(int index) onCheckedAttachment;
-  final void Function(PlatformFile file, int index) onPickedFile;
+  final void Function(String fileName, String filePath, int index) onPickedFile;
 
   @override
   Widget build(BuildContext context) {
@@ -135,21 +135,18 @@ class SecondSection extends StatelessWidget {
                                         onSelectedCoordinate(coordinate, index);
                                       }
                                     } else {
-                                      final pickedFile = await FilePicker
-                                          .platform
-                                          .pickFiles(
-                                            type: FileType.custom,
-                                            allowedExtensions: [
-                                              'jpg',
-                                              'jpeg',
-                                              'png',
-                                              'pdf',
-                                            ],
+                                      final result =
+                                          await showFileSourceBottomSheet(
+                                            context,
                                           );
 
-                                      if (pickedFile != null) {
+                                      if (result != null) {
+                                        final file =
+                                            result as Map<String, dynamic>;
+
                                         onPickedFile(
-                                          pickedFile.files.single,
+                                          file['fileName'],
+                                          file['filePath'],
                                           index,
                                         );
                                       }

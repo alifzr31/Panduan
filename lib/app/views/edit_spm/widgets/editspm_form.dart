@@ -1,18 +1,23 @@
+import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
+import 'package:panduan/app/cubits/spm/spm_cubit.dart';
 import 'package:panduan/app/models/attachment.dart';
 import 'package:panduan/app/models/district.dart';
 import 'package:panduan/app/models/service_type.dart';
 import 'package:panduan/app/models/spm.dart';
 import 'package:panduan/app/models/spm_attachment.dart';
+import 'package:panduan/app/models/spm_field.dart';
 import 'package:panduan/app/models/subdistrict.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/app_strings.dart';
 import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/views/edit_spm/widgets/editfirst_section.dart';
 import 'package:panduan/app/views/edit_spm/widgets/editsecond_section.dart';
@@ -39,6 +44,9 @@ class EditSpmForm extends StatefulWidget {
 class _EditSpmFormState extends State<EditSpmForm> {
   final _pageController = PageController();
   int _currentPage = 0;
+  final _spmFieldCardKey = GlobalKey<ExpansionTileCardState>();
+  SpmField? _currentSpmField;
+  SpmField? _selectedSpmField;
 
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedSubmissionDate = DateTime.now();
@@ -75,6 +83,8 @@ class _EditSpmFormState extends State<EditSpmForm> {
 
   final _formKeyAttachment = GlobalKey<FormState>();
   List<SpmAttachment> _spmAttachments = [];
+  Map<String, bool> checkedMap = {};
+  Map<String, dynamic> hasFileMap = {};
   double? _latitude;
   double? _longitude;
   final Map<String, String> _attachmentPaths = {};
@@ -85,6 +95,8 @@ class _EditSpmFormState extends State<EditSpmForm> {
     final detailSpm = widget.detailSpm;
 
     setState(() {
+      _currentSpmField = detailSpm?.spmField;
+      _selectedSpmField = detailSpm?.spmField;
       _selectedSubmissionDate = detailSpm?.date ?? DateTime(0000);
       _selectedRt = detailSpm?.user?.rt;
       _selectedRw = detailSpm?.user?.rw;
@@ -178,14 +190,25 @@ class _EditSpmFormState extends State<EditSpmForm> {
           widget.detailSpm?.longitude != null) {
         _attachmentControllers.last.text = '$_latitude, $_longitude';
       }
+    } else {
+      _checkListAttachments.addAll(_spmAttachments.map((e) => false));
     }
 
-    _checkListAttachments.addAll(_spmAttachments.map((e) => false));
+    final detailSpmAttachments = widget.detailSpm?.attachments ?? [];
+
+    for (int i = 0; i < _spmAttachments.length; i++) {
+      final key = _spmAttachments[i].key ?? '';
+      hasFileMap[key] = detailSpmAttachments.length > i
+          ? detailSpmAttachments[i].path
+          : null;
+    }
   }
 
   @override
   void initState() {
-    _initEditSpmData();
+    context.read<SpmCubit>().fetchSpmFields().then((_) {
+      _initEditSpmData();
+    });
     super.initState();
   }
 
@@ -225,8 +248,292 @@ class _EditSpmFormState extends State<EditSpmForm> {
       },
       child: Column(
         children: [
+          if (_selectedSpmField != null) ...{
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Material(
+                elevation: 1,
+                color: Colors.white,
+                clipBehavior: Clip.antiAlias,
+                borderRadius: BorderRadius.circular(8),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                      child: Column(
+                        children: [
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Bidang SPM',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Ketuk dibawah ini untuk mengubah bidang SPM',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Divider(
+                              height: 1,
+                              color: Colors.grey.shade300,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    BlocBuilder<SpmCubit, SpmState>(
+                      builder: (context, state) {
+                        return ExpansionTileCard(
+                          key: _spmFieldCardKey,
+                          baseColor: Colors.white,
+                          elevation: 0,
+                          expandedColor: Colors.white,
+                          borderRadius: BorderRadius.zero,
+                          initialElevation: 0,
+                          initialPadding: EdgeInsets.zero,
+                          finalPadding: EdgeInsets.zero,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
+                          leading: Ink(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              border: Border.all(
+                                width: 0.2,
+                                color: Colors.grey.shade300,
+                              ),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: SvgPicture.asset(
+                              '${AppStrings.assetsIcons}/${_selectedSpmField?.name?.replaceAll(' ', '_').toLowerCase()}.svg',
+                              width: 26,
+                            ),
+                          ),
+                          title: Text(
+                            _selectedSpmField?.name ?? '',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                          ),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Divider(
+                                height: 1,
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            SizedBox(
+                              height: 180,
+                              width: double.infinity,
+                              child: ListView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 16,
+                                ),
+                                itemCount: state.spmFields
+                                    .where((element) {
+                                      return element.uuid !=
+                                          _selectedSpmField?.uuid;
+                                    })
+                                    .toList()
+                                    .length,
+                                itemBuilder: (context, index) {
+                                  final spmField = state.spmFields.where((
+                                    element,
+                                  ) {
+                                    return element.uuid !=
+                                        _selectedSpmField?.uuid;
+                                  }).toList()[index];
+
+                                  return Card(
+                                    elevation: 0,
+                                    clipBehavior: Clip.antiAlias,
+                                    color: Colors.grey.shade100,
+                                    margin: EdgeInsets.only(
+                                      bottom:
+                                          index == (state.spmFields.length - 1)
+                                          ? 0
+                                          : 6,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadiusGeometry.circular(6),
+                                      side:
+                                          _currentSpmField?.uuid ==
+                                              spmField.uuid
+                                          ? const BorderSide(
+                                              color: AppColors.purpleColor,
+                                            )
+                                          : BorderSide.none,
+                                    ),
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedSpmField = spmField;
+                                          _selectedServiceCategory = null;
+
+                                          for (
+                                            int i = 0;
+                                            i < _spmAttachments.length;
+                                            i++
+                                          ) {
+                                            final key =
+                                                _spmAttachments[i].key ?? '';
+                                            checkedMap[key] =
+                                                _checkListAttachments.length > i
+                                                ? _checkListAttachments[i]
+                                                : false;
+                                          }
+
+                                          _attachmentControllers.clear();
+                                          _checkListAttachments.clear();
+                                          _spmAttachments.clear();
+                                          _spmAttachments =
+                                              AppHelpers.filterSpmAttachmentsByField(
+                                                spmFieldName:
+                                                    _selectedSpmField?.name
+                                                        ?.toLowerCase() ??
+                                                    '',
+                                              );
+                                          _attachmentControllers.addAll(
+                                            _spmAttachments.map((e) {
+                                              return TextEditingController();
+                                            }),
+                                          );
+                                          _checkListAttachments.addAll(
+                                            _spmAttachments.map((e) {
+                                              return checkedMap[e.key] ?? false;
+                                            }),
+                                          );
+                                        });
+
+                                        context
+                                            .read<EditSpmCubit>()
+                                            .fetchServiceCategories(
+                                              spmFieldUuid:
+                                                  _selectedSpmField?.uuid,
+                                            );
+
+                                        _spmFieldCardKey.currentState
+                                            ?.collapse();
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Row(
+                                          children: [
+                                            Ink(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade200,
+                                                border: Border.all(
+                                                  width: 0.2,
+                                                  color: Colors.grey.shade300,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Center(
+                                                child: SvgPicture.asset(
+                                                  '${AppStrings.assetsIcons}/${spmField.name?.replaceAll(' ', '_').toLowerCase()}.svg',
+                                                  width: 26,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    spmField.name ?? '',
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  if (spmField.description !=
+                                                      null) ...{
+                                                    const SizedBox(height: 2),
+                                                    Text(
+                                                      spmField.description ??
+                                                          '',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors
+                                                            .grey
+                                                            .shade600,
+                                                      ),
+                                                    ),
+                                                  },
+                                                ],
+                                              ),
+                                            ),
+                                            if (_currentSpmField?.uuid ==
+                                                spmField.uuid) ...{
+                                              const SizedBox(width: 10),
+                                              const Material(
+                                                clipBehavior: Clip.antiAlias,
+                                                color: AppColors.purpleColor,
+                                                shape: StadiumBorder(),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 2,
+                                                    horizontal: 8,
+                                                  ),
+                                                  child: Text(
+                                                    'Sebelumnya',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            },
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          },
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
                 Row(
@@ -282,6 +589,7 @@ class _EditSpmFormState extends State<EditSpmForm> {
               ],
             ),
           ),
+          const SizedBox(height: 10),
           Expanded(
             child: PageView(
               controller: _pageController,
@@ -406,9 +714,10 @@ class _EditSpmFormState extends State<EditSpmForm> {
                   reportDescriptionController: _reportDescriptionController,
                 ),
                 EditSecondSection(
-                  spmFieldName: widget.spmFieldName,
+                  spmFieldName: _selectedSpmField?.name ?? '',
                   formKeyAttachment: _formKeyAttachment,
                   spmAttachments: _spmAttachments,
+                  hasFileMap: hasFileMap,
                   attachments: widget.detailSpm?.attachments ?? const [],
                   attachmentControllers: _attachmentControllers,
                   latitude: _latitude,
@@ -427,6 +736,8 @@ class _EditSpmFormState extends State<EditSpmForm> {
                     setState(() {
                       _checkListAttachments[index] =
                           !_checkListAttachments[index];
+                      checkedMap[_spmAttachments[index].key ?? ''] =
+                          _checkListAttachments[index];
                     });
 
                     if (!_checkListAttachments[index] &&
@@ -435,13 +746,11 @@ class _EditSpmFormState extends State<EditSpmForm> {
                       _attachmentControllers[index].clear();
                     }
                   },
-                  onPickedFile: (file, index) {
-                    final filePath = file.path;
-
+                  onPickedFile: (fileName, filePath, index) {
                     setState(() {
-                      _attachmentControllers[index].text = file.name;
+                      _attachmentControllers[index].text = fileName;
                       _attachmentPaths[_spmAttachments[index].key ?? ''] =
-                          filePath ?? '';
+                          filePath;
                       _checkListAttachments[index] = true;
                     });
                   },
@@ -515,7 +824,7 @@ class _EditSpmFormState extends State<EditSpmForm> {
                             subDistrictCode: _selectedSubDistrict?.code,
                             phone: _phoneController.text,
                             serviceType: _selectedServiceType,
-                            spmFieldUuid: widget.spmFieldUuid,
+                            spmFieldUuid: _selectedSpmField?.uuid,
                             serviceCategoryUuid: _selectedServiceCategory,
                             reportDescription:
                                 _reportDescriptionController.text,

@@ -79,14 +79,18 @@ class ServiceSection extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         BaseFormGroupField(
-          label: 'Keluhan/Usulan/Pengaduan',
-          hint: 'Masukkan keluhan/usulan/pengaduan',
+          label: 'Uraian Pelaporan',
+          hint: 'Masukkan uraian pelaporan (min. 20 karakter)',
           mandatory: true,
           controller: reportDescriptionController,
           maxLines: 4,
           validator: (value) {
             if (value!.isEmpty) {
-              return 'Silahkan masukkan keluhan/usulan/pengaduan';
+              return 'Silahkan masukkan uraian pelaporan';
+            } else {
+              if (value.length < 20) {
+                return 'Uraian pelaporan minimal berisi 20 karakter';
+              }
             }
 
             return null;

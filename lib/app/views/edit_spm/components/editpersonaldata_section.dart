@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
 import 'package:panduan/app/models/district.dart';
@@ -54,11 +55,12 @@ class EditPersonalDataSection extends StatelessWidget {
       children: [
         BaseFormGroupField(
           label: 'NIK',
-          hint: 'Masukkan NIK',
+          hint: 'Masukkan NIK (16 Digit)',
           mandatory: true,
           controller: nikController,
           keyboardType: TextInputType.number,
           maxLength: 16,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           validator: (value) {
             if (value!.isEmpty) {
               return 'Silahkan masukkan NIK';
@@ -88,13 +90,17 @@ class EditPersonalDataSection extends StatelessWidget {
         const SizedBox(height: 10),
         BaseFormGroupField(
           label: 'Alamat',
-          hint: 'Masukkan alamat',
+          hint: 'Masukkan alamat (min. 10 karakter)',
           mandatory: true,
           controller: addressController,
           maxLines: 4,
           validator: (value) {
             if (value!.isEmpty) {
               return 'Silahkan masukkan alamat';
+            } else {
+              if (value.length < 10) {
+                return 'Alamat minimal berisi 10 karakter';
+              }
             }
 
             return null;
@@ -239,17 +245,22 @@ class EditPersonalDataSection extends StatelessWidget {
         const SizedBox(height: 10),
         BaseFormGroupField(
           label: 'Nomor Telepon',
-          hint: 'Masukkan nomor telepon',
+          hint: 'Masukkan nomor telepon (08xxx atau 62xxx)',
           mandatory: true,
           controller: phoneController,
           keyboardType: TextInputType.phone,
           maxLength: 13,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           validator: (value) {
             if (value!.isEmpty) {
               return 'Silahkan masukkan nomor telepon';
             } else {
-              if (value.length < 10 || value.length > 13) {
-                return 'Nomor telepon harus berjumlah 10 sampai 13 digit';
+              if (!(value.startsWith('08') || value.startsWith('62'))) {
+                return 'Nomor telepon harus diawali dengan 08 atau 62';
+              } else {
+                if (value.length < 10 || value.length > 13) {
+                  return 'Nomor telepon harus berjumlah 10 sampai 13 digit';
+                }
               }
             }
 

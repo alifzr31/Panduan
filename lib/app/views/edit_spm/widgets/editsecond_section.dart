@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -9,12 +8,14 @@ import 'package:panduan/app/views/webview/webview_page.dart';
 import 'package:panduan/app/widgets/base_formfield.dart';
 import 'package:panduan/app/widgets/base_iconbutton.dart';
 import 'package:panduan/app/widgets/base_textbutton.dart';
+import 'package:panduan/app/widgets/show_filesourcebottomsheet.dart';
 
 class EditSecondSection extends StatelessWidget {
   const EditSecondSection({
     required this.spmFieldName,
     required this.formKeyAttachment,
     required this.spmAttachments,
+    required this.hasFileMap,
     required this.attachments,
     required this.attachmentControllers,
     required this.latitude,
@@ -29,6 +30,7 @@ class EditSecondSection extends StatelessWidget {
   final String spmFieldName;
   final GlobalKey<FormState> formKeyAttachment;
   final List<SpmAttachment> spmAttachments;
+  final Map<String, dynamic> hasFileMap;
   final List<Attachment> attachments;
   final List<TextEditingController> attachmentControllers;
   final double? latitude;
@@ -36,7 +38,7 @@ class EditSecondSection extends StatelessWidget {
   final void Function(LatLng coordinate, int index) onSelectedCoordinate;
   final List<bool> checkListAttachments;
   final void Function(int index) onCheckedAttachment;
-  final void Function(PlatformFile file, int index) onPickedFile;
+  final void Function(String fileName, String filePath, int index) onPickedFile;
 
   @override
   Widget build(BuildContext context) {
@@ -170,21 +172,18 @@ class EditSecondSection extends StatelessWidget {
                                             );
                                           }
                                         } else {
-                                          final pickedFile = await FilePicker
-                                              .platform
-                                              .pickFiles(
-                                                type: FileType.custom,
-                                                allowedExtensions: [
-                                                  'jpg',
-                                                  'jpeg',
-                                                  'png',
-                                                  'pdf',
-                                                ],
+                                          final result =
+                                              await showFileSourceBottomSheet(
+                                                context,
                                               );
 
-                                          if (pickedFile != null) {
+                                          if (result != null) {
+                                            final file =
+                                                result as Map<String, dynamic>;
+
                                             onPickedFile(
-                                              pickedFile.files.single,
+                                              file['fileName'],
+                                              file['filePath'],
                                               index,
                                             );
                                           }
@@ -212,7 +211,8 @@ class EditSecondSection extends StatelessWidget {
                                   },
                                 ],
                               ),
-                              if (attachments[index].path != null) ...{
+                              if (hasFileMap[spmAttachments[index].key] !=
+                                  null) ...{
                                 const SizedBox(height: 4),
                                 Align(
                                   alignment: Alignment.centerLeft,
@@ -224,8 +224,14 @@ class EditSecondSection extends StatelessWidget {
                                         WebviewPage.routeName,
                                         arguments: {
                                           'fileName':
-                                              attachments[index].nameFile,
-                                          'filePath': attachments[index].path,
+                                              hasFileMap[spmAttachments[index]
+                                                      .key]
+                                                  .toString()
+                                                  .split('/')
+                                                  .last,
+                                          'filePath':
+                                              hasFileMap[spmAttachments[index]
+                                                  .key],
                                         },
                                       );
                                     },

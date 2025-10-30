@@ -346,13 +346,11 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                       _attachmentControllers[index].clear();
                     }
                   },
-                  onPickedFile: (file, index) {
-                    final filePath = file.path;
-
+                  onPickedFile: (fileName, filePath, index) {
                     setState(() {
-                      _attachmentControllers[index].text = file.name;
+                      _attachmentControllers[index].text = fileName;
                       _attachmentPaths[_spmAttachments[index].key ?? ''] =
-                          filePath ?? '';
+                          filePath;
                       _checkListAttachments[index] = true;
                     });
                   },
