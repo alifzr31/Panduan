@@ -27,7 +27,7 @@ class SpmService extends DioClient {
           if (statuses?.isNotEmpty ?? false) ...{
             'statuses': statuses?.join(','),
           },
-          'order': 'date',
+          'order': 'updated_at',
           'sort': 'desc',
         },
       );
