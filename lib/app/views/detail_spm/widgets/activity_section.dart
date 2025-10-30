@@ -3,14 +3,20 @@ import 'package:panduan/app/models/spm.dart';
 import 'package:panduan/app/views/detail_spm/components/activity_tracking.dart';
 
 class ActivitySection extends StatelessWidget {
-  const ActivitySection({required this.activities, super.key});
+  const ActivitySection({
+    required this.activities,
+    required this.canSubmitOrVerify,
+    super.key,
+  });
 
   final List<Activity> activities;
+  final bool canSubmitOrVerify;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
+      bottom: !canSubmitOrVerify,
       child: Material(
         elevation: 1,
         color: Colors.white,
