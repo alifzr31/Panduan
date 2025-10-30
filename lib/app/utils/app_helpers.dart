@@ -138,8 +138,9 @@ class AppHelpers {
       'VERIFICATION_SUB_DISTRICT',
       'PROCESS_BY_SUB_DISTRICT',
       'PROCESS_BY_OPD',
-      'FORWARD_TO_OPD',
       'FORWARD_TO_DISTRICT',
+      'FORWARD_TO_TP_POSYANDU_KOTA',
+      'FORWARD_TO_OPD',
       'FINISH_BY_SUB_DISTRICT',
       'FINISH_BY_OPD',
       'DECLINE_BY_SUB_DISTRICT',
@@ -166,10 +167,12 @@ class AppHelpers {
         return "Ditolak Kecamatan";
       case "DECLINE_BY_OPD":
         return "Ditolak OPD";
-      case "FORWARD_TO_OPD":
-        return "Diteruskan ke OPD";
       case "FORWARD_TO_DISTRICT":
         return "Diteruskan ke Kecamatan";
+      case "FORWARD_TO_TP_POSYANDU_KOTA":
+        return "Perlu Tindak Lanjut TP Posyandu Kota";
+      case "FORWARD_TO_OPD":
+        return "Diteruskan ke OPD";
       case "NEED_VERIFICATION_SUB_DISTRICT":
         return "Perlu Verifikasi Kelurahan";
       case "NEED_VERIFICATION_OPD":
@@ -196,8 +199,8 @@ class AppHelpers {
       case "DECLINE_BY_DISTRICT":
       case "DECLINE_BY_OPD":
         return Colors.red.shade500;
-      case "FORWARD_TO_OPD":
       case "FORWARD_TO_DISTRICT":
+      case "FORWARD_TO_OPD":
         return Colors.purple.shade500;
       default:
         return Colors.grey.shade500;
