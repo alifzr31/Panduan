@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/widgets/base_button.dart';
@@ -27,34 +25,35 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
   bool _isFiltered = false;
 
   List<String> showFilterStatusByLevel() {
-    if (AppHelpers.hasPermission(
-      context.read<AuthCubit>().state.userPermissions,
-      permissionName: 'level-opd',
-    )) {
-      return const ['NEED_VERIFICATION_OPD', 'FINISH_BY_OPD', 'DECLINE_BY_OPD'];
-    } else if (AppHelpers.hasPermission(
-      context.read<AuthCubit>().state.userPermissions,
-      permissionName: 'level-kecematan',
-    )) {
-      return const [
-        'NEED_APPROVAL_DISTRICT',
-        'FORWARD_TO_OPD',
-        'DECLINE_BY_DISTRICT',
-      ];
-    } else if (AppHelpers.hasPermission(
-      context.read<AuthCubit>().state.userPermissions,
-      permissionName: 'level-kelurahan',
-    )) {
-      return const [
-        'NEED_VERIFICATION_SUB_DISTRICT',
-        'FORWARD_TO_DISTRICT',
-        'FORWARD_TO_OPD',
-        'FINISH_BY_SUB_DISTRICT',
-        'DECLINE_BY_SUB_DISTRICT',
-      ];
-    } else {
-      return widget.listStatus;
-    }
+    // if (AppHelpers.hasPermission(
+    //   context.read<AuthCubit>().state.userPermissions,
+    //   permissionName: 'level-opd',
+    // )) {
+    //   return const ['NEED_VERIFICATION_OPD', 'FINISH_BY_OPD', 'DECLINE_BY_OPD'];
+    // } else if (AppHelpers.hasPermission(
+    //   context.read<AuthCubit>().state.userPermissions,
+    //   permissionName: 'level-kecematan',
+    // )) {
+    //   return const [
+    //     'NEED_APPROVAL_DISTRICT',
+    //     'FORWARD_TO_TP_POSYANDU_KOTA',
+    //     'DECLINE_BY_DISTRICT',
+    //   ];
+    // } else if (AppHelpers.hasPermission(
+    //   context.read<AuthCubit>().state.userPermissions,
+    //   permissionName: 'level-kelurahan',
+    // )) {
+    //   return const [
+    //     'NEED_VERIFICATION_SUB_DISTRICT',
+    //     'FORWARD_TO_DISTRICT',
+    //     'FORWARD_TO_TP_POSYANDU_KOTA',
+    //     'FINISH_BY_SUB_DISTRICT',
+    //     'DECLINE_BY_SUB_DISTRICT',
+    //   ];
+    // } else {
+    //   return widget.listStatus;
+    // }
+    return widget.listStatus;
   }
 
   @override
