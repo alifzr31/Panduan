@@ -150,8 +150,7 @@ class DashboardService extends DioClient {
           'page': 1,
           'limit': 3,
           'year': DateTime.now().year,
-          'month': DateTime.now().month,
-          'order': 'date',
+          'order': 'updated_at',
           'sort': 'desc',
         },
       );
