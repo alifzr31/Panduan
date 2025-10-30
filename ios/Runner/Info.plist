@@ -48,11 +48,20 @@
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
 
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>App membutuhkan akses ke galeri untuk memilih foto.</string>
+
+		<key>NSCameraUsageDescription</key>
+		<string>Panduan membutuhkan akses ke kamera untuk mengambil foto.</string>
+
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Panduan membutuhkan akses mikrofon (jika merekam video).</string>
+
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>App membutuhkan lokasi saat digunakan</string>
+		<string>Panduan membutuhkan lokasi saat digunakan</string>
 
 		<key>NSLocationAlwaysUsageDescription</key>
-		<string>App membutuhkan lokasi selalu</string>
+		<string>Panduan membutuhkan lokasi selalu</string>
 
 		<key>LSApplicationQueriesSchemes</key>
 		<array>
