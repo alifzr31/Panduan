@@ -13,7 +13,7 @@ class ActivityService extends DioClient {
     String? spmUuid,
     String? status,
     String? description,
-    String? opdUuid,
+    List<String>? opdUuids,
     double? latitude,
     double? longitude,
     List<String>? attachmentKeys,
@@ -24,8 +24,10 @@ class ActivityService extends DioClient {
       'status': status,
       'description': description,
       'date': AppHelpers.formDateTimeFormat(DateTime.now()),
-      if (opdUuid != null || (opdUuid?.isNotEmpty ?? false)) ...{
-        'opd_uuid': opdUuid,
+      if (opdUuids?.isNotEmpty ?? false) ...{
+        for (var i = 0; i < (opdUuids?.length ?? 0); i++) ...{
+          'opd_uuids[$i]': opdUuids?[i],
+        },
       },
       if (latitude != null) ...{'latitude': latitude},
       if (longitude != null) ...{'longitude': longitude},
@@ -51,7 +53,7 @@ class ActivityService extends DioClient {
     }
   }
 
-  Future<List<Opd>> fetchOpd({String? serviceCategoryUuid}) async {
+  Future<List<Opd>> fetchOpd() async {
     try {
       final response = await get(
         '/opd',
@@ -60,7 +62,6 @@ class ActivityService extends DioClient {
           'limit': 100,
           'province_code': 32,
           'city_code': 73,
-          'service_category_uuid': serviceCategoryUuid,
           'order': 'name',
           'sort': 'asc',
         },

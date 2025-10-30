@@ -16,7 +16,7 @@ class ActivityCubit extends Cubit<ActivityState> {
     String? spmUuid,
     String? status,
     String? description,
-    String? opdUuid,
+    List<String>? opdUuids,
     double? latitude,
     double? longitude,
     List<String>? attachmentKeys,
@@ -29,7 +29,7 @@ class ActivityCubit extends Cubit<ActivityState> {
         spmUuid: spmUuid,
         status: status,
         description: description,
-        opdUuid: opdUuid,
+        opdUuids: opdUuids,
         latitude: latitude,
         longitude: longitude,
         attachmentKeys: attachmentKeys,
@@ -61,13 +61,11 @@ class ActivityCubit extends Cubit<ActivityState> {
     }
   }
 
-  Future<void> fetchOpd({String? serviceCategoryUuid}) async {
+  Future<void> fetchOpd() async {
     emit(state.copyWith(opdStatus: OpdStatus.loading));
 
     try {
-      final opd = await _repository.fetchOpd(
-        serviceCategoryUuid: serviceCategoryUuid,
-      );
+      final opd = await _repository.fetchOpd();
 
       emit(state.copyWith(opdStatus: OpdStatus.success, opd: opd));
     } on DioException catch (e) {

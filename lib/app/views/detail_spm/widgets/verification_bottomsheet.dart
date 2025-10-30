@@ -1,4 +1,4 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,6 +14,7 @@ import 'package:panduan/app/widgets/base_dropdownfield.dart';
 import 'package:panduan/app/widgets/base_formfield.dart';
 import 'package:panduan/app/widgets/base_iconbutton.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
+import 'package:panduan/app/widgets/show_filesourcebottomsheet.dart';
 import 'package:toastification/toastification.dart';
 
 class VerificationBottomSheet extends StatefulWidget {
@@ -37,7 +38,8 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
   final _formKey = GlobalKey<FormState>();
   late final List<String> _verificationResults;
   String? _selectedVerificationResult;
-  String? _selectedOpdUuid;
+  final List<String> _selectedOpdUuids = [];
+  final List<String> _selectedOpdNames = [];
   final _noteController = TextEditingController();
   double? _latitude;
   double? _longitude;
@@ -71,10 +73,17 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
         _verificationResults = const ['PROCESS_BY_OPD', 'DECLINE_BY_OPD'];
       });
     } else if (context.read<AuthCubit>().state.userPermissions.contains(
+      'level-walikota',
+    )) {
+      context.read<ActivityCubit>().fetchOpd();
+    } else if (context.read<AuthCubit>().state.userPermissions.contains(
       'level-kecamatan',
     )) {
       setState(() {
-        _verificationResults = const ['DECLINE_BY_DISTRICT', 'FORWARD_TO_OPD'];
+        _verificationResults = const [
+          'DECLINE_BY_DISTRICT',
+          'FORWARD_TO_TP_POSYANDU_KOTA',
+        ];
       });
     } else if (context.read<AuthCubit>().state.userPermissions.contains(
       'level-kelurahan',
@@ -92,7 +101,7 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
           _verificationResults = const [
             'PROCESS_BY_SUB_DISTRICT',
             'DECLINE_BY_SUB_DISTRICT',
-            'FORWARD_TO_OPD',
+            'FORWARD_TO_TP_POSYANDU_KOTA',
           ];
         });
       }
@@ -132,39 +141,10 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
             key: _formKey,
             child: Column(
               children: [
-                BaseDropdownGroupField(
-                  label: 'Hasil Verifikasi',
-                  hint: 'Pilih hasil verifikasi',
-                  mandatory: true,
-                  value: _selectedVerificationResult,
-                  items: _verificationResults.map((e) {
-                    return DropdownMenuItem(
-                      value: e,
-                      child: Text(AppHelpers.statusLabel(e)),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedOpdUuid = null;
-                      _selectedVerificationResult = value as String;
-                    });
-
-                    if (_selectedVerificationResult == 'FORWARD_TO_OPD') {
-                      context.read<ActivityCubit>().fetchOpd(
-                        serviceCategoryUuid: widget.serviceCategoryUuid,
-                      );
-                    }
-                  },
-                  validator: (value) {
-                    if (_selectedVerificationResult == null) {
-                      return 'Silahkan pilih hasil verifikasi';
-                    }
-
-                    return null;
-                  },
-                ),
-                if (_selectedVerificationResult == 'FORWARD_TO_OPD') ...{
-                  const SizedBox(height: 10),
+                if (AppHelpers.hasPermission(
+                  context.read<AuthCubit>().state.userPermissions,
+                  permissionName: 'level-walikota',
+                )) ...{
                   BlocBuilder<ActivityCubit, ActivityState>(
                     builder: (context, state) {
                       return BaseDropdownGroupField(
@@ -173,26 +153,142 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                             ? 'Pilih OPD tujuan'
                             : 'Mohon tunggu...',
                         mandatory: true,
-                        value: _selectedOpdUuid,
+                        menuItemStylePadding: EdgeInsets.zero,
+                        value: (_selectedOpdUuids.isEmpty)
+                            ? null
+                            : _selectedOpdUuids.last,
                         items: state.opd.map((e) {
                           return DropdownMenuItem(
+                            enabled: false,
                             value: e.uuid,
-                            child: Text(e.name ?? ''),
+                            child: StatefulBuilder(
+                              builder: (context, menuSetState) {
+                                final isSelected = _selectedOpdUuids.contains(
+                                  e.uuid,
+                                );
+
+                                return InkWell(
+                                  onTap: () {
+                                    if (isSelected) {
+                                      _selectedOpdUuids.remove(e.uuid);
+                                      _selectedOpdNames.remove(e.name);
+                                    } else {
+                                      _selectedOpdUuids.add(e.uuid ?? '');
+                                      _selectedOpdNames.add(e.name ?? '');
+                                    }
+                                    setState(() {});
+                                    menuSetState(() {});
+                                  },
+
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          isSelected
+                                              ? MingCute.checkbox_fill
+                                              : MingCute.square_line,
+                                          size: 18,
+                                          color: isSelected
+                                              ? AppColors.blueColor
+                                              : null,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          e.name ?? '',
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           );
                         }).toList(),
+                        selectedItemBuilder: (context) {
+                          return state.opd.map((e) {
+                            return ListView(
+                              padding: EdgeInsets.zero,
+                              scrollDirection: Axis.horizontal,
+                              physics: const ClampingScrollPhysics(),
+                              children: List.generate(
+                                _selectedOpdNames.length,
+                                (index) {
+                                  return Row(
+                                    children: [
+                                      Material(
+                                        shape: const StadiumBorder(),
+                                        clipBehavior: Clip.antiAlias,
+                                        color: AppColors.softBlueColor,
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 2,
+                                              horizontal: 10,
+                                            ),
+                                            child: Text(
+                                              _selectedOpdNames[index],
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.blueColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      if (index !=
+                                          (_selectedOpdNames.length - 1))
+                                        const SizedBox(width: 4),
+                                    ],
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList();
+                        },
                         onChanged: (value) {
-                          setState(() {
-                            _selectedOpdUuid = value as String;
-                          });
+                          if (kDebugMode) {
+                            print(_selectedOpdUuids);
+                            print(_selectedOpdNames);
+                          }
                         },
                         validator: (value) {
-                          if (_selectedOpdUuid == null) {
+                          if (_selectedOpdUuids.isEmpty) {
                             return 'Silahkan pilih OPD tujuan';
                           }
 
                           return null;
                         },
                       );
+                    },
+                  ),
+                } else ...{
+                  BaseDropdownGroupField(
+                    label: 'Hasil Verifikasi',
+                    hint: 'Pilih hasil verifikasi',
+                    mandatory: true,
+                    value: _selectedVerificationResult,
+                    items: _verificationResults.map((e) {
+                      return DropdownMenuItem(
+                        value: e,
+                        child: Text(AppHelpers.statusLabel(e)),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedOpdUuids.clear();
+                        _selectedOpdNames.clear();
+                        _selectedVerificationResult = value as String;
+                      });
+                    },
+                    validator: (value) {
+                      if (_selectedVerificationResult == null) {
+                        return 'Silahkan pilih hasil verifikasi';
+                      }
+
+                      return null;
                     },
                   ),
                 },
@@ -322,26 +418,21 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                                       controller: _attachmentControllers[index],
                                       isDate: true,
                                       onTap: () async {
-                                        final pickedFile = await FilePicker
-                                            .platform
-                                            .pickFiles(
-                                              type: FileType.custom,
-                                              allowedExtensions: [
-                                                'jpg',
-                                                'jpeg',
-                                                'png',
-                                                'pdf',
-                                              ],
+                                        final result =
+                                            await showFileSourceBottomSheet(
+                                              context,
                                             );
 
-                                        if (pickedFile != null) {
+                                        if (result != null) {
+                                          final file =
+                                              result as Map<String, dynamic>;
+
                                           setState(() {
                                             _attachmentPaths[index] =
-                                                pickedFile.files.single.path ??
-                                                '';
+                                                file['filePath'];
                                           });
                                           _attachmentControllers[index].text =
-                                              pickedFile.files.single.name;
+                                              file['fileName'];
                                         }
                                       },
                                       validator: index < 1
@@ -433,9 +524,18 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                         if (_formKey.currentState?.validate() ?? false) {
                           context.read<ActivityCubit>().createActivity(
                             spmUuid: widget.spmUuid,
-                            status: _selectedVerificationResult,
+                            status:
+                                AppHelpers.hasPermission(
+                                  context
+                                      .read<AuthCubit>()
+                                      .state
+                                      .userPermissions,
+                                  permissionName: 'level-walikota',
+                                )
+                                ? 'FORWARD_TO_OPD'
+                                : _selectedVerificationResult,
                             description: _noteController.text,
-                            opdUuid: _selectedOpdUuid,
+                            opdUuids: _selectedOpdUuids,
                             latitude: _latitude,
                             longitude: _longitude,
                             attachmentKeys: _attachmentKeyControllers.map((e) {

@@ -7,13 +7,13 @@ abstract class ActivityRepository {
     String? spmUuid,
     String? status,
     String? description,
-    String? opdUuid,
+    List<String>? opdUuids,
     double? latitude,
     double? longitude,
     List<String>? attachmentKeys,
     List<String>? attachmentPaths,
   });
-  Future<List<Opd>> fetchOpd({String? serviceCategoryUuid});
+  Future<List<Opd>> fetchOpd();
 }
 
 class ActivityRepositoryImpl implements ActivityRepository {
@@ -26,7 +26,7 @@ class ActivityRepositoryImpl implements ActivityRepository {
     String? spmUuid,
     String? status,
     String? description,
-    String? opdUuid,
+    List<String>? opdUuids,
     double? latitude,
     double? longitude,
     List<String>? attachmentKeys,
@@ -36,7 +36,7 @@ class ActivityRepositoryImpl implements ActivityRepository {
       spmUuid: spmUuid,
       status: status,
       description: description,
-      opdUuid: opdUuid,
+      opdUuids: opdUuids,
       latitude: latitude,
       longitude: longitude,
       attachmentKeys: attachmentKeys,
@@ -45,7 +45,7 @@ class ActivityRepositoryImpl implements ActivityRepository {
   }
 
   @override
-  Future<List<Opd>> fetchOpd({String? serviceCategoryUuid}) async {
-    return await _service.fetchOpd(serviceCategoryUuid: serviceCategoryUuid);
+  Future<List<Opd>> fetchOpd() async {
+    return await _service.fetchOpd();
   }
 }

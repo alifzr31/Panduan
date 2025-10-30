@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -10,6 +9,7 @@ import 'package:panduan/app/widgets/base_button.dart';
 import 'package:panduan/app/widgets/base_formfield.dart';
 import 'package:panduan/app/widgets/base_iconbutton.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
+import 'package:panduan/app/widgets/show_filesourcebottomsheet.dart';
 import 'package:toastification/toastification.dart';
 
 class CompleteBottomSheet extends StatefulWidget {
@@ -171,26 +171,21 @@ class _CompleteBottomSheetState extends State<CompleteBottomSheet> {
                                       controller: _attachmentControllers[index],
                                       isDate: true,
                                       onTap: () async {
-                                        final pickedFile = await FilePicker
-                                            .platform
-                                            .pickFiles(
-                                              type: FileType.custom,
-                                              allowedExtensions: [
-                                                'jpg',
-                                                'jpeg',
-                                                'png',
-                                                'pdf',
-                                              ],
+                                        final result =
+                                            await showFileSourceBottomSheet(
+                                              context,
                                             );
 
-                                        if (pickedFile != null) {
+                                        if (result != null) {
+                                          final file =
+                                              result as Map<String, dynamic>;
+
                                           setState(() {
                                             _attachmentPaths[index] =
-                                                pickedFile.files.single.path ??
-                                                '';
+                                                file['filePath'];
                                           });
                                           _attachmentControllers[index].text =
-                                              pickedFile.files.single.name;
+                                              file['fileName'];
                                         }
                                       },
                                       validator: index < 1
