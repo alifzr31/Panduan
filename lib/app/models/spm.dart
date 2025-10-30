@@ -8,6 +8,8 @@ import 'package:equatable/equatable.dart';
 import 'package:panduan/app/models/attachment.dart';
 import 'package:panduan/app/models/district.dart';
 import 'package:panduan/app/models/opd.dart';
+import 'package:panduan/app/models/service_category.dart';
+import 'package:panduan/app/models/spm_field.dart';
 import 'package:panduan/app/models/subdistrict.dart';
 
 Spm spmFromJson(dynamic data) => Spm.fromJson(data);
@@ -32,11 +34,11 @@ class Spm extends Equatable {
   final String? status;
   final User? user;
   final ActionBy? healthPost;
-  final Opd? opd;
+  final List<Opd>? opd;
   final District? district;
-  final District? subDistrict;
-  final ActionBy? spmField;
-  final ActionBy? serviceCategory;
+  final SubDistrict? subDistrict;
+  final SpmField? spmField;
+  final ServiceCategory? serviceCategory;
   final ActionBy? createdBy;
   final List<Activity>? activity;
   final List<Attachment>? attachments;
@@ -102,19 +104,21 @@ class Spm extends Equatable {
     healthPost: json["health_post"] == null
         ? null
         : ActionBy.fromJson(json["health_post"]),
-    opd: json["opd"] == null ? null : Opd.fromJson(json["opd"]),
+    opd: json["opd"] == null
+        ? null
+        : List<Opd>.from(json["opd"]!.map((x) => Opd.fromJson(x))),
     district: json["district"] == null
         ? null
         : District.fromJson(json["district"]),
     subDistrict: json["sub_district"] == null
         ? null
-        : District.fromJson(json["sub_district"]),
+        : SubDistrict.fromJson(json["sub_district"]),
     spmField: json["spm_field"] == null
         ? null
-        : ActionBy.fromJson(json["spm_field"]),
+        : SpmField.fromJson(json["spm_field"]),
     serviceCategory: json["service_category"] == null
         ? null
-        : ActionBy.fromJson(json["service_category"]),
+        : ServiceCategory.fromJson(json["service_category"]),
     createdBy: json["created_by"] == null
         ? null
         : ActionBy.fromJson(json["created_by"]),
@@ -142,7 +146,7 @@ class Spm extends Equatable {
     "status": status,
     "user": user?.toJson(),
     "health_post": healthPost?.toJson(),
-    "opd": opd?.toJson(),
+    "opd": opd == null ? [] : List<dynamic>.from(opd!.map((x) => x.toJson())),
     "district": district?.toJson(),
     "sub_district": subDistrict?.toJson(),
     "spm_field": spmField?.toJson(),
@@ -167,7 +171,7 @@ class Activity extends Equatable {
   final String? longitude;
   final String? status;
   final ActionBy? healthPost;
-  final ActionBy? opd;
+  final List<Opd>? opd;
   final District? district;
   final District? subDistrict;
   final ActionBy? createdBy;
@@ -222,7 +226,9 @@ class Activity extends Equatable {
     healthPost: json["health_post"] == null
         ? null
         : ActionBy.fromJson(json["health_post"]),
-    opd: json["opd"] == null ? null : ActionBy.fromJson(json["opd"]),
+    opd: json["opd"] == null
+        ? null
+        : List<Opd>.from(json["opd"]!.map((x) => Opd.fromJson(x))),
     district: json["district"] == null
         ? null
         : District.fromJson(json["district"]),
@@ -249,7 +255,7 @@ class Activity extends Equatable {
     "longitude": longitude,
     "status": status,
     "health_post": healthPost?.toJson(),
-    "opd": opd?.toJson(),
+    "opd": opd == null ? [] : List<dynamic>.from(opd!.map((x) => x)),
     "district": district?.toJson(),
     "sub_district": subDistrict?.toJson(),
     "created_by": createdBy?.toJson(),
