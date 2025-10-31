@@ -182,9 +182,18 @@ class _EditSpmFormState extends State<EditSpmForm> {
     );
 
     if (attachments != null && attachments.isNotEmpty) {
-      _checkListAttachments.addAll(
-        attachments.map((e) => e.checklist ?? false),
-      );
+      // Initialize all checklist values to false first
+      _checkListAttachments.addAll(_spmAttachments.map((e) => false));
+
+      for (int i = 0; i < _spmAttachments.length; i++) {
+        final spmAttachment = _spmAttachments[i];
+        final key = spmAttachment.key ?? '';
+        final matchingAttachment = attachments.firstWhere(
+          (attachment) => attachment.title?.toLowerCase() == key.toLowerCase(),
+          orElse: () => const Attachment(),
+        );
+        _checkListAttachments[i] = matchingAttachment.checklist ?? false;
+      }
 
       if (widget.detailSpm?.latitude != null &&
           widget.detailSpm?.longitude != null) {
@@ -194,13 +203,15 @@ class _EditSpmFormState extends State<EditSpmForm> {
       _checkListAttachments.addAll(_spmAttachments.map((e) => false));
     }
 
-    final detailSpmAttachments = widget.detailSpm?.attachments ?? [];
+    for (final spmAttachment in _spmAttachments) {
+      final key = spmAttachment.key ?? '';
+      final matchingAttachment = attachments?.firstWhere(
+        (attachment) => attachment.title?.toLowerCase() == key.toLowerCase(),
+      );
 
-    for (int i = 0; i < _spmAttachments.length; i++) {
-      final key = _spmAttachments[i].key ?? '';
-      hasFileMap[key] = detailSpmAttachments.length > i
-          ? detailSpmAttachments[i].path
-          : null;
+      setState(() {
+        hasFileMap[key] = matchingAttachment?.path;
+      });
     }
   }
 
