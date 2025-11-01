@@ -11,10 +11,11 @@ class RemoteConfigService {
   final FirebaseRemoteConfig _remote;
 
   static const _kDefault = {
-    'latest_version': '1.0.0',
-    'latest_build_number': 1,
-    'mandatory_update': false,
-    'update_description': 'Perbaikan bugs dan optimalisasi performa aplikasi.',
+    'latest_version': '1.0.1',
+    'latest_build_number': 2,
+    'mandatory_update': true,
+    'update_description':
+        'Pembaruan fitur, perbaikan bugs dan optimalisasi performa aplikasi.',
   };
 
   Future<void> init() async {
