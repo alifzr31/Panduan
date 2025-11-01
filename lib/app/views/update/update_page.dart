@@ -38,7 +38,7 @@ class UpdatePage extends StatelessWidget {
             children: [
               Expanded(
                 child: SvgPicture.asset(
-                  '${AppStrings.assetsImages}/panduan-logo.svg',
+                  '${AppStrings.assetsImages}/update.svg',
                   width: 180,
                 ),
               ),

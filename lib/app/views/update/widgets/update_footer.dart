@@ -105,8 +105,6 @@ class UpdateFooter extends StatelessWidget {
           height: 40,
           width: double.infinity,
           child: BaseButton(
-            bgColor: AppColors.pinkColor,
-            fgColor: Colors.white,
             label: 'Perbarui Sekarang',
             onPressed: () async {
               final url = Uri.parse(
