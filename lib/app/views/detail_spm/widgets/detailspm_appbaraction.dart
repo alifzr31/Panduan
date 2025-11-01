@@ -19,6 +19,10 @@ List<Widget> detailSpmAppBarAction(
   return [
     if (AppHelpers.hasPermission(
           context.read<AuthCubit>().state.userPermissions,
+          permissionName: 'level-posyandu',
+        ) &&
+        AppHelpers.hasPermission(
+          context.read<AuthCubit>().state.userPermissions,
           permissionName: 'user-submission-update',
         ) &&
         context.watch<DetailSpmCubit>().state.detailSpm?.status ==
@@ -59,6 +63,10 @@ List<Widget> detailSpmAppBarAction(
       ),
     },
     if (AppHelpers.hasPermission(
+          context.read<AuthCubit>().state.userPermissions,
+          permissionName: 'level-posyandu',
+        ) &&
+        AppHelpers.hasPermission(
           context.read<AuthCubit>().state.userPermissions,
           permissionName: 'user-submission-delete',
         ) &&
