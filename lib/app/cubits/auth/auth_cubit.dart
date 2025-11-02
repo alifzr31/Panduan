@@ -26,8 +26,12 @@ class AuthCubit extends Cubit<AuthState> {
           profileStatus: ProfileStatus.initial,
           profile: null,
           profileError: null,
+          changePasswordStatus: ChangePasswordStatus.initial,
+          changePasswordResponse: null,
+          changePasswordError: null,
           logoutStatus: LogoutStatus.initial,
           logoutResponse: null,
+          logoutReason: null,
           logoutError: null,
         ),
       );
@@ -152,6 +156,58 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  void changePassword({
+    String? currentPassword,
+    String? newPassword,
+    String? confirmPassword,
+  }) async {
+    emit(
+      state.copyWith(
+        profile: state.profile,
+        userPermissions: state.userPermissions,
+        changePasswordStatus: ChangePasswordStatus.loading,
+      ),
+    );
+
+    try {
+      final response = await _repository.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+        confirmPassword: confirmPassword,
+      );
+
+      if (response.data['status']) {
+        emit(
+          state.copyWith(
+            profile: state.profile,
+            userPermissions: state.userPermissions,
+            changePasswordStatus: ChangePasswordStatus.success,
+            changePasswordResponse: response,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            profile: state.profile,
+            userPermissions: state.userPermissions,
+            changePasswordStatus: ChangePasswordStatus.error,
+            changePasswordError: response.data['message'],
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      emit(
+        state.copyWith(
+          profile: state.profile,
+          userPermissions: state.userPermissions,
+          changePasswordStatus: ChangePasswordStatus.error,
+          changePasswordError:
+              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+        ),
+      );
+    }
+  }
+
   void logoutSession() async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
@@ -166,7 +222,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(state.copyWith(authStatus: AuthStatus.unauthorized));
   }
 
-  void logout() async {
+  void logout({String? logoutReason}) async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
     emit(
@@ -194,6 +250,7 @@ class AuthCubit extends Cubit<AuthState> {
             userPermissions: state.userPermissions,
             logoutStatus: LogoutStatus.success,
             logoutResponse: response,
+            logoutReason: logoutReason,
           ),
         );
       } else {

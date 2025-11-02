@@ -12,6 +12,7 @@ import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:panduan/app/configs/local_notification/local_notif.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
+import 'package:panduan/app/views/change_password/changepassword_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/widgets/base_listtile.dart';
 import 'package:panduan/app/widgets/base_skeletonizer.dart';
@@ -166,6 +167,32 @@ class DashboardEndDrawer extends StatelessWidget {
             Expanded(
               child: Column(
                 children: [
+                  BlocBuilder<AuthCubit, AuthState>(
+                    builder: (context, state) {
+                      return BaseListTile(
+                        leading: const Icon(
+                          MingCute.lock_line,
+                          size: 22,
+                          color: AppColors.blueColor,
+                        ),
+                        title: 'Ubah Kata Sandi',
+                        subtitle: state.profile?.isNeedResetPassword ?? false
+                            ? state.profile?.descriptionResetPassword
+                            : null,
+                        subtitleColor: Colors.red.shade600,
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            ChangePasswordPage.routeName,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Divider(height: 1, color: Colors.grey.shade300),
+                  ),
                   BaseListTile(
                     leading: const Icon(
                       MingCute.information_line,
@@ -267,9 +294,15 @@ class DashboardEndDrawer extends StatelessWidget {
                         );
                         showCustomToast(
                           context,
-                          type: ToastificationType.success,
-                          title: 'Keluar Berhasil',
-                          description: 'Sampai jumpa kembali!',
+                          type: state.logoutReason == 'password-updated'
+                              ? ToastificationType.info
+                              : ToastificationType.success,
+                          title: state.logoutReason == 'password-updated'
+                              ? 'Ubah Kata Sandi Berhasil'
+                              : 'Keluar Berhasil',
+                          description: state.logoutReason == 'password-updated'
+                              ? 'Silahkan masuk kembali menggunakan kata sandi baru anda'
+                              : 'Sampai jumpa kembali!',
                         );
 
                         context.read<AuthCubit>().resetState();

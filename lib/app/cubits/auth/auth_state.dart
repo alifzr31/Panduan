@@ -6,6 +6,8 @@ enum LoginStatus { initial, loading, success, error }
 
 enum ProfileStatus { initial, loading, success, error }
 
+enum ChangePasswordStatus { initial, loading, success, error }
+
 enum LogoutStatus { initial, loading, success, error }
 
 class AuthState extends Equatable {
@@ -17,8 +19,12 @@ class AuthState extends Equatable {
   final Profile? profile;
   final List<String> userPermissions;
   final String? profileError;
+  final ChangePasswordStatus changePasswordStatus;
+  final Response? changePasswordResponse;
+  final String? changePasswordError;
   final LogoutStatus logoutStatus;
   final Response? logoutResponse;
+  final String? logoutReason;
   final String? logoutError;
 
   const AuthState({
@@ -30,8 +36,12 @@ class AuthState extends Equatable {
     this.profile,
     this.userPermissions = const [],
     this.profileError,
+    this.changePasswordStatus = ChangePasswordStatus.initial,
+    this.changePasswordResponse,
+    this.changePasswordError,
     this.logoutStatus = LogoutStatus.initial,
     this.logoutResponse,
+    this.logoutReason,
     this.logoutError,
   });
 
@@ -44,8 +54,12 @@ class AuthState extends Equatable {
     Profile? profile,
     List<String>? userPermissions,
     String? profileError,
+    ChangePasswordStatus? changePasswordStatus,
+    Response? changePasswordResponse,
+    String? changePasswordError,
     LogoutStatus? logoutStatus,
     Response? logoutResponse,
+    String? logoutReason,
     String? logoutError,
   }) {
     return AuthState(
@@ -57,8 +71,12 @@ class AuthState extends Equatable {
       profile: profile,
       userPermissions: userPermissions ?? this.userPermissions,
       profileError: loginError,
+      changePasswordStatus: changePasswordStatus ?? this.changePasswordStatus,
+      changePasswordResponse: changePasswordResponse,
+      changePasswordError: changePasswordError,
       logoutStatus: logoutStatus ?? this.logoutStatus,
-      logoutResponse: loginResponse,
+      logoutResponse: logoutResponse,
+      logoutReason: logoutReason,
       logoutError: logoutError,
     );
   }
@@ -73,8 +91,12 @@ class AuthState extends Equatable {
     profile,
     userPermissions,
     profileError,
+    changePasswordStatus,
+    changePasswordResponse,
+    changePasswordError,
     logoutStatus,
     logoutResponse,
+    logoutReason,
     logoutError,
   ];
 }

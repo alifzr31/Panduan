@@ -58,6 +58,27 @@ class AuthService extends DioClient {
     }
   }
 
+  Future<Response> changePassword({
+    String? currentPassword,
+    String? newPassword,
+    String? confirmPassword,
+  }) async {
+    try {
+      final response = await patch(
+        '/update-password',
+        data: {
+          'current_password': currentPassword,
+          'password': newPassword,
+          'password_confirmation': confirmPassword,
+        },
+      );
+
+      return await compute((message) => message, response);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<Response> logout() async {
     try {
       final response = await post(

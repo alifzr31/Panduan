@@ -6,6 +6,11 @@ abstract class AuthRepository {
   Future<Response> login({String? email, String? password});
   Future<Profile?> fetchProfile();
   Future<Response> refreshToken();
+  Future<Response> changePassword({
+    String? currentPassword,
+    String? newPassword,
+    String? confirmPassword,
+  });
   Future<Response> logout();
 }
 
@@ -27,6 +32,19 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Response> refreshToken() async {
     return await _service.refreshToken();
+  }
+
+  @override
+  Future<Response> changePassword({
+    String? currentPassword,
+    String? newPassword,
+    String? confirmPassword,
+  }) async {
+    return await _service.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+      confirmPassword: confirmPassword,
+    );
   }
 
   @override

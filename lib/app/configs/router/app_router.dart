@@ -9,6 +9,7 @@ import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
 import 'package:panduan/app/cubits/notification/notification_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
+import 'package:panduan/app/views/change_password/changepassword_page.dart';
 import 'package:panduan/app/views/create_spm/createspm_page.dart';
 import 'package:panduan/app/views/dashboard/dashboard_page.dart';
 import 'package:panduan/app/views/detail_notification/detailnotification_page.dart';
@@ -62,6 +63,12 @@ class AppRouter {
             create: (context) => sl<DashboardCubit>(),
             child: const DashboardPage(),
           ),
+        );
+      case ChangePasswordPage.routeName:
+        return customPageRouteBuilder(
+          settings,
+          bottomSafeArea: false,
+          child: const ChangePasswordPage(),
         );
       case NotificationPage.routeName:
         return customPageRouteBuilder(
