@@ -103,6 +103,20 @@ class AppHelpers {
     return DateFormat('dd MMMM yyyy HH:mm').format(date);
   }
 
+  static bool passwordHasUppercase(String password) {
+    return password.contains(RegExp(r'[A-Z]'));
+  }
+
+  static bool passwordHasDigit(String password) {
+    return password.contains(RegExp(r'\d'));
+  }
+
+  static bool passwordHasSymbol(String password) {
+    return password.contains(
+      RegExp(r'[!@#\$%^&*(),.?":{}|<>=+\-_~`\[\]\\\/;]'),
+    );
+  }
+
   static bool hasPermission(
     List<String> userPermissions, {
     required String permissionName,
