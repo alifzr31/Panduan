@@ -92,6 +92,26 @@ abstract class DioClient {
     }
   }
 
+  Future<Response> patch(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParams,
+    Map<String, dynamic>? headers,
+  }) async {
+    try {
+      final response = await dio.patch(
+        path,
+        data: data,
+        queryParameters: queryParams,
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
   Future<Response> delete(
     String path, {
     dynamic data,
