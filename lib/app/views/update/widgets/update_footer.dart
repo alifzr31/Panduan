@@ -30,6 +30,8 @@ class UpdateFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(mandatoryUpdate);
+
     return Column(
       children: [
         Align(
@@ -119,7 +121,7 @@ class UpdateFooter extends StatelessWidget {
             },
           ),
         ),
-        if (mandatoryUpdate) ...{
+        if (!mandatoryUpdate) ...{
           const SizedBox(height: 10),
           SizedBox(
             height: 40,
