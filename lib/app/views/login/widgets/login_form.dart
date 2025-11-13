@@ -28,7 +28,7 @@ class _LoginFormState extends State<LoginForm> {
   @override
   void initState() {
     if (kDebugMode) {
-      _passwordController.text = 'Password123!';
+      _passwordController.text = 'bandung123';
     }
     super.initState();
   }
