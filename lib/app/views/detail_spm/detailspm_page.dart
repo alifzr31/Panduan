@@ -9,6 +9,7 @@ import 'package:panduan/app/views/detail_spm/widgets/detailspm_appbaraction.dart
 import 'package:panduan/app/views/detail_spm/widgets/detailspm_footer.dart';
 import 'package:panduan/app/views/detail_spm/widgets/report_section.dart';
 import 'package:panduan/app/views/detail_spm/widgets/reporter_section.dart';
+import 'package:panduan/app/widgets/base_handlestate.dart';
 
 class DetailSpmPage extends StatefulWidget {
   const DetailSpmPage({required this.spmUuid, super.key});
@@ -175,11 +176,14 @@ class _DetailSpmPageState extends State<DetailSpmPage> {
               builder: (context, state) {
                 switch (state.detailStatus) {
                   case DetailStatus.error:
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(state.detailError ?? ''),
-                      ),
+                    return BaseHandleState(
+                      handleType: HandleType.error,
+                      errorMessage: state.detailError ?? '',
+                      onRefetch: () {
+                        context.read<DetailSpmCubit>().refetchDetailSpm(
+                          uuid: widget.spmUuid,
+                        );
+                      },
                     );
                   case DetailStatus.success:
                     return ListView(
