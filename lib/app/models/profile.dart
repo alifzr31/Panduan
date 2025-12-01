@@ -6,6 +6,7 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 import 'package:panduan/app/models/district.dart';
+import 'package:panduan/app/models/health_post.dart';
 import 'package:panduan/app/models/opd.dart';
 import 'package:panduan/app/models/subdistrict.dart';
 
@@ -163,21 +164,6 @@ class HealthFacility extends Equatable {
 
   factory HealthFacility.fromJson(Map<String, dynamic> json) =>
       HealthFacility(uuid: json["uuid"], name: json["name"]);
-
-  Map<String, dynamic> toJson() => {"uuid": uuid, "name": name};
-}
-
-class HealthPost extends Equatable {
-  final String? uuid;
-  final String? name;
-
-  const HealthPost({this.uuid, this.name});
-
-  @override
-  List<Object?> get props => [uuid, name];
-
-  factory HealthPost.fromJson(Map<String, dynamic> json) =>
-      HealthPost(uuid: json["uuid"], name: json["name"]);
 
   Map<String, dynamic> toJson() => {"uuid": uuid, "name": name};
 }
