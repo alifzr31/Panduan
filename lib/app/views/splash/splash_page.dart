@@ -197,8 +197,6 @@ class _SplashPageState extends State<SplashPage> {
           if (biometricsEnabled) {
             final didAuthFingerprint = await _authBiometrics();
 
-            print(didAuthFingerprint);
-
             setState(() {
               _hasAuth = didAuthFingerprint;
             });
