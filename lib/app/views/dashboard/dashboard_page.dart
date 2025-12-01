@@ -89,28 +89,30 @@ class _DashboardPageState extends State<DashboardPage> {
   Future<bool> _authBiometrics() async {
     try {
       final didAuthFingerprint = await _localAuthentication.authenticate(
-        localizedReason: 'Silahkan pindai sidik jari anda untuk melanjutkan',
+        localizedReason:
+            'Silahkan pindai sidik jari/deteksi wajah anda untuk melanjutkan',
         authMessages: const [
           AndroidAuthMessages(
             signInTitle: 'Panduan',
-            biometricHint: 'Aktifkan keamanan sidik jari',
+            signInHint: 'Masuk dengan biometrik',
             cancelButton: 'Batal',
-            biometricNotRecognized: 'Sidik jari tidak dikenali, coba lagi',
-            biometricSuccess: 'Autentikasi berhasil',
           ),
         ],
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-          sensitiveTransaction: true,
-          useErrorDialogs: true,
-        ),
+        biometricOnly: true,
+        sensitiveTransaction: true,
       );
 
       return didAuthFingerprint;
-    } on PlatformException catch (e) {
-      if (kDebugMode) print(e.message);
-      return false;
+    } on LocalAuthException catch (e) {
+      switch (e.code) {
+        case LocalAuthExceptionCode.userCanceled:
+          return false;
+        default:
+          if (kDebugMode) print(e.code);
+          if (kDebugMode) print(e.description);
+          if (kDebugMode) print(e.details);
+          rethrow;
+      }
     }
   }
 
@@ -264,7 +266,11 @@ class _DashboardPageState extends State<DashboardPage> {
                             });
 
                             _rangeDateController.text =
-                                '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
+                                dates.first.isAtSameMomentAs(dates.last)
+                                ? AppHelpers.rangeDateFormat(
+                                    _selectedRangeDates.first,
+                                  )
+                                : '${AppHelpers.rangeDateFormat(_selectedRangeDates.first)} - ${AppHelpers.rangeDateFormat(_selectedRangeDates.last)}';
 
                             context.read<DashboardCubit>().refetchDataByLevel(
                               userPermissions: context

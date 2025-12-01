@@ -157,28 +157,30 @@ class _SplashPageState extends State<SplashPage> {
   Future<bool> _authBiometrics() async {
     try {
       final didAuthFingerprint = await _localAuthentication.authenticate(
-        localizedReason: 'Silahkan pindai sidik jari anda untuk melanjutkan',
+        localizedReason:
+            'Silahkan pindai sidik jari/deteksi wajah anda untuk melanjutkan',
         authMessages: const [
           AndroidAuthMessages(
             signInTitle: 'Panduan',
-            biometricHint: 'Masuk dengan sidik jari',
+            signInHint: 'Masuk dengan biometrik',
             cancelButton: 'Batal',
-            biometricNotRecognized: 'Sidik jari tidak dikenali, coba lagi',
-            biometricSuccess: 'Autentikasi berhasil',
           ),
         ],
-        options: const AuthenticationOptions(
-          biometricOnly: false,
-          stickyAuth: true,
-          sensitiveTransaction: true,
-          useErrorDialogs: true,
-        ),
+        biometricOnly: false,
+        sensitiveTransaction: true,
       );
 
       return didAuthFingerprint;
-    } on PlatformException catch (e) {
-      if (kDebugMode) print(e.message);
-      return false;
+    } on LocalAuthException catch (e) {
+      switch (e.code) {
+        case LocalAuthExceptionCode.userCanceled:
+          return false;
+        default:
+          if (kDebugMode) print(e.code);
+          if (kDebugMode) print(e.description);
+          if (kDebugMode) print(e.details);
+          rethrow;
+      }
     }
   }
 
@@ -194,6 +196,8 @@ class _SplashPageState extends State<SplashPage> {
         if (canAuthenticate) {
           if (biometricsEnabled) {
             final didAuthFingerprint = await _authBiometrics();
+
+            print(didAuthFingerprint);
 
             setState(() {
               _hasAuth = didAuthFingerprint;
