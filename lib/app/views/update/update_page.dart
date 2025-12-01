@@ -30,30 +30,27 @@ class UpdatePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Expanded(
-                child: SvgPicture.asset(
-                  '${AppStrings.assetsImages}/update.svg',
-                  width: 180,
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Expanded(
+              child: SvgPicture.asset(
+                '${AppStrings.assetsImages}/update.svg',
+                width: 180,
               ),
-              UpdateFooter(
-                isLoggedIn: isLoggedIn,
-                packageName: packageName,
-                currentVersion: currentVersion,
-                currentBuildNumber: currentBuildNumber,
-                latestVersion: latestVersion,
-                latestBuildNumber: latestBuildNumber,
-                updateDescription: updateDescription,
-                mandatoryUpdate: mandatoryUpdate,
-              ),
-            ],
-          ),
+            ),
+            UpdateFooter(
+              isLoggedIn: isLoggedIn,
+              packageName: packageName,
+              currentVersion: currentVersion,
+              currentBuildNumber: currentBuildNumber,
+              latestVersion: latestVersion,
+              latestBuildNumber: latestBuildNumber,
+              updateDescription: updateDescription,
+              mandatoryUpdate: mandatoryUpdate,
+            ),
+          ],
         ),
       ),
     );

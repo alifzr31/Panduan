@@ -30,8 +30,6 @@ class UpdateFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(mandatoryUpdate);
-
     return Column(
       children: [
         Align(
@@ -103,39 +101,47 @@ class UpdateFooter extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        SizedBox(
-          height: 40,
-          width: double.infinity,
-          child: BaseButton(
-            label: 'Perbarui Sekarang',
-            onPressed: () async {
-              final url = Uri.parse(
-                'https://play.google.com/store/apps/details?id=$packageName',
-              );
+        SafeArea(
+          top: false,
+          bottom: mandatoryUpdate,
+          child: SizedBox(
+            height: 40,
+            width: double.infinity,
+            child: BaseButton(
+              label: 'Perbarui Sekarang',
+              onPressed: () async {
+                final url = Uri.parse(
+                  'https://play.google.com/store/apps/details?id=$packageName',
+                );
 
-              try {
-                await launchUrl(url);
-              } catch (e) {
-                if (kDebugMode) print(e);
-              }
-            },
+                try {
+                  await launchUrl(url);
+                } catch (e) {
+                  if (kDebugMode) print(e);
+                }
+              },
+            ),
           ),
         ),
         if (!mandatoryUpdate) ...{
           const SizedBox(height: 10),
-          SizedBox(
-            height: 40,
-            width: double.infinity,
-            child: BaseOutlineButton(
-              borderColor: AppColors.amberColor,
-              fgColor: AppColors.amberColor,
-              label: 'Nanti Saja',
-              onPressed: () {
-                Navigator.pushReplacementNamed(
-                  context,
-                  isLoggedIn ? DashboardPage.routeName : LoginPage.routeName,
-                );
-              },
+          SafeArea(
+            top: false,
+            bottom: true,
+            child: SizedBox(
+              height: 40,
+              width: double.infinity,
+              child: BaseOutlineButton(
+                borderColor: AppColors.amberColor,
+                fgColor: AppColors.amberColor,
+                label: 'Nanti Saja',
+                onPressed: () {
+                  Navigator.pushReplacementNamed(
+                    context,
+                    isLoggedIn ? DashboardPage.routeName : LoginPage.routeName,
+                  );
+                },
+              ),
             ),
           ),
         },
