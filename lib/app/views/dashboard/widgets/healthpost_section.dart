@@ -102,7 +102,7 @@ class HealthPostSection extends StatelessWidget {
                               },
                             );
                     default:
-                      return spmHpCountCardLoading();
+                      return const SpmHpCountCardLoading();
                   }
                 },
               ),

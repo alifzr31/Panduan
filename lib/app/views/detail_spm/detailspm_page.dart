@@ -230,7 +230,7 @@ class _DetailSpmPageState extends State<DetailSpmPage> {
                       ],
                     );
                   default:
-                    return detailSpmLoading();
+                    return const DetailSpmLoading();
                 }
               },
             ),

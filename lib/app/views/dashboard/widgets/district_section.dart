@@ -103,7 +103,7 @@ class DistrictSection extends StatelessWidget {
                               },
                             );
                     default:
-                      return spmHpCountCardLoading();
+                      return const SpmHpCountCardLoading();
                   }
                 },
               ),

@@ -123,7 +123,7 @@ class SpmCounterSection extends StatelessWidget {
               ],
             );
           default:
-            return counterCardLoading();
+            return const CounterCardLoading();
         }
       },
     );

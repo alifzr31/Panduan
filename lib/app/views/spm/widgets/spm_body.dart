@@ -128,7 +128,7 @@ class SpmBody extends StatelessWidget {
                       ),
                     );
             default:
-              return spmCardLoading();
+              return const SpmCardLoading();
           }
         },
       ),

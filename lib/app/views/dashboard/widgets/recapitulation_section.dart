@@ -129,7 +129,7 @@ class RecapitulationSection extends StatelessWidget {
                         ],
                       );
                     default:
-                      return spmFieldCountCardLoading();
+                      return const SpmFieldCountCardLoading();
                   }
                 },
               ),

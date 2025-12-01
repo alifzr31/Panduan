@@ -329,7 +329,7 @@ class _HealthPostPageState extends State<HealthPostPage> {
                             ),
                           );
                   default:
-                    return healthPostCardLoading();
+                    return const HealthPostCardLoading();
                 }
               },
             ),

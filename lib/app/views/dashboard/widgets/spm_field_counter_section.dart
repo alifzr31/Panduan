@@ -78,7 +78,7 @@ class SpmFieldCounterSection extends StatelessWidget {
               ],
             );
           default:
-            return spmFieldCounterCardLoading();
+            return const SpmFieldCounterCardLoading();
         }
       },
     );

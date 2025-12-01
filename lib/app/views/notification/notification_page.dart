@@ -223,7 +223,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       ),
                     );
             default:
-              return notificationCardLoading();
+              return const NotificationCardLoading();
           }
         },
       ),

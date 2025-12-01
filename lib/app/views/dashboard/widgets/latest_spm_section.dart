@@ -115,7 +115,7 @@ class LatestSpmSection extends StatelessWidget {
                               },
                             );
                     default:
-                      return spmCardDashboardLoading();
+                      return const SpmCardDashboardLoading();
                   }
                 },
               ),

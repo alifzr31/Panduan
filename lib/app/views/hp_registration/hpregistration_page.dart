@@ -400,7 +400,7 @@ class _HpRegistrationPageState extends State<HpRegistrationPage> {
                       ],
                     );
             default:
-              return hpRegistrationLoading();
+              return const HpRegistrationLoading();
           }
         },
       ),

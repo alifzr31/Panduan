@@ -112,7 +112,7 @@ class SubDistrictSection extends StatelessWidget {
                               },
                             );
                     default:
-                      return spmHpCountCardLoading();
+                      return const SpmHpCountCardLoading();
                   }
                 },
               ),

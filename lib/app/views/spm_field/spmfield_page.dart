@@ -142,7 +142,7 @@ class _SpmFieldPageState extends State<SpmFieldPage> {
                                       },
                                     );
                             default:
-                              return spmFieldCardLoading();
+                              return const SpmFieldCardLoading();
                           }
                         },
                       ),
