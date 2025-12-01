@@ -60,10 +60,10 @@ class FirstSection extends StatelessWidget {
   final void Function(Object?)? onSelectedRw;
   final District? selectedDistrict;
   final TextEditingController districtController;
-  final void Function(Object?)? onSelectedDistrict;
+  final void Function(District value)? onSelectedDistrict;
   final SubDistrict? selectedSubDistrict;
   final TextEditingController subDistrictController;
-  final void Function(Object?)? onSelectedSubDistrict;
+  final void Function(SubDistrict value)? onSelectedSubDistrict;
   final TextEditingController phoneController;
   final String? selectedServiceCategory;
   final void Function(Object?)? onSelectedServiceCategory;

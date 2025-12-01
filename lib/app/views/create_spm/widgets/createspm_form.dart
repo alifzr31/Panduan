@@ -227,42 +227,46 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                     setState(() {
                       _selectedRt = resident?.rt;
                       _selectedRw = resident?.rw;
-                      _selectedDistrict = null;
-                      _selectedSubDistrict = null;
                     });
 
-                    if (resident?.district?.code != null) {
-                      setState(() {
-                        _selectedDistrict = context
-                            .read<LocationCubit>()
-                            .state
-                            .districts
-                            .firstWhere(
-                              (element) =>
-                                  element.code == resident?.district?.code,
-                            );
-                        _selectedSubDistrict = null;
-                      });
+                    final locationCubit = context.read<LocationCubit>();
+                    final residentDistrictCode = resident?.district?.code;
+                    final residentSubDistrictCode = resident?.subDistrict?.code;
+
+                    _selectedSubDistrict = null;
+
+                    if (residentDistrictCode != null) {
+                      final district = locationCubit.state.districts.firstWhere(
+                        (e) => e.code == residentDistrictCode,
+                      );
+
+                      setState(() => _selectedDistrict = district);
+
+                      _districtController.text =
+                          district.name?.capitalize() ?? '';
+                    } else {
+                      setState(() => _selectedDistrict = null);
+                      _districtController.clear();
                     }
 
-                    if (resident?.subDistrict?.code != null) {
-                      context
-                          .read<LocationCubit>()
+                    _subDistrictController.clear();
+
+                    if (_selectedDistrict != null &&
+                        residentSubDistrictCode != null) {
+                      locationCubit
                           .fetchSubDistricts(
-                            districtCode: _selectedDistrict?.districtCode,
+                            districtCode: _selectedDistrict!.districtCode,
                           )
-                          .then((value) {
-                            setState(() {
-                              _selectedSubDistrict = context
-                                  .read<LocationCubit>()
-                                  .state
-                                  .subDistricts
-                                  .firstWhere(
-                                    (element) =>
-                                        element.code ==
-                                        resident?.subDistrict?.code,
-                                  );
-                            });
+                          .then((_) {
+                            final sub = locationCubit.state.subDistricts
+                                .firstWhere(
+                                  (e) => e.code == residentSubDistrictCode,
+                                );
+
+                            setState(() => _selectedSubDistrict = sub);
+
+                            _subDistrictController.text =
+                                sub.name?.capitalize() ?? '';
                           });
                     }
                   },
@@ -287,8 +291,10 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                   onSelectedDistrict: (value) {
                     setState(() {
                       _selectedSubDistrict = null;
-                      _selectedDistrict = value as District;
+                      _selectedDistrict = value;
                     });
+                    _subDistrictController.clear();
+                    _districtController.text = value.name?.capitalize() ?? '';
 
                     context.read<LocationCubit>().fetchSubDistricts(
                       districtCode: _selectedDistrict?.districtCode,
@@ -298,8 +304,10 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                   subDistrictController: _subDistrictController,
                   onSelectedSubDistrict: (value) {
                     setState(() {
-                      _selectedSubDistrict = value as SubDistrict;
+                      _selectedSubDistrict = value;
                     });
+                    _subDistrictController.text =
+                        value.name?.capitalize() ?? '';
                   },
                   phoneController: _phoneController,
                   selectedServiceCategory: _selectedServiceCategory,

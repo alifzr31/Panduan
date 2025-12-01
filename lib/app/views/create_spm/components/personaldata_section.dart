@@ -10,6 +10,7 @@ import 'package:panduan/app/models/subdistrict.dart';
 import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/widgets/base_dropdownfield.dart';
 import 'package:panduan/app/widgets/base_formfield.dart';
+import 'package:panduan/app/widgets/base_typeaheadfield.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
 import 'package:toastification/toastification.dart';
 
@@ -47,10 +48,10 @@ class PersonalDataSection extends StatelessWidget {
   final String? selectedRw;
   final District? selectedDistrict;
   final TextEditingController districtController;
-  final void Function(Object?)? onSelectedDistrict;
+  final void Function(District value)? onSelectedDistrict;
   final SubDistrict? selectedSubDistrict;
   final TextEditingController subDistrictController;
-  final void Function(Object?)? onSelectedSubDistrict;
+  final void Function(SubDistrict value)? onSelectedSubDistrict;
   final TextEditingController phoneController;
 
   @override
@@ -192,41 +193,33 @@ class PersonalDataSection extends StatelessWidget {
         const SizedBox(height: 10),
         BlocBuilder<LocationCubit, LocationState>(
           builder: (context, state) {
-            return BaseDropdownSearchGroupField<District>(
+            return BaseTypeaHeadGroupField<District>(
               label: 'Kecamatan',
-              hint: state.districtStatus == DistrictStatus.success
-                  ? 'Pilih kecamatan'
-                  : 'Mohon tunggu...',
-              searchHint: 'Cari nama kecamatan',
+              hint: 'Pilih kecamatan',
               mandatory: true,
-              value: selectedDistrict,
-              items: state.districtStatus == DistrictStatus.success
-                  ? state.districts.map((e) {
-                      return DropdownMenuItem(
-                        value: e,
-                        child: Text(e.name?.capitalize() ?? ''),
-                      );
-                    }).toList()
-                  : const [],
-              onChanged: onSelectedDistrict,
+              controller: districtController,
+              emptyLabel: 'Kecamatan Tidak Ditemukan',
+              itemBuilder: (context, value) {
+                return Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Text(value.name?.capitalize() ?? ''),
+                );
+              },
+              onSelected: onSelectedDistrict,
+              suggestionsCallback: (keyword) {
+                return state.districts.where((element) {
+                  return element.name?.toLowerCase().contains(
+                        keyword.toLowerCase(),
+                      ) ??
+                      false;
+                }).toList();
+              },
               validator: (value) {
-                if (selectedDistrict == null) {
+                if (value!.isEmpty) {
                   return 'Silahkan pilih kecamatan';
                 }
 
                 return null;
-              },
-              searchController: districtController,
-              searchMatchFn: (item, keyword) {
-                return item.value?.name?.toLowerCase().contains(
-                      keyword.toLowerCase(),
-                    ) ??
-                    false;
-              },
-              onMenuStateChange: (isOpen) {
-                if (!isOpen) {
-                  districtController.clear();
-                }
               },
             );
           },
@@ -235,41 +228,33 @@ class PersonalDataSection extends StatelessWidget {
           const SizedBox(height: 10),
           BlocBuilder<LocationCubit, LocationState>(
             builder: (context, state) {
-              return BaseDropdownSearchGroupField<SubDistrict>(
+              return BaseTypeaHeadGroupField<SubDistrict>(
                 label: 'Kelurahan',
-                hint: state.subDistrictStatus == SubDistrictStatus.success
-                    ? 'Pilih kelurahan'
-                    : 'Mohon tunggu...',
-                searchHint: 'Cari nama kelurahan',
+                hint: 'Pilih kelurahan',
                 mandatory: true,
-                value: selectedSubDistrict,
-                items: state.subDistrictStatus == SubDistrictStatus.success
-                    ? state.subDistricts.map((e) {
-                        return DropdownMenuItem(
-                          value: e,
-                          child: Text(e.name?.capitalize() ?? ''),
-                        );
-                      }).toList()
-                    : const [],
-                onChanged: onSelectedSubDistrict,
+                controller: subDistrictController,
+                emptyLabel: 'Kelurahan Tidak Ditemukan',
+                itemBuilder: (context, value) {
+                  return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(value.name?.capitalize() ?? ''),
+                  );
+                },
+                onSelected: onSelectedSubDistrict,
+                suggestionsCallback: (keyword) {
+                  return state.subDistricts.where((element) {
+                    return element.name?.toLowerCase().contains(
+                          keyword.toLowerCase(),
+                        ) ??
+                        false;
+                  }).toList();
+                },
                 validator: (value) {
-                  if (selectedSubDistrict == null) {
+                  if (value!.isEmpty) {
                     return 'Silahkan pilih kelurahan';
                   }
 
                   return null;
-                },
-                searchController: subDistrictController,
-                searchMatchFn: (item, keyword) {
-                  return item.value?.name?.toLowerCase().contains(
-                        keyword.toLowerCase(),
-                      ) ??
-                      false;
-                },
-                onMenuStateChange: (isOpen) {
-                  if (!isOpen) {
-                    subDistrictController.clear();
-                  }
                 },
               );
             },
