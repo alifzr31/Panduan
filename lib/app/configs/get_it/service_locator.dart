@@ -6,6 +6,8 @@ import 'package:panduan/app/cubits/asset/asset_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/cubits/detail_spm/detailspm_cubit.dart';
 import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
+import 'package:panduan/app/cubits/health_post/health_post_cubit.dart';
+import 'package:panduan/app/cubits/hp_registration/hp_registration_cubit.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
 import 'package:panduan/app/cubits/notification/notification_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
@@ -16,6 +18,8 @@ import 'package:panduan/app/repositories/createspm_repository.dart';
 import 'package:panduan/app/repositories/dashboard_repository.dart';
 import 'package:panduan/app/repositories/detailspm_repository.dart';
 import 'package:panduan/app/repositories/editspm_repository.dart';
+import 'package:panduan/app/repositories/healthpost_repository.dart';
+import 'package:panduan/app/repositories/hpregistration_repository.dart';
 import 'package:panduan/app/repositories/location_repository.dart';
 import 'package:panduan/app/repositories/notification_repository.dart';
 import 'package:panduan/app/repositories/spm_repository.dart';
@@ -26,6 +30,8 @@ import 'package:panduan/app/services/createspm_service.dart';
 import 'package:panduan/app/services/dashboard_service.dart';
 import 'package:panduan/app/services/detailspm_service.dart';
 import 'package:panduan/app/services/editspm_service.dart';
+import 'package:panduan/app/services/healthpost_service.dart';
+import 'package:panduan/app/services/hpregistration_service.dart';
 import 'package:panduan/app/services/location_service.dart';
 import 'package:panduan/app/services/notification_service.dart';
 import 'package:panduan/app/services/spm_service.dart';
@@ -54,6 +60,18 @@ void init() {
     () => NotificationRepositoryImpl(sl()),
   );
   sl.registerFactory(() => NotificationCubit(sl()));
+
+  sl.registerLazySingleton(() => HealthPostService());
+  sl.registerLazySingleton<HealthPostRepository>(
+    () => HealthPostRepositoryImpl(sl()),
+  );
+  sl.registerFactory(() => HealthPostCubit(sl()));
+
+  sl.registerLazySingleton(() => HpRegistrationService());
+  sl.registerLazySingleton<HpRegistrationRepository>(
+    () => HpRegistrationRepositoryImpl(sl()),
+  );
+  sl.registerFactory(() => HpRegistrationCubit(sl()));
 
   sl.registerLazySingleton(() => SpmService());
   sl.registerLazySingleton<SpmRepository>(() => SpmRepositoryImpl(sl()));

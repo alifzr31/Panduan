@@ -6,6 +6,8 @@ import 'package:panduan/app/cubits/create_spm/createspm_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/cubits/detail_spm/detailspm_cubit.dart';
 import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
+import 'package:panduan/app/cubits/health_post/health_post_cubit.dart';
+import 'package:panduan/app/cubits/hp_registration/hp_registration_cubit.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
 import 'package:panduan/app/cubits/notification/notification_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
@@ -15,6 +17,8 @@ import 'package:panduan/app/views/dashboard/dashboard_page.dart';
 import 'package:panduan/app/views/detail_notification/detailnotification_page.dart';
 import 'package:panduan/app/views/detail_spm/detailspm_page.dart';
 import 'package:panduan/app/views/edit_spm/editspm_page.dart';
+import 'package:panduan/app/views/health_post/healthpost_page.dart';
+import 'package:panduan/app/views/hp_registration/hpregistration_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/views/map_coordinate/mapcoordinate_page.dart';
 import 'package:panduan/app/views/notification/notification_page.dart';
@@ -38,6 +42,7 @@ class AppRouter {
 
         return customPageRouteBuilder(
           settings,
+          bottomSafeArea: false,
           child: UpdatePage(
             isLoggedIn: args['isLoggedIn'],
             packageName: args['packageName'],
@@ -77,6 +82,29 @@ class AppRouter {
           child: BlocProvider(
             create: (context) => sl<NotificationCubit>(),
             child: const NotificationPage(),
+          ),
+        );
+      case HealthPostPage.routeName:
+        return customPageRouteBuilder(
+          settings,
+          bottomSafeArea: false,
+          child: BlocProvider(
+            create: (context) => sl<HealthPostCubit>(),
+            child: const HealthPostPage(),
+          ),
+        );
+      case HpRegistrationPage.routeName:
+        final args = settings.arguments as Map<String, dynamic>?;
+
+        return customPageRouteBuilder(
+          settings,
+          bottomSafeArea: false,
+          child: BlocProvider(
+            create: (context) => sl<HpRegistrationCubit>(),
+            child: HpRegistrationPage(
+              healthPostId: args?['healthPostId'],
+              healthPostCode: args?['healthPostCode'],
+            ),
           ),
         );
       case DetailNotificationPage.routeName:

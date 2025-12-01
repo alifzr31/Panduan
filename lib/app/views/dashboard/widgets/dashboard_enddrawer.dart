@@ -12,7 +12,9 @@ import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:panduan/app/configs/local_notification/local_notif.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/views/change_password/changepassword_page.dart';
+import 'package:panduan/app/views/health_post/healthpost_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/widgets/base_listtile.dart';
 import 'package:panduan/app/widgets/base_skeletonizer.dart';
@@ -167,6 +169,30 @@ class DashboardEndDrawer extends StatelessWidget {
             Expanded(
               child: Column(
                 children: [
+                  if (!AppHelpers.hasPermission(
+                        context.read<AuthCubit>().state.userPermissions,
+                        permissionName: 'level-posyandu',
+                      ) &&
+                      !AppHelpers.hasPermission(
+                        context.read<AuthCubit>().state.userPermissions,
+                        permissionName: 'level-opd',
+                      )) ...{
+                    BaseListTile(
+                      leading: const Icon(
+                        MingCute.building_1_line,
+                        size: 22,
+                        color: AppColors.blueColor,
+                      ),
+                      title: 'Posyandu Binaan',
+                      onTap: () {
+                        Navigator.pushNamed(context, HealthPostPage.routeName);
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(height: 1, color: Colors.grey.shade300),
+                    ),
+                  },
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       return BaseListTile(
@@ -232,7 +258,7 @@ class DashboardEndDrawer extends StatelessWidget {
                       },
                     ),
                   },
-                  if (hasBiometricsHardware) ...{
+                  if (hasBiometricsHardware && Platform.isAndroid) ...{
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Divider(height: 1, color: Colors.grey.shade300),
@@ -245,15 +271,13 @@ class DashboardEndDrawer extends StatelessWidget {
                         size: 22,
                         color: AppColors.blueColor,
                       ),
-                      title: Platform.isAndroid
-                          ? 'Sidik Jari'
-                          : 'Deteksi Wajah',
+                      title: 'Biometrik',
                       subtitle: availableBiometrics.isNotEmpty
-                          ? null
-                          : Platform.isAndroid
-                          ? 'Tidak ada sidik jari terdaftar diperangkat anda'
-                          : 'Tidak ada deteksi wajah terdaftar diperangkat anda',
-                      subtitleColor: Colors.red.shade600,
+                          ? 'Aktifkan keamanan biometrik (sidik jari/deteksi wajah)'
+                          : 'Tidak ada sidik jari/deteksi wajah terdaftar diperangkat anda',
+                      subtitleColor: availableBiometrics.isNotEmpty
+                          ? Colors.grey.shade600
+                          : Colors.red.shade600,
                       trailing: availableBiometrics.isEmpty
                           ? null
                           : Transform.scale(
