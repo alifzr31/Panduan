@@ -68,7 +68,7 @@ class DashboardEndDrawer extends StatelessWidget {
                           children: [
                             const Icon(
                               MingCute.user_4_fill,
-                              size: 66,
+                              size: 68,
                               color: Colors.white,
                             ),
                             const SizedBox(width: 4),
@@ -87,22 +87,12 @@ class DashboardEndDrawer extends StatelessWidget {
                                   ),
                                   Text(
                                     state.profile?.name ?? '',
-                                    maxLines: 1,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
-                                    ),
-                                  ),
-                                  Text(
-                                    state.profile?.email ?? '',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey.shade300,
                                     ),
                                   ),
                                 ],
