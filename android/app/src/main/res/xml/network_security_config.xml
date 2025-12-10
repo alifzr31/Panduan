@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 🔓 DEBUG BUILD: Trust user-installed certificates -->
+    <!-- Allows Burp Suite, OWASP ZAP, Frida to intercept HTTPS traffic -->
+    <debug-overrides>
+        <trust-anchors>
+            <!-- User-installed certificates (Burp Suite CA, custom CAs) -->
+            <certificates src="user" />
+            <!-- System certificates (default Android CA store) -->
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+
+    <!-- 🔒 PRODUCTION BUILD: Maximum security -->
+    <!-- Only trust system certificates, reject user-installed CAs -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Only system certificates trusted -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

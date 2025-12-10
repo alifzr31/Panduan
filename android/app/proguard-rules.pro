@@ -1,11 +1,10 @@
 ##############################################
-## Project-specific keep rules
+## Project Package
 ##############################################
 -keep class gov.bdg.panduan.** { *; }
--keep class gov.bdg.panduan.models.** { *; }
 
 ##############################################
-## Android core
+## Core Android Components
 ##############################################
 -keep public class * extends android.app.Application
 -keep public class * extends android.app.Activity
@@ -15,78 +14,88 @@
 -keep public class * extends androidx.lifecycle.ViewModel
 -keep public class * extends androidx.lifecycle.LiveData
 
--keepclassmembers class ** {
-    @android.webkit.JavascriptInterface <methods>;
-}
-
--keepclassmembers class * {
-    public void *(java.lang.String, java.lang.Class[]);
-}
-
--keepclasseswithmembernames class * {
-    native <methods>;
-}
-
--dontwarn android.support.**
--dontwarn androidx.**
--keep class androidx.** { *; }
-
 ##############################################
-## Flutter
+## Flutter Engine & Plugins
 ##############################################
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
--keep public class * extends io.flutter.embedding.android.FlutterActivity
--keep public class * extends io.flutter.embedding.android.FlutterFragmentActivity
 -dontwarn io.flutter.embedding.**
 
+-keep class * extends io.flutter.embedding.android.FlutterActivity
+-keep class * extends io.flutter.embedding.android.FlutterFragmentActivity
+
 ##############################################
-## Firebase
+## Firebase (Core, Messaging, Remote Config)
 ##############################################
--keepattributes Signature
--keepattributes *Annotation*
 -keep class com.google.firebase.** { *; }
 -dontwarn com.google.firebase.**
 -dontwarn io.grpc.**
 
--keep class com.google.firebase.messaging.** { *; }
--keep class com.google.firebase.remoteconfig.** { *; }
--keepclassmembers class * {
-    @com.google.firebase.remoteconfig.FirebaseRemoteConfigParameter public *;
-}
-
--keep class com.google.android.gms.common.** { *; }
--keep interface com.google.android.gms.common.** { *; }
+-keep class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
 
-# Maps
-# -keep class com.google.maps.android.** { *; }
-# -keep public class com.google.android.gms.maps.MapsInitializer { *; }
-# -keep @interface com.google.android.gms.maps.**
-
 ##############################################
-## Networking (Dio, OkHttp, Okio, Logging)
+## Networking: Dio, OkHttp, Okio
 ##############################################
--dontwarn okhttp3.**
--keepattributes Signature, *Annotation*, SourceFile, LineNumberTable
 -keep class okhttp3.** { *; }
--keep interface okhttp3.** { *; }
--keep enum okhttp3.** { *; }
-
+-keep interface okhttp3.**
 -keep class okio.** { *; }
+-dontwarn okhttp3.**
 -dontwarn okio.**
 
 -keep class com.github.ihsanbal.logging.** { *; }
--dontwarn com.github.ihsanbal.logging.*
+-dontwarn com.github.ihsanbal.logging.**
 
 ##############################################
-## Flutter Secure Storage & Keystore
+## Secure Storage & Keystore
 ##############################################
 -keep class io.flutter.plugins.fluttersecurestorage.** { *; }
 -keep class androidx.security.crypto.** { *; }
--keepclassmembers class androidx.security.crypto.** { *; }
+
+##############################################
+## Shared Preferences
+##############################################
+-keep class io.flutter.plugins.sharedpreferences.** { *; }
+
+##############################################
+## Location & Maps
+##############################################
+-keep class com.google.android.gms.location.** { *; }
+-keep class com.google.android.gms.maps.** { *; }
+-dontwarn com.google.android.libraries.**
+
+##############################################
+## Geolocator
+##############################################
+-keep class com.baseflow.geolocator.** { *; }
+
+##############################################
+## local_auth
+##############################################
+-keep class io.flutter.plugins.localauth.** { *; }
+-keep class androidx.biometric.** { *; }
+
+##############################################
+## flutter_local_notifications
+##############################################
+-keep class com.dexterous.flutterlocalnotifications.** { *; }
+
+##############################################
+## File Picker
+##############################################
+-keep class com.mr.flutter.plugin.filepicker.** { *; }
+
+##############################################
+## Image Picker
+##############################################
+-keep class io.flutter.plugins.imagepicker.** { *; }
+
+##############################################
+## WebView (webview_flutter)
+##############################################
+-keep class android.webkit.WebView { *; }
 -keepclassmembers class * {
-    @androidx.annotation.Keep *;
+    @android.webkit.JavascriptInterface <methods>;
 }
 
 ##############################################
@@ -99,15 +108,11 @@
 ## flutter_svg
 ##############################################
 -keep class com.caverock.androidsvg.** { *; }
--dontwarn com.caverock.androidsvg.**
--keep class com.bumptech.glide.** { *; }
--dontwarn com.bumptech.glide.**
 
 ##############################################
-## local_auth
+## Camera Plugin
 ##############################################
--keep class io.flutter.plugins.localauth.** { *; }
--keep class androidx.biometric.** { *; }
+-keep class io.flutter.plugins.camera.** { *; }
 
 ##############################################
 ## Toastification
@@ -115,47 +120,25 @@
 -keep class com.toastification.** { *; }
 
 ##############################################
-## image_picker
+## OpenFileX
 ##############################################
--keep class io.flutter.plugins.imagepicker.** { *; }
+-keep class com.jcraft.jsch.** { *; }
+-keep class com.openfilex.** { *; }
 
 ##############################################
-## file_picker
+## URL Launcher
 ##############################################
--keep class com.mr.flutter.plugin.filepicker.** { *; }
-
-##############################################
-## webview_flutter
-##############################################
-# Keep WebView related classes
--keep class android.webkit.WebView { *; }
--keep class android.webkit.WebViewClient { *; }
--keep class android.webkit.WebChromeClient { *; }
--keep class android.webkit.WebResourceRequest { *; }
--keep class android.webkit.WebResourceResponse { *; }
-
-# Keep JavaScript interfaces
--keepclassmembers class * {
-    @android.webkit.JavascriptInterface <methods>;
-}
-
-# Prevent stripping of console logs / JS bridge
--keepclassmembers class * extends android.webkit.WebChromeClient {
-    public void onConsoleMessage(...);
-}
+-keep class io.flutter.plugins.urllauncher.** { *; }
 
 ##############################################
 ## Misc
 ##############################################
--keep class java.util.** { *; }
--keep class org.intellij.lang.annotations.** { *; }
--dontwarn org.intellij.lang.annotations.**
-
-# Preserve resource files (like .env, R classes)
 -keep class **.R$* { *; }
 -dontwarn **.R
 
-# Hide Log methods in release
+##############################################
+## Remove debug log in release
+##############################################
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** w(...);

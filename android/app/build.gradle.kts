@@ -32,6 +32,15 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+    packaging {
+        resources.excludes += "META-INF/LICENSE*"
+        resources.excludes += "META-INF/NOTICE.txt"
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "gov.bdg.panduan"
@@ -42,6 +51,7 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
+        vectorDrawables.useSupportLibrary = true
     }
 
     signingConfigs {
@@ -57,10 +67,13 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
+            isDebuggable = false
+            isJniDebuggable = false
             signingConfig = signingConfigs.getByName("release")
             isShrinkResources = true
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            buildConfigField("boolean", "LOG_ENABLED", "false")
         }
     }
 }
