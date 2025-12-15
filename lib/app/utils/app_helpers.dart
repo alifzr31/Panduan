@@ -1,9 +1,9 @@
-import 'dart:math';
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:panduan/app/models/service_type.dart';
 import 'package:panduan/app/models/spm_attachment.dart';
+import 'package:panduan/app/utils/app_strings.dart';
 
 class AppHelpers {
   static double getHeightDevice(BuildContext context) {
@@ -18,65 +18,30 @@ class AppHelpers {
     return MediaQuery.of(context).viewPadding.bottom;
   }
 
-  static bool isTablet(BuildContext context) {
-    try {
-      final mediaQuery = MediaQuery.maybeOf(context);
-      if (mediaQuery == null) return false;
+  static String errorHandlingApiMessage(DioException e) {
+    final type = e.type;
+    final statusCode = e.response?.statusCode;
 
-      final size = mediaQuery.size;
-      final diagonal = sqrt(
-        (size.width * size.width) + (size.height * size.height),
-      );
-
-      return (diagonal / mediaQuery.devicePixelRatio) > 1100;
-    } catch (_) {
-      return false;
+    if (type == DioExceptionType.connectionError) {
+      return AppStrings.noConnectionErrorApiMessage;
     }
-  }
 
-  static bool isPhone(BuildContext context) {
-    return !isTablet(context);
-  }
-
-  static bool isFoldable(BuildContext context) {
-    try {
-      final mediaQuery = MediaQuery.maybeOf(context);
-      if (mediaQuery == null) return false;
-
-      final size = mediaQuery.size;
-      final ratio = size.width / size.height;
-
-      final isWide = ratio > 1.8;
-      final isTall = ratio < 0.55;
-      final physicalWidth = size.width / mediaQuery.devicePixelRatio;
-
-      final notTablet = !isTablet(context);
-
-      return notTablet && (isWide || isTall) && physicalWidth > 700;
-    } catch (_) {
-      return false;
+    if (statusCode == null) {
+      return AppStrings.unknownErrorApiMessage;
     }
-  }
 
-  static bool isFlipable(BuildContext context) {
-    try {
-      final mediaQuery = MediaQuery.maybeOf(context);
-      if (mediaQuery == null) return false;
-
-      final size = mediaQuery.size;
-      final ratio = size.height / size.width;
-      final diagonal = sqrt(
-        size.width * size.width + size.height * size.height,
-      );
-      final physicalDiagonal = diagonal / mediaQuery.devicePixelRatio;
-
-      final isTall = ratio > 2.2;
-      final isNotTablet = physicalDiagonal < 1100;
-
-      return isTall && isNotTablet;
-    } catch (_) {
-      return false;
+    if (statusCode >= 500) {
+      return AppStrings.serverErrorApiMessage;
     }
+
+    final rawMessage = e.response?.data['message'];
+    final apiMessage = e.response?.data['message'] is String
+        ? rawMessage
+        : null;
+
+    return apiMessage == null || apiMessage.isEmpty
+        ? AppStrings.unknownErrorApiMessage
+        : apiMessage;
   }
 
   static Map<String, dynamic> addOnHeaders() {
@@ -160,6 +125,7 @@ class AppHelpers {
       'DECLINE_BY_SUB_DISTRICT',
       'DECLINE_BY_DISTRICT',
       'DECLINE_BY_OPD',
+      'RETURN_TO_TP_POSYANDU_KOTA',
     ];
   }
 
@@ -193,6 +159,8 @@ class AppHelpers {
         return "Perlu Verifikasi OPD";
       case "NEED_APPROVAL_DISTRICT":
         return "Perlu Verifikasi Kecamatan";
+      case "RETURN_TO_TP_POSYANDU_KOTA":
+        return "Dikembalikan ke TP Posyandu Kota";
       default:
         return "Status Tidak Diketahui";
     }
@@ -216,6 +184,8 @@ class AppHelpers {
       case "FORWARD_TO_DISTRICT":
       case "FORWARD_TO_OPD":
         return Colors.purple.shade500;
+      case "RETURN_TO_TP_POSYANDU_KOTA":
+        return Colors.orange.shade500;
       default:
         return Colors.grey.shade500;
     }
@@ -331,10 +301,10 @@ class AppHelpers {
         key: 'catatan_kesehatan',
         label: 'Catatan Kesehatan Sebelumnya (jika ada)',
       ),
-      SpmAttachment(
-        key: 'location_coordinates',
-        label: 'Titik Koordinat Lokasi',
-      ),
+      // SpmAttachment(
+      //   key: 'location_coordinates',
+      //   label: 'Titik Koordinat Lokasi',
+      // ),
     ];
 
     final includeAttachmentMap = {
@@ -348,7 +318,7 @@ class AppHelpers {
         'catatan_kesehatan',
       },
       'pekerjaan umum': {
-        'location_coordinates',
+        // 'location_coordinates',
         'fc_ktp',
         'fc_kk',
         'surat_permohonan_rtrw',
