@@ -128,15 +128,24 @@ class _SpmFieldPageState extends State<SpmFieldPage> {
                                               'Pilih bidang pelayanan ini',
                                           index: index,
                                           dataLength: state.spmFields.length,
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              CreateSpmPage.routeName,
-                                              arguments: {
-                                                'spmFieldUuid': spmField.uuid,
-                                                'spmFieldName': spmField.name,
-                                              },
-                                            );
+                                          onTap: () async {
+                                            final result =
+                                                await Navigator.pushNamed(
+                                                  context,
+                                                  CreateSpmPage.routeName,
+                                                  arguments: {
+                                                    'spmFieldUuid':
+                                                        spmField.uuid,
+                                                    'spmFieldName':
+                                                        spmField.name,
+                                                  },
+                                                );
+
+                                            if (!context.mounted) return;
+
+                                            if (result != null) {
+                                              Navigator.pop(context, result);
+                                            }
                                           },
                                         );
                                       },

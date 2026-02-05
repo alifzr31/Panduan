@@ -4,9 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:panduan/app/cubits/create_spm/createspm_cubit.dart';
-import 'package:panduan/app/cubits/location/location_cubit.dart';
+import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/models/district.dart';
-import 'package:panduan/app/models/service_type.dart';
 import 'package:panduan/app/models/spm_attachment.dart';
 import 'package:panduan/app/models/subdistrict.dart';
 import 'package:panduan/app/utils/app_colors.dart';
@@ -60,13 +59,6 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
   SubDistrict? _selectedSubDistrict;
   final _phoneController = TextEditingController();
   String? _selectedServiceCategory;
-  final _serviceTypes = const [
-    ServiceType(nameIndonesian: 'Perencanaan', nameEnglish: 'Planning'),
-    ServiceType(nameIndonesian: 'Pelaksanaan', nameEnglish: 'Implementation'),
-    ServiceType(nameIndonesian: 'Pengawasan', nameEnglish: 'Surveillance'),
-    ServiceType(nameIndonesian: 'Layanan', nameEnglish: 'Service'),
-  ];
-  String? _selectedServiceType;
   final _reportDescriptionController = TextEditingController();
 
   final _formKeyAttachment = GlobalKey<FormState>();
@@ -76,29 +68,31 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
   final Map<String, String> _attachmentPaths = {};
   final List<TextEditingController> _attachmentControllers = [];
   final List<bool> _checkListAttachments = [];
+  int _lastAttachmentIndex = 0;
 
   void _initSpmAttachments() {
     final spmFieldName = widget.spmFieldName.toLowerCase();
 
-    _spmAttachments = AppHelpers.filterSpmAttachmentsByField(
-      spmFieldName: spmFieldName,
-    );
-
-    _attachmentControllers.addAll(
-      _spmAttachments.map((e) => TextEditingController()),
-    );
-
-    _checkListAttachments.addAll(_spmAttachments.map((e) => false));
+    setState(() {
+      _spmAttachments = AppHelpers.filterSpmAttachmentsByField(
+        spmFieldName: spmFieldName,
+      );
+      _attachmentControllers.addAll(
+        _spmAttachments.map((e) => TextEditingController()),
+      );
+      _checkListAttachments.addAll(_spmAttachments.map((e) => false));
+      _lastAttachmentIndex = _spmAttachments.length - 1;
+    });
   }
 
   @override
   void initState() {
-    context.read<LocationCubit>().fetchDistricts();
+    super.initState();
+    context.read<RegionCubit>().fetchDistricts();
     context.read<CreateSpmCubit>().fetchServiceCategories(
       spmFieldUuid: widget.spmFieldUuid,
     );
     _initSpmAttachments();
-    super.initState();
   }
 
   @override
@@ -229,14 +223,14 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                       _selectedRw = resident?.rw;
                     });
 
-                    final locationCubit = context.read<LocationCubit>();
+                    final regionCubit = context.read<RegionCubit>();
                     final residentDistrictCode = resident?.district?.code;
                     final residentSubDistrictCode = resident?.subDistrict?.code;
 
                     _selectedSubDistrict = null;
 
                     if (residentDistrictCode != null) {
-                      final district = locationCubit.state.districts.firstWhere(
+                      final district = regionCubit.state.districts.firstWhere(
                         (e) => e.code == residentDistrictCode,
                       );
 
@@ -253,12 +247,12 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
 
                     if (_selectedDistrict != null &&
                         residentSubDistrictCode != null) {
-                      locationCubit
+                      regionCubit
                           .fetchSubDistricts(
                             districtCode: _selectedDistrict!.districtCode,
                           )
                           .then((_) {
-                            final sub = locationCubit.state.subDistricts
+                            final sub = regionCubit.state.subDistricts
                                 .firstWhere(
                                   (e) => e.code == residentSubDistrictCode,
                                 );
@@ -296,7 +290,7 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                     _subDistrictController.clear();
                     _districtController.text = value.name?.capitalize() ?? '';
 
-                    context.read<LocationCubit>().fetchSubDistricts(
+                    context.read<RegionCubit>().fetchSubDistricts(
                       districtCode: _selectedDistrict?.districtCode,
                     );
                   },
@@ -314,13 +308,6 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                   onSelectedServiceCategory: (value) {
                     setState(() {
                       _selectedServiceCategory = value as String;
-                    });
-                  },
-                  serviceTypes: _serviceTypes,
-                  selectedServiceType: _selectedServiceType,
-                  onSelectedServiceType: (value) {
-                    setState(() {
-                      _selectedServiceType = value as String;
                     });
                   },
                   reportDescriptionController: _reportDescriptionController,
@@ -354,12 +341,36 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                       _attachmentControllers[index].clear();
                     }
                   },
+                  lastAttachmentIndex: _lastAttachmentIndex,
                   onPickedFile: (fileName, filePath, index) {
                     setState(() {
                       _attachmentControllers[index].text = fileName;
                       _attachmentPaths[_spmAttachments[index].key ?? ''] =
                           filePath;
                       _checkListAttachments[index] = true;
+                    });
+                  },
+                  onRemoveAddOnAttachment: (index) {
+                    setState(() {
+                      _spmAttachments.removeAt(index);
+                      _attachmentControllers[index].dispose();
+                      _attachmentControllers.removeAt(index);
+                      _checkListAttachments.removeAt(index);
+                    });
+                  },
+                  onAddAttachment: (addOnAttachments) {
+                    setState(() {
+                      _spmAttachments.addAll(addOnAttachments);
+                      _attachmentControllers.addAll(
+                        List.generate(addOnAttachments.length, (index) {
+                          return TextEditingController();
+                        }),
+                      );
+                      _checkListAttachments.addAll(
+                        List.generate(addOnAttachments.length, (index) {
+                          return false;
+                        }),
+                      );
                     });
                   },
                 ),
@@ -427,7 +438,7 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
 
                 if (state.formStatus == FormStatus.success) {
                   context.loaderOverlay.hide();
-                  Navigator.pop(context);
+                  Navigator.pop(context, 'created-spm');
                   showCustomToast(
                     context,
                     type: ToastificationType.success,
@@ -453,64 +464,60 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
               top: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-                child: SizedBox(
+                child: BaseButtonIcon(
                   width: double.infinity,
-                  child: BaseButtonIcon(
-                    label: _currentPage == 0 ? 'Lanjutkan' : 'Kirim Pelaporan',
-                    icon: _currentPage == 0
-                        ? MingCute.arrow_right_line
-                        : MingCute.send_line,
-                    onPressed: () {
-                      if (_currentPage == 0) {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          if (context
-                                  .read<CreateSpmCubit>()
-                                  .state
-                                  .resident
-                                  ?.fullName ==
-                              null) {
-                            context.read<CreateSpmCubit>().verifyNikName(
-                              nik: _nikController.text,
-                              name: _fullNameController.text,
-                            );
-                          } else {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.easeInOutCubic,
-                            );
-                            SchedulerBinding.instance.addPostFrameCallback((_) {
-                              FocusScope.of(context).unfocus();
-                            });
-                          }
-                        }
-                      } else {
-                        if (_formKeyAttachment.currentState?.validate() ??
-                            false) {
-                          context.read<CreateSpmCubit>().createSpm(
-                            submissionDate: _selectedSubmissionDate,
+                  label: _currentPage == 0 ? 'Lanjutkan' : 'Kirim Pelaporan',
+                  icon: _currentPage == 0
+                      ? MingCute.arrow_right_line
+                      : MingCute.send_line,
+                  onPressed: () {
+                    if (_currentPage == 0) {
+                      if (_formKey.currentState?.validate() ?? false) {
+                        if (context
+                                .read<CreateSpmCubit>()
+                                .state
+                                .resident
+                                ?.fullName ==
+                            null) {
+                          context.read<CreateSpmCubit>().verifyNikName(
                             nik: _nikController.text,
                             name: _fullNameController.text,
-                            address: _addressController.text,
-                            rt: _selectedRt,
-                            rw: _selectedRw,
-                            districtCode: _selectedDistrict?.code,
-                            subDistrictCode: _selectedSubDistrict?.code,
-                            phone: _phoneController.text,
-                            serviceType: _selectedServiceType,
-                            spmFieldUuid: widget.spmFieldUuid,
-                            serviceCategoryUuid: _selectedServiceCategory,
-                            reportDescription:
-                                _reportDescriptionController.text,
-                            latitude: _latitude,
-                            longitude: _longitude,
-                            spmAttachments: _spmAttachments,
-                            attachmentPaths: _attachmentPaths,
-                            checklistAttachments: _checkListAttachments,
                           );
+                        } else {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOutCubic,
+                          );
+                          SchedulerBinding.instance.addPostFrameCallback((_) {
+                            FocusScope.of(context).unfocus();
+                          });
                         }
                       }
-                    },
-                  ),
+                    } else {
+                      if (_formKeyAttachment.currentState?.validate() ??
+                          false) {
+                        context.read<CreateSpmCubit>().createSpm(
+                          submissionDate: _selectedSubmissionDate,
+                          nik: _nikController.text,
+                          name: _fullNameController.text,
+                          address: _addressController.text,
+                          rt: _selectedRt,
+                          rw: _selectedRw,
+                          districtCode: _selectedDistrict?.code,
+                          subDistrictCode: _selectedSubDistrict?.code,
+                          phone: _phoneController.text,
+                          spmFieldUuid: widget.spmFieldUuid,
+                          serviceCategoryUuid: _selectedServiceCategory,
+                          reportDescription: _reportDescriptionController.text,
+                          latitude: _latitude,
+                          longitude: _longitude,
+                          spmAttachments: _spmAttachments,
+                          attachmentPaths: _attachmentPaths,
+                          checklistAttachments: _checkListAttachments,
+                        );
+                      }
+                    }
+                  },
                 ),
               ),
             ),
