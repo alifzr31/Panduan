@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -9,35 +10,122 @@ import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:open_settings_plus/core/open_settings_plus.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:panduan/app/configs/local_notification/local_notif.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
-import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/views/change_password/changepassword_page.dart';
-import 'package:panduan/app/views/health_post/healthpost_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/widgets/base_listtile.dart';
 import 'package:panduan/app/widgets/base_skeletonizer.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
-class DashboardEndDrawer extends StatelessWidget {
-  const DashboardEndDrawer({
-    required this.appName,
-    required this.appVersion,
-    required this.hasBiometricsHardware,
-    required this.biometricsEnabled,
-    required this.availableBiometrics,
-    this.onChangedBiometrics,
-    super.key,
-  });
+class DashboardEndDrawer extends StatefulWidget {
+  const DashboardEndDrawer({super.key});
 
-  final String? appName;
-  final String? appVersion;
-  final bool hasBiometricsHardware;
-  final bool biometricsEnabled;
-  final List<BiometricType> availableBiometrics;
-  final void Function(bool)? onChangedBiometrics;
+  @override
+  State<DashboardEndDrawer> createState() => _DashboardEndDrawerState();
+}
+
+class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
+  final LocalAuthentication _localAuthentication = LocalAuthentication();
+  bool _hasBiometricsHardware = false;
+  List<BiometricType> _availableBiometrics = const [];
+  bool _biometricsEnabled = false;
+  String? _appName;
+  String? _appVersion;
+
+  Future<void> _getPackageInfo() async {
+    try {
+      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+      setState(() {
+        _appName = packageInfo.appName;
+        _appVersion = packageInfo.version;
+      });
+    } catch (e) {
+      if (kDebugMode) print(e);
+    }
+  }
+
+  Future<void> _checkBiometricsHardware() async {
+    try {
+      final canAuthenticateWithBiometrics =
+          await _localAuthentication.canCheckBiometrics;
+      final availableBiometrics = await _localAuthentication
+          .getAvailableBiometrics();
+
+      setState(() {
+        _hasBiometricsHardware = canAuthenticateWithBiometrics;
+        _availableBiometrics = availableBiometrics;
+      });
+    } on PlatformException catch (e) {
+      if (kDebugMode) print(e.message);
+    }
+  }
+
+  Future<void> _checkBiometricsEnabled() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    setState(() {
+      _biometricsEnabled =
+          sharedPreferences.getBool('biometrics_enabled') ?? false;
+    });
+  }
+
+  Future<bool> _authBiometrics() async {
+    try {
+      final didAuthFingerprint = await _localAuthentication.authenticate(
+        localizedReason:
+            'Silahkan pindai sidik jari/deteksi wajah anda untuk melanjutkan',
+        authMessages: const [
+          AndroidAuthMessages(
+            signInTitle: 'Panduan',
+            signInHint: 'Masuk dengan biometrik',
+            cancelButton: 'Batal',
+          ),
+        ],
+        biometricOnly: true,
+        sensitiveTransaction: true,
+      );
+
+      return didAuthFingerprint;
+    } on LocalAuthException catch (e) {
+      switch (e.code) {
+        case LocalAuthExceptionCode.userCanceled:
+          return false;
+        default:
+          if (kDebugMode) print(e.code);
+          if (kDebugMode) print(e.description);
+          if (kDebugMode) print(e.details);
+          rethrow;
+      }
+    }
+  }
+
+  Future<void> _setBiometrics(bool value) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setBool('biometrics_enabled', value);
+    await sharedPreferences.reload();
+
+    setState(() {
+      _biometricsEnabled = value;
+    });
+  }
+
+  void _initEndDrawer() async {
+    await _getPackageInfo();
+    await _checkBiometricsHardware();
+    await _checkBiometricsEnabled();
+  }
+
+  @override
+  void initState() {
+    _initEndDrawer();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +156,7 @@ class DashboardEndDrawer extends StatelessWidget {
                           children: [
                             const Icon(
                               MingCute.user_4_fill,
-                              size: 68,
+                              size: 66,
                               color: Colors.white,
                             ),
                             const SizedBox(width: 4),
@@ -87,12 +175,22 @@ class DashboardEndDrawer extends StatelessWidget {
                                   ),
                                   Text(
                                     state.profile?.name ?? '',
-                                    maxLines: 2,
+                                    maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    state.profile?.email ?? '',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey.shade300,
                                     ),
                                   ),
                                 ],
@@ -159,30 +257,6 @@ class DashboardEndDrawer extends StatelessWidget {
             Expanded(
               child: Column(
                 children: [
-                  if (!AppHelpers.hasPermission(
-                        context.read<AuthCubit>().state.userPermissions,
-                        permissionName: 'level-posyandu',
-                      ) &&
-                      !AppHelpers.hasPermission(
-                        context.read<AuthCubit>().state.userPermissions,
-                        permissionName: 'level-opd',
-                      )) ...{
-                    BaseListTile(
-                      leading: const Icon(
-                        MingCute.building_1_line,
-                        size: 22,
-                        color: AppColors.blueColor,
-                      ),
-                      title: 'Posyandu Binaan',
-                      onTap: () {
-                        Navigator.pushNamed(context, HealthPostPage.routeName);
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Divider(height: 1, color: Colors.grey.shade300),
-                    ),
-                  },
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       return BaseListTile(
@@ -248,7 +322,7 @@ class DashboardEndDrawer extends StatelessWidget {
                       },
                     ),
                   },
-                  if (hasBiometricsHardware && Platform.isAndroid) ...{
+                  if (_hasBiometricsHardware && Platform.isAndroid) ...{
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Divider(height: 1, color: Colors.grey.shade300),
@@ -262,13 +336,13 @@ class DashboardEndDrawer extends StatelessWidget {
                         color: AppColors.blueColor,
                       ),
                       title: 'Biometrik',
-                      subtitle: availableBiometrics.isNotEmpty
+                      subtitle: _availableBiometrics.isNotEmpty
                           ? 'Aktifkan keamanan biometrik (sidik jari/deteksi wajah)'
                           : 'Tidak ada sidik jari/deteksi wajah terdaftar diperangkat anda',
-                      subtitleColor: availableBiometrics.isNotEmpty
+                      subtitleColor: _availableBiometrics.isNotEmpty
                           ? Colors.grey.shade600
                           : Colors.red.shade600,
-                      trailing: availableBiometrics.isEmpty
+                      trailing: _availableBiometrics.isEmpty
                           ? null
                           : Transform.scale(
                               scale: 0.6,
@@ -280,8 +354,18 @@ class DashboardEndDrawer extends StatelessWidget {
                                 trackOutlineColor: const WidgetStatePropertyAll(
                                   AppColors.pinkColor,
                                 ),
-                                value: biometricsEnabled,
-                                onChanged: onChangedBiometrics,
+                                value: _biometricsEnabled,
+                                onChanged: (value) {
+                                  if (_biometricsEnabled) {
+                                    _setBiometrics(value);
+                                  } else {
+                                    _authBiometrics().then((didAuth) {
+                                      if (didAuth) {
+                                        _setBiometrics(value);
+                                      }
+                                    });
+                                  }
+                                },
                                 padding: EdgeInsets.zero,
                               ),
                             ),
@@ -350,7 +434,7 @@ class DashboardEndDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                '$appName $appVersion',
+                '$_appName $_appVersion',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,

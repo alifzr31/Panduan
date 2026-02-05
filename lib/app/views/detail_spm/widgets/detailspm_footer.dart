@@ -13,12 +13,14 @@ import 'package:panduan/app/widgets/show_custombottomsheet.dart';
 class DetailSpmFooter extends StatelessWidget {
   const DetailSpmFooter({
     required this.spmUuid,
+    required this.spmStatus,
     required this.canSubmit,
     required this.canVerify,
     super.key,
   });
 
   final String spmUuid;
+  final String spmStatus;
   final bool canSubmit;
   final bool canVerify;
 
@@ -99,6 +101,7 @@ class DetailSpmFooter extends StatelessWidget {
                           create: (ctx) => sl<ActivityCubit>(),
                           child: VerificationBottomSheet(
                             spmUuid: spmUuid,
+                            spmStatus: spmStatus,
                             serviceCategoryUuid:
                                 context
                                     .read<DetailSpmCubit>()

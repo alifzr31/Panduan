@@ -8,9 +8,12 @@ class DetailSpmService extends DioClient {
   @override
   String get baseUrl => AppEnv.baseOwnerUrl;
 
-  Future<Spm?> fetchDetailSpm({String? uuid}) async {
+  Future<Spm?> fetchDetailSpm({String? uuid, bool? isEdit}) async {
     try {
-      final response = await get('/user-submission/$uuid');
+      final response = await get(
+        '/user-submission/$uuid',
+        queryParams: {if (isEdit != null) 'is_edit': isEdit},
+      );
 
       return await compute(
         (message) => spmFromJson(message),

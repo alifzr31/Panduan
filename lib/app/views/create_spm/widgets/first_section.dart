@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:panduan/app/models/district.dart';
 import 'package:panduan/app/models/resident.dart';
-import 'package:panduan/app/models/service_type.dart';
 import 'package:panduan/app/models/subdistrict.dart';
 import 'package:panduan/app/views/create_spm/components/personaldata_section.dart';
 import 'package:panduan/app/views/create_spm/components/service_section.dart';
@@ -35,9 +34,9 @@ class FirstSection extends StatelessWidget {
     required this.phoneController,
     required this.selectedServiceCategory,
     required this.onSelectedServiceCategory,
-    required this.serviceTypes,
-    required this.selectedServiceType,
-    required this.onSelectedServiceType,
+    // required this.serviceTypes,
+    // required this.selectedServiceType,
+    // required this.onSelectedServiceType,
     required this.reportDescriptionController,
     super.key,
   });
@@ -67,9 +66,9 @@ class FirstSection extends StatelessWidget {
   final TextEditingController phoneController;
   final String? selectedServiceCategory;
   final void Function(Object?)? onSelectedServiceCategory;
-  final List<ServiceType> serviceTypes;
-  final String? selectedServiceType;
-  final void Function(Object?)? onSelectedServiceType;
+  // final List<ServiceType> serviceTypes;
+  // final String? selectedServiceType;
+  // final void Function(Object?)? onSelectedServiceType;
   final TextEditingController reportDescriptionController;
 
   @override
@@ -160,9 +159,9 @@ class FirstSection extends StatelessWidget {
                       ServiceSection(
                         selectedServiceCategory: selectedServiceCategory,
                         onSelectedServiceCategory: onSelectedServiceCategory,
-                        serviceTypes: serviceTypes,
-                        selectedServiceType: selectedServiceType,
-                        onSelectedServiceType: onSelectedServiceType,
+                        // serviceTypes: serviceTypes,
+                        // selectedServiceType: selectedServiceType,
+                        // onSelectedServiceType: onSelectedServiceType,
                         reportDescriptionController:
                             reportDescriptionController,
                       ),

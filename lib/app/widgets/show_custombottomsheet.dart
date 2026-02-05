@@ -106,10 +106,7 @@ Future<Object?> showDynamicHeightBottomSheet(
                   padding: const EdgeInsets.only(top: 16),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxHeight: maxHeight),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: SafeArea(top: false, child: child),
-                    ),
+                    child: SizedBox(width: double.infinity, child: child),
                   ),
                 ),
               ],

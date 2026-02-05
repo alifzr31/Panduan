@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
-import 'package:panduan/app/models/service_type.dart';
 import 'package:panduan/app/widgets/base_dropdownfield.dart';
 import 'package:panduan/app/widgets/base_formfield.dart';
 
@@ -9,18 +8,18 @@ class EditServiceSection extends StatelessWidget {
   const EditServiceSection({
     required this.selectedServiceCategory,
     required this.onSelectedServiceCategory,
-    required this.serviceTypes,
-    required this.selectedServiceType,
-    required this.onSelectedServiceType,
+    // required this.serviceTypes,
+    // required this.selectedServiceType,
+    // required this.onSelectedServiceType,
     required this.reportDescriptionController,
     super.key,
   });
 
   final String? selectedServiceCategory;
   final void Function(Object?)? onSelectedServiceCategory;
-  final List<ServiceType> serviceTypes;
-  final String? selectedServiceType;
-  final void Function(Object?)? onSelectedServiceType;
+  // final List<ServiceType> serviceTypes;
+  // final String? selectedServiceType;
+  // final void Function(Object?)? onSelectedServiceType;
   final TextEditingController reportDescriptionController;
 
   @override
@@ -56,27 +55,27 @@ class EditServiceSection extends StatelessWidget {
             );
           },
         ),
-        const SizedBox(height: 10),
-        BaseDropdownGroupField(
-          label: 'Jenis Pelayanan',
-          hint: 'Pilih jenis pelayanan',
-          mandatory: true,
-          value: selectedServiceType,
-          items: serviceTypes.map((e) {
-            return DropdownMenuItem(
-              value: e.nameEnglish,
-              child: Text(e.nameIndonesian ?? ''),
-            );
-          }).toList(),
-          onChanged: onSelectedServiceType,
-          validator: (value) {
-            if (selectedServiceType == null) {
-              return 'Silahkan pilih jenis pelayanan';
-            }
+        // const SizedBox(height: 10),
+        // BaseDropdownGroupField(
+        //   label: 'Jenis Pelayanan',
+        //   hint: 'Pilih jenis pelayanan',
+        //   mandatory: true,
+        //   value: selectedServiceType,
+        //   items: serviceTypes.map((e) {
+        //     return DropdownMenuItem(
+        //       value: e.nameEnglish,
+        //       child: Text(e.nameIndonesian ?? ''),
+        //     );
+        //   }).toList(),
+        //   onChanged: onSelectedServiceType,
+        //   validator: (value) {
+        //     if (selectedServiceType == null) {
+        //       return 'Silahkan pilih jenis pelayanan';
+        //     }
 
-            return null;
-          },
-        ),
+        //     return null;
+        //   },
+        // ),
         const SizedBox(height: 10),
         BaseFormGroupField(
           label: 'Uraian Pelaporan',

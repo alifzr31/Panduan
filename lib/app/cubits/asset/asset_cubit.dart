@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:panduan/app/repositories/asset_repository.dart';
-import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 
 part 'asset_state.dart';
 
@@ -52,8 +52,7 @@ class AssetCubit extends Cubit<AssetState> {
       emit(
         state.copyWith(
           downloadStatus: DownloadStatus.error,
-          downloadError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          downloadError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }

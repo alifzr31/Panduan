@@ -62,60 +62,106 @@ class _NotificationPageState extends State<NotificationPage> {
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
         ),
         actionsPadding: const EdgeInsets.only(right: 16),
-        actions:
-            context.watch<NotificationCubit>().state.listStatus ==
-                    ListStatus.success &&
-                context
-                    .watch<NotificationCubit>()
-                    .state
-                    .notifications
-                    .isNotEmpty &&
-                context
-                    .watch<NotificationCubit>()
-                    .state
-                    .notifications
-                    .map((element) => element.readAt != null)
-                    .toList()
-                    .isEmpty
-            ? [
-                BlocListener<NotificationCubit, NotificationState>(
-                  listenWhen: (previous, current) =>
-                      previous.readAllStatus != current.readAllStatus,
-                  listener: (context, state) {
-                    if (state.readAllStatus == ReadAllStatus.success) {
-                      context.read<NotificationCubit>().refetchNotifications();
-                    }
+        actions: [
+          BlocSelector<NotificationCubit, NotificationState, bool>(
+            selector: (state) {
+              return state.listStatus == ListStatus.success &&
+                  state.notifications.isNotEmpty &&
+                  state.notifications.any((element) => element.readAt == null);
+            },
+            builder: (context, state) {
+              return Visibility(
+                visible: state,
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  onPressed: () {
+                    context.read<NotificationCubit>().readAllNotification();
                   },
-                  child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    minimumSize: Size.zero,
-                    onPressed: () {
-                      context.read<NotificationCubit>().readAllNotification();
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(
-                          MingCute.checks_line,
-                          size: 18,
+                  child: const Row(
+                    children: [
+                      Icon(
+                        MingCute.checks_line,
+                        size: 18,
+                        color: AppColors.amberColor,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Tandai Baca Semua',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                           color: AppColors.amberColor,
+                          fontFamily: 'Jost',
                         ),
-                        SizedBox(width: 4),
-                        Text(
-                          'Tandai Baca Semua',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.amberColor,
-                            fontFamily: 'Jost',
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ]
-            : null,
+              );
+            },
+          ),
+        ],
       ),
+      // appBar: AppBar(
+      //   titleSpacing: 0,
+      //   backgroundColor: Colors.white,
+      //   surfaceTintColor: Colors.white,
+      //   title: const Text(
+      //     'Notifikasi',
+      //     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+      //   ),
+      //   actionsPadding: const EdgeInsets.only(right: 16),
+      //   actions:
+      //       context.watch<NotificationCubit>().state.listStatus ==
+      //               ListStatus.success &&
+      //           context
+      //               .watch<NotificationCubit>()
+      //               .state
+      //               .notifications
+      //               .isNotEmpty &&
+      //           context.watch<NotificationCubit>().state.notifications.any(
+      //             (element) => element.readAt == null,
+      //           )
+      //       ? [
+      //           BlocListener<NotificationCubit, NotificationState>(
+      //             listenWhen: (previous, current) =>
+      //                 previous.readAllStatus != current.readAllStatus,
+      //             listener: (context, state) {
+      //               if (state.readAllStatus == ReadAllStatus.success) {
+      //                 context.read<NotificationCubit>().refetchNotifications();
+      //               }
+      //             },
+      //             child: CupertinoButton(
+      //               padding: EdgeInsets.zero,
+      //               minimumSize: Size.zero,
+      //               onPressed: () {
+      //                 context.read<NotificationCubit>().readAllNotification();
+      //               },
+      //               child: const Row(
+      //                 children: [
+      //                   Icon(
+      //                     MingCute.checks_line,
+      //                     size: 18,
+      //                     color: AppColors.amberColor,
+      //                   ),
+      //                   SizedBox(width: 4),
+      //                   Text(
+      //                     'Tandai Baca Semua',
+      //                     style: TextStyle(
+      //                       fontSize: 12,
+      //                       fontWeight: FontWeight.w500,
+      //                       color: AppColors.amberColor,
+      //                       fontFamily: 'Jost',
+      //                     ),
+      //                   ),
+      //                 ],
+      //               ),
+      //             ),
+      //           ),
+      //         ]
+      //       : null,
+      // ),
       body: BlocBuilder<NotificationCubit, NotificationState>(
         builder: (context, state) {
           switch (state.listStatus) {
@@ -207,14 +253,16 @@ class _NotificationPageState extends State<NotificationPage> {
                                         },
                                       );
 
-                                      if (result != null) {
-                                        if (result == 'readed-notification') {
-                                          if (context.mounted) {
-                                            context
-                                                .read<NotificationCubit>()
-                                                .refetchNotifications();
-                                          }
-                                        }
+                                      if (!context.mounted) return;
+
+                                      if (result != null &&
+                                          result == 'readed-notification') {
+                                        context
+                                            .read<NotificationCubit>()
+                                            .markAsReadNotification(
+                                              state.notifications[index].id ??
+                                                  '',
+                                            );
                                       }
                                     },
                                   ),

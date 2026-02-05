@@ -263,22 +263,20 @@ class _DetailNotificationPageState extends State<DetailNotificationPage> {
                                       color: Colors.grey.shade300,
                                     ),
                                   ),
-                                  SizedBox(
+                                  BaseButton(
                                     width: double.infinity,
-                                    child: BaseButton(
-                                      label: 'Detail SPM',
-                                      onPressed: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          DetailSpmPage.routeName,
-                                          arguments: state
-                                              .detailNotification
-                                              ?.data
-                                              ?.data
-                                              ?.uuid,
-                                        );
-                                      },
-                                    ),
+                                    label: 'Detail SPM',
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        DetailSpmPage.routeName,
+                                        arguments: state
+                                            .detailNotification
+                                            ?.data
+                                            ?.data
+                                            ?.uuid,
+                                      );
+                                    },
                                   ),
                                 ],
                               ),

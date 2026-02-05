@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:panduan/app/models/spm.dart';
 import 'package:panduan/app/repositories/detailspm_repository.dart';
-import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 
 part 'detailspm_state.dart';
 
@@ -12,11 +12,14 @@ class DetailSpmCubit extends Cubit<DetailSpmState> {
 
   final DetailSpmRepository _repository;
 
-  Future<void> fetchDetailSpm({String? uuid}) async {
+  Future<void> fetchDetailSpm({String? uuid, bool? isEdit}) async {
     emit(state.copyWith(detailStatus: DetailStatus.loading));
 
     try {
-      final detailSpm = await _repository.fetchDetailSpm(uuid: uuid);
+      final detailSpm = await _repository.fetchDetailSpm(
+        uuid: uuid,
+        isEdit: isEdit,
+      );
 
       emit(
         state.copyWith(
@@ -28,8 +31,7 @@ class DetailSpmCubit extends Cubit<DetailSpmState> {
       emit(
         state.copyWith(
           detailStatus: DetailStatus.error,
-          detailError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          detailError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -80,8 +82,7 @@ class DetailSpmCubit extends Cubit<DetailSpmState> {
         state.copyWith(
           detailSpm: state.detailSpm,
           deleteStatus: DeleteStatus.error,
-          deleteError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          deleteError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }

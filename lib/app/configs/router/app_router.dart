@@ -6,24 +6,23 @@ import 'package:panduan/app/cubits/create_spm/createspm_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/cubits/detail_spm/detailspm_cubit.dart';
 import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
-import 'package:panduan/app/cubits/health_post/health_post_cubit.dart';
 import 'package:panduan/app/cubits/hp_registration/hp_registration_cubit.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
+import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/cubits/notification/notification_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
+import 'package:panduan/app/views/camera/camera_page.dart';
 import 'package:panduan/app/views/change_password/changepassword_page.dart';
 import 'package:panduan/app/views/create_spm/createspm_page.dart';
 import 'package:panduan/app/views/dashboard/dashboard_page.dart';
 import 'package:panduan/app/views/detail_notification/detailnotification_page.dart';
 import 'package:panduan/app/views/detail_spm/detailspm_page.dart';
 import 'package:panduan/app/views/edit_spm/editspm_page.dart';
-import 'package:panduan/app/views/health_post/healthpost_page.dart';
 import 'package:panduan/app/views/hp_registration/hpregistration_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/views/map_coordinate/mapcoordinate_page.dart';
 import 'package:panduan/app/views/notification/notification_page.dart';
 import 'package:panduan/app/views/splash/splash_page.dart';
-import 'package:panduan/app/views/spm/spm_page.dart';
 import 'package:panduan/app/views/spm_field/spmfield_page.dart';
 import 'package:panduan/app/views/update/update_page.dart';
 import 'package:panduan/app/views/webview/webview_page.dart';
@@ -84,14 +83,11 @@ class AppRouter {
             child: const NotificationPage(),
           ),
         );
-      case HealthPostPage.routeName:
+      case CameraPage.routeName:
         return customPageRouteBuilder(
           settings,
           bottomSafeArea: false,
-          child: BlocProvider(
-            create: (context) => sl<HealthPostCubit>(),
-            child: const HealthPostPage(),
-          ),
+          child: const CameraPage(),
         );
       case HpRegistrationPage.routeName:
         final args = settings.arguments as Map<String, dynamic>?;
@@ -122,17 +118,6 @@ class AppRouter {
             ),
           ),
         );
-      case SpmPage.routeName:
-        final status = settings.arguments as String?;
-
-        return customPageRouteBuilder(
-          settings,
-          bottomSafeArea: false,
-          child: BlocProvider(
-            create: (context) => sl<SpmCubit>(),
-            child: SpmPage(status: status),
-          ),
-        );
       case DetailSpmPage.routeName:
         final spmUuid = settings.arguments as String;
 
@@ -161,7 +146,7 @@ class AppRouter {
           bottomSafeArea: false,
           child: MultiBlocProvider(
             providers: [
-              BlocProvider(create: (context) => sl<LocationCubit>()),
+              BlocProvider(create: (context) => sl<RegionCubit>()),
               BlocProvider(create: (context) => sl<CreateSpmCubit>()),
             ],
             child: CreateSpmPage(
@@ -179,7 +164,8 @@ class AppRouter {
           child: MultiBlocProvider(
             providers: [
               BlocProvider(create: (context) => sl<SpmCubit>()),
-              BlocProvider(create: (context) => sl<LocationCubit>()),
+              BlocProvider(create: (context) => sl<RegionCubit>()),
+              BlocProvider(create: (context) => sl<DetailSpmCubit>()),
               BlocProvider(create: (context) => sl<EditSpmCubit>()),
             ],
             child: EditSpmPage(
@@ -195,10 +181,13 @@ class AppRouter {
         return customPageRouteBuilder(
           settings,
           bottomSafeArea: false,
-          child: MapCoordinatePage(
-            latitude: args?['latitude'],
-            longitude: args?['longitude'],
-            viewOnly: args?['viewOnly'] ?? false,
+          child: BlocProvider(
+            create: (context) => sl<LocationCubit>(),
+            child: MapCoordinatePage(
+              latitude: args?['latitude'],
+              longitude: args?['longitude'],
+              viewOnly: args?['viewOnly'] ?? false,
+            ),
           ),
         );
       case WebviewPage.routeName:

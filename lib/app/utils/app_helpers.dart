@@ -126,6 +126,8 @@ class AppHelpers {
       'DECLINE_BY_DISTRICT',
       'DECLINE_BY_OPD',
       'RETURN_TO_TP_POSYANDU_KOTA',
+      'RETURN_TO_SUB_DISTRICT',
+      'RETURN_TO_KADER',
     ];
   }
 
@@ -161,6 +163,10 @@ class AppHelpers {
         return "Perlu Verifikasi Kecamatan";
       case "RETURN_TO_TP_POSYANDU_KOTA":
         return "Dikembalikan ke TP Posyandu Kota";
+      case "RETURN_TO_SUB_DISTRICT":
+        return "Dikembalikan ke Kelurahan";
+      case "RETURN_TO_KADER":
+        return "Dikembalikan ke Posyandu";
       default:
         return "Status Tidak Diketahui";
     }
@@ -185,6 +191,8 @@ class AppHelpers {
       case "FORWARD_TO_OPD":
         return Colors.purple.shade500;
       case "RETURN_TO_TP_POSYANDU_KOTA":
+      case "RETURN_TO_SUB_DISTRICT":
+      case "RETURN_TO_KADER":
         return Colors.orange.shade500;
       default:
         return Colors.grey.shade500;

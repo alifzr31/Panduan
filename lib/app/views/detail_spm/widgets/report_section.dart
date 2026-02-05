@@ -153,28 +153,30 @@ class ReportSection extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Material(
-                    shape: const StadiumBorder(),
-                    clipBehavior: Clip.antiAlias,
-                    color: AppColors.softBlueColor,
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                          horizontal: 10,
-                        ),
-                        child: Text(
-                          AppHelpers.serviceTypeIndonesian(serviceType),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.blueColor,
+                  if (serviceType.isNotEmpty) ...{
+                    const SizedBox(width: 6),
+                    Material(
+                      shape: const StadiumBorder(),
+                      clipBehavior: Clip.antiAlias,
+                      color: AppColors.softBlueColor,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 10,
+                          ),
+                          child: Text(
+                            AppHelpers.serviceTypeIndonesian(serviceType),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.blueColor,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  },
                 ],
               ),
             ),

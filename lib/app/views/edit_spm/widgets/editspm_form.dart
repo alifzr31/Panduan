@@ -5,12 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:panduan/app/cubits/detail_spm/detailspm_cubit.dart';
 import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
-import 'package:panduan/app/cubits/location/location_cubit.dart';
+import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
 import 'package:panduan/app/models/attachment.dart';
 import 'package:panduan/app/models/district.dart';
-import 'package:panduan/app/models/service_type.dart';
 import 'package:panduan/app/models/spm.dart';
 import 'package:panduan/app/models/spm_attachment.dart';
 import 'package:panduan/app/models/spm_field.dart';
@@ -72,13 +72,13 @@ class _EditSpmFormState extends State<EditSpmForm> {
   SubDistrict? _selectedSubDistrict;
   final _phoneController = TextEditingController();
   String? _selectedServiceCategory;
-  final _serviceTypes = const [
-    ServiceType(nameIndonesian: 'Perencanaan', nameEnglish: 'Planning'),
-    ServiceType(nameIndonesian: 'Pelaksanaan', nameEnglish: 'Implementation'),
-    ServiceType(nameIndonesian: 'Pengawasan', nameEnglish: 'Surveillance'),
-    ServiceType(nameIndonesian: 'Layanan', nameEnglish: 'Service'),
-  ];
-  String? _selectedServiceType;
+  // final _serviceTypes = const [
+  //   ServiceType(nameIndonesian: 'Perencanaan', nameEnglish: 'Planning'),
+  //   ServiceType(nameIndonesian: 'Pelaksanaan', nameEnglish: 'Implementation'),
+  //   ServiceType(nameIndonesian: 'Pengawasan', nameEnglish: 'Surveillance'),
+  //   ServiceType(nameIndonesian: 'Layanan', nameEnglish: 'Service'),
+  // ];
+  // String? _selectedServiceType;
   final _reportDescriptionController = TextEditingController();
 
   final _formKeyAttachment = GlobalKey<FormState>();
@@ -90,99 +90,93 @@ class _EditSpmFormState extends State<EditSpmForm> {
   final Map<String, String> _attachmentPaths = {};
   final List<TextEditingController> _attachmentControllers = [];
   final List<bool> _checkListAttachments = [];
+  int _lastAttachmentIndex = 0;
 
-  void _initEditSpmData() {
-    final detailSpm = widget.detailSpm;
+  void _initEditSpmData() async {
+    final detailSpmCubit = context.read<DetailSpmCubit>();
+    final regionCubit = context.read<RegionCubit>();
+    final editSpmCubit = context.read<EditSpmCubit>();
 
-    setState(() {
-      _currentSpmField = detailSpm?.spmField;
-      _selectedSpmField = detailSpm?.spmField;
-      _selectedSubmissionDate = detailSpm?.date ?? DateTime(0000);
-      _selectedRt = detailSpm?.user?.rt;
-      _selectedRw = detailSpm?.user?.rw;
-    });
+    await detailSpmCubit.fetchDetailSpm(
+      uuid: widget.detailSpm?.uuid,
+      isEdit: true,
+    );
 
+    final detailSpm = detailSpmCubit.state.detailSpm;
+
+    _currentSpmField = detailSpm?.spmField;
+    _selectedSpmField = detailSpm?.spmField;
+    _selectedSubmissionDate = detailSpm?.date ?? DateTime(0000);
+    _selectedRt = detailSpm?.user?.rt;
+    _selectedRw = detailSpm?.user?.rw;
     _submissionDateController.text = AppHelpers.dmyhmDateFormat(
       _selectedSubmissionDate,
     );
     _nikController.text = detailSpm?.user?.nik ?? '';
     _fullNameController.text = detailSpm?.user?.fullName ?? '';
     _addressController.text = detailSpm?.user?.address ?? '';
-    context.read<LocationCubit>().fetchDistricts().then((_) {
-      setState(() {
-        _selectedDistrict = context
-            .read<LocationCubit>()
-            .state
-            .districts
-            .firstWhere((element) {
-              return element.code == detailSpm?.user?.district?.code;
-            });
-      });
 
-      if (mounted) {
-        context
-            .read<LocationCubit>()
-            .fetchSubDistricts(
-              districtCode: _selectedDistrict?.code?.split('.').last,
-            )
-            .then((_) {
-              setState(() {
-                _selectedSubDistrict = context
-                    .read<LocationCubit>()
-                    .state
-                    .subDistricts
-                    .firstWhere((element) {
-                      return element.code == detailSpm?.user?.subDistrict?.code;
-                    });
-              });
-            });
-      }
+    await regionCubit.fetchDistricts();
+    _selectedDistrict = regionCubit.state.districts.firstWhere((element) {
+      return element.code == detailSpm?.user?.district?.code;
     });
+
+    await regionCubit.fetchSubDistricts(
+      districtCode: _selectedDistrict?.code?.split('.').last,
+    );
+    _selectedSubDistrict = regionCubit.state.subDistricts.firstWhere((element) {
+      return element.code == detailSpm?.user?.subDistrict?.code;
+    });
+
     _phoneController.text = detailSpm?.user?.phone ?? '';
-    context
-        .read<EditSpmCubit>()
-        .fetchServiceCategories(spmFieldUuid: widget.spmFieldUuid)
-        .then((_) {
-          if (mounted) {
-            setState(() {
-              _selectedServiceCategory = context
-                  .read<EditSpmCubit>()
-                  .state
-                  .serviceCategories
-                  .firstWhere((element) {
-                    return element.uuid == detailSpm?.serviceCategory?.uuid;
-                  })
-                  .uuid;
-            });
-          }
-        });
-    setState(() {
-      _selectedServiceType = detailSpm?.type?.capitalize();
-    });
+    await editSpmCubit.fetchServiceCategories(
+      spmFieldUuid: widget.spmFieldUuid,
+    );
+    _selectedServiceCategory = editSpmCubit.state.serviceCategories.firstWhere((
+      element,
+    ) {
+      return element.uuid == detailSpm?.serviceCategory?.uuid;
+    }).uuid;
+    // setState(() {
+    //   _selectedServiceType = detailSpm?.type?.capitalize();
+    // });
     _reportDescriptionController.text = detailSpm?.description ?? '';
 
     if (detailSpm?.latitude != null && detailSpm?.longitude != null) {
-      setState(() {
-        _latitude = double.parse(detailSpm?.latitude ?? '0');
-        _longitude = double.parse(detailSpm?.longitude ?? '0');
-      });
+      _latitude = double.parse(detailSpm?.latitude ?? '0');
+      _longitude = double.parse(detailSpm?.longitude ?? '0');
     }
+    setState(() {});
     _initSpmAttachments(detailSpm?.attachments);
   }
 
   void _initSpmAttachments(List<Attachment>? attachments) {
     final spmFieldName = widget.spmFieldName.toLowerCase();
 
-    _spmAttachments = AppHelpers.filterSpmAttachmentsByField(
+    final attachmentsByField = AppHelpers.filterSpmAttachmentsByField(
       spmFieldName: spmFieldName,
     );
+    final lastIndex = attachmentsByField.length - 1;
+    _spmAttachments = attachmentsByField;
+
+    if ((attachments?.length ?? 0) > _spmAttachments.length) {
+      for (var i = 0; i < (attachments?.length ?? 0); i++) {
+        if (i > lastIndex) {
+          _spmAttachments.add(
+            SpmAttachment(
+              key: attachments?[i].title,
+              label: attachments?[i].title,
+            ),
+          );
+        }
+      }
+    }
 
     _attachmentControllers.addAll(
       _spmAttachments.map((e) => TextEditingController()),
     );
 
     if (attachments != null && attachments.isNotEmpty) {
-      // Initialize all checklist values to false first
       _checkListAttachments.addAll(_spmAttachments.map((e) => false));
 
       for (int i = 0; i < _spmAttachments.length; i++) {
@@ -209,9 +203,9 @@ class _EditSpmFormState extends State<EditSpmForm> {
         (attachment) => attachment.title?.toLowerCase() == key.toLowerCase(),
       );
 
-      setState(() {
-        hasFileMap[key] = matchingAttachment?.path;
-      });
+      hasFileMap[key] = matchingAttachment?.path;
+      _lastAttachmentIndex = _spmAttachments.length - 1;
+      setState(() {});
     }
   }
 
@@ -641,7 +635,7 @@ class _EditSpmFormState extends State<EditSpmForm> {
                     if (resident?.district?.code != null) {
                       setState(() {
                         _selectedDistrict = context
-                            .read<LocationCubit>()
+                            .read<RegionCubit>()
                             .state
                             .districts
                             .firstWhere(
@@ -654,14 +648,14 @@ class _EditSpmFormState extends State<EditSpmForm> {
 
                     if (resident?.subDistrict?.code != null) {
                       context
-                          .read<LocationCubit>()
+                          .read<RegionCubit>()
                           .fetchSubDistricts(
                             districtCode: _selectedDistrict?.districtCode,
                           )
                           .then((value) {
                             setState(() {
                               _selectedSubDistrict = context
-                                  .read<LocationCubit>()
+                                  .read<RegionCubit>()
                                   .state
                                   .subDistricts
                                   .firstWhere(
@@ -697,7 +691,7 @@ class _EditSpmFormState extends State<EditSpmForm> {
                       _selectedDistrict = value as District;
                     });
 
-                    context.read<LocationCubit>().fetchSubDistricts(
+                    context.read<RegionCubit>().fetchSubDistricts(
                       districtCode: _selectedDistrict?.districtCode,
                     );
                   },
@@ -715,13 +709,13 @@ class _EditSpmFormState extends State<EditSpmForm> {
                       _selectedServiceCategory = value as String;
                     });
                   },
-                  serviceTypes: _serviceTypes,
-                  selectedServiceType: _selectedServiceType,
-                  onSelectedServiceType: (value) {
-                    setState(() {
-                      _selectedServiceType = value as String;
-                    });
-                  },
+                  // serviceTypes: _serviceTypes,
+                  // selectedServiceType: _selectedServiceType,
+                  // onSelectedServiceType: (value) {
+                  //   setState(() {
+                  //     _selectedServiceType = value as String;
+                  //   });
+                  // },
                   reportDescriptionController: _reportDescriptionController,
                 ),
                 EditSecondSection(
@@ -757,12 +751,36 @@ class _EditSpmFormState extends State<EditSpmForm> {
                       _attachmentControllers[index].clear();
                     }
                   },
+                  lastAttachmentIndex: _lastAttachmentIndex,
                   onPickedFile: (fileName, filePath, index) {
                     setState(() {
                       _attachmentControllers[index].text = fileName;
                       _attachmentPaths[_spmAttachments[index].key ?? ''] =
                           filePath;
                       _checkListAttachments[index] = true;
+                    });
+                  },
+                  onRemoveAddOnAttachment: (index) {
+                    setState(() {
+                      _spmAttachments.removeAt(index);
+                      _attachmentControllers[index].dispose();
+                      _attachmentControllers.removeAt(index);
+                      _checkListAttachments.removeAt(index);
+                    });
+                  },
+                  onAddAttachment: (addOnAttachments) {
+                    setState(() {
+                      _spmAttachments.addAll(addOnAttachments);
+                      _attachmentControllers.addAll(
+                        List.generate(addOnAttachments.length, (index) {
+                          return TextEditingController();
+                        }),
+                      );
+                      _checkListAttachments.addAll(
+                        List.generate(addOnAttachments.length, (index) {
+                          return false;
+                        }),
+                      );
                     });
                   },
                 ),
@@ -834,7 +852,7 @@ class _EditSpmFormState extends State<EditSpmForm> {
                             districtCode: _selectedDistrict?.code,
                             subDistrictCode: _selectedSubDistrict?.code,
                             phone: _phoneController.text,
-                            serviceType: _selectedServiceType,
+                            // serviceType: _selectedServiceType,
                             spmFieldUuid: _selectedSpmField?.uuid,
                             serviceCategoryUuid: _selectedServiceCategory,
                             reportDescription:

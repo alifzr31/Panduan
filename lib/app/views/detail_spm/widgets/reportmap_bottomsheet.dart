@@ -122,14 +122,17 @@ class _ReportMapBottomsheetState extends State<ReportMapBottomsheet> {
             ),
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: BaseButtonIcon(
-              icon: MingCute.arrow_left_line,
-              label: 'Tutup',
-              onPressed: () {
-                Navigator.pop(context);
-              },
+          SafeArea(
+            top: false,
+            child: SizedBox(
+              width: double.infinity,
+              child: BaseButtonIcon(
+                icon: MingCute.arrow_left_line,
+                label: 'Tutup',
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
           ),
         ],

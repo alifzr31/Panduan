@@ -25,8 +25,10 @@ List<Widget> detailSpmAppBarAction(
           context.read<AuthCubit>().state.userPermissions,
           permissionName: 'user-submission-update',
         ) &&
-        context.watch<DetailSpmCubit>().state.detailSpm?.status ==
-            'NEED_VERIFICATION_SUB_DISTRICT') ...{
+        (context.watch<DetailSpmCubit>().state.detailSpm?.status ==
+                'NEED_VERIFICATION_SUB_DISTRICT' ||
+            context.watch<DetailSpmCubit>().state.detailSpm?.status ==
+                'RETURN_TO_KADER')) ...{
       BaseIconButton(
         icon: MingCute.edit_line,
         size: 22,

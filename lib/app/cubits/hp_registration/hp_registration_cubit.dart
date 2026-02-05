@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:panduan/app/models/hp_registration.dart';
 import 'package:panduan/app/repositories/hpregistration_repository.dart';
-import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 
 part 'hpregistration_state.dart';
 
@@ -30,8 +30,7 @@ class HpRegistrationCubit extends Cubit<HpRegistrationState> {
       emit(
         state.copyWith(
           registrationStatus: RegistrationStatus.error,
-          registrationError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          registrationError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }

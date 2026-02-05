@@ -11,11 +11,11 @@ class RemoteConfigService {
   final FirebaseRemoteConfig _remote;
 
   static const _kDefault = {
-    'latest_version': '1.0.3',
-    'latest_build_number': 4,
+    'latest_version': '1.0.5',
+    'latest_build_number': 6,
     'mandatory_update': true,
     'update_description':
-        'Pembuatan fitur Posyandu Binaan, perbaikan bugs dan optimalisasi performa aplikasi.',
+        '- Penambahan opsi verifikasi SPM\n- Perubahan tampilan data spm\n- Perubahan tampilan posyandu binaan\n- Perbaikan bugs\n- Optimalisasi performa aplikasi.',
   };
 
   Future<void> init() async {

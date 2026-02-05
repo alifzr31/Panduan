@@ -11,6 +11,7 @@ class ActivityService extends DioClient {
 
   Future<Response> createActivity({
     String? spmUuid,
+    String? serviceType,
     String? status,
     String? description,
     List<String>? opdUuids,
@@ -21,12 +22,13 @@ class ActivityService extends DioClient {
   }) async {
     final formData = FormData.fromMap({
       'user_submission_uuid': spmUuid,
+      'type': serviceType?.toUpperCase(),
       'status': status,
       'description': description,
       'date': AppHelpers.formDateTimeFormat(DateTime.now()),
-      if (opdUuids?.isNotEmpty ?? false) ...{
-        for (var i = 0; i < (opdUuids?.length ?? 0); i++) ...{
-          'opd_uuids[$i]': opdUuids?[i],
+      if (opdUuids != null && opdUuids.isNotEmpty) ...{
+        for (var i = 0; i < opdUuids.length; i++) ...{
+          'opd_uuids[$i]': opdUuids[i],
         },
       },
       if (latitude != null) ...{'latitude': latitude},

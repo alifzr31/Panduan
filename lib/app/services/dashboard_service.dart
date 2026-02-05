@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/dio/dio_client.dart';
+import 'package:panduan/app/models/health_post.dart';
 import 'package:panduan/app/models/spm.dart';
 import 'package:panduan/app/models/spm_count.dart';
 import 'package:panduan/app/models/spm_district_count.dart';
@@ -142,14 +143,35 @@ class DashboardService extends DioClient {
     }
   }
 
-  Future<List<Spm>> fetchSpm() async {
+  Future<List<Spm>> fetchSpm({
+    int? page,
+    String? keyword,
+    int? month,
+    int? year,
+    String? districtCode,
+    String? subDistrictCode,
+    String? healthPostUuid,
+    String? spmFieldName,
+    Set<String>? statuses,
+  }) async {
     try {
       final response = await get(
         '/user-submission/list-with-detail',
         queryParams: {
-          'page': 1,
-          'limit': 3,
-          'year': DateTime.now().year,
+          'page': page,
+          'limit': 10,
+          if (keyword != null || (keyword?.isNotEmpty ?? false)) 'q': keyword,
+          if (month != null) 'month': month,
+          'year': year,
+          if (districtCode != null) ...{'district_code': districtCode},
+          if (subDistrictCode != null) ...{
+            'sub_district_code': subDistrictCode,
+          },
+          if (healthPostUuid != null) ...{'health_post_uuid': healthPostUuid},
+          if (spmFieldName != null) ...{'spm_name': spmFieldName},
+          if (statuses?.isNotEmpty ?? false) ...{
+            'statuses': statuses?.join(','),
+          },
           'order': 'updated_at',
           'sort': 'desc',
         },
@@ -161,6 +183,38 @@ class DashboardService extends DioClient {
               (message) => listSpmFromJson(message),
               response.data['data'],
             );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<HealthPost>> fetchHealthPosts({
+    int? page,
+    String? keyword,
+    String? districtCode,
+    String? subDistrictCode,
+  }) async {
+    try {
+      final response = await get(
+        '/health-post',
+        queryParams: {
+          'page': page,
+          'limit': 10,
+          'order': 'name',
+          'sort': 'asc',
+          if (keyword != null && keyword.isNotEmpty) ...{'q': keyword},
+          if (districtCode != null) ...{'district_code': districtCode},
+          if (subDistrictCode != null) ...{
+            'sub_district_code': subDistrictCode,
+          },
+        },
+      );
+
+      return await compute(
+        (message) =>
+            message == null ? const [] : listHealthPostFromJson(message),
+        response.data['data'],
+      );
     } catch (e) {
       rethrow;
     }

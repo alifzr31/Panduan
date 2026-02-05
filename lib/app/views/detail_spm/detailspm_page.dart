@@ -49,8 +49,10 @@ class _DetailSpmPageState extends State<DetailSpmPage> {
       permissionName: 'level-walikota',
     )) {
       final possible =
-          context.read<DetailSpmCubit>().state.detailSpm?.status ==
-              'FORWARD_TO_TP_POSYANDU_KOTA' &&
+          (context.read<DetailSpmCubit>().state.detailSpm?.status ==
+                  'FORWARD_TO_TP_POSYANDU_KOTA' ||
+              context.read<DetailSpmCubit>().state.detailSpm?.status ==
+                  'RETURN_TO_TP_POSYANDU_KOTA') &&
           AppHelpers.hasPermission(
             context.read<AuthCubit>().state.userPermissions,
             permissionName: 'user-submission-verification',
@@ -94,6 +96,23 @@ class _DetailSpmPageState extends State<DetailSpmPage> {
         _canVerify = possible;
       });
     }
+
+    // if (AppHelpers.hasPermission(
+    //   context.read<AuthCubit>().state.userPermissions,
+    //   permissionName: 'level-posyandu',
+    // )) {
+    //   final possible =
+    //       context.read<DetailSpmCubit>().state.detailSpm?.status ==
+    //           'RETURN_TO_KADER' &&
+    //       AppHelpers.hasPermission(
+    //         context.read<AuthCubit>().state.userPermissions,
+    //         permissionName: 'user-submission-verification',
+    //       );
+
+    //   setState(() {
+    //     _canVerify = possible;
+    //   });
+    // }
   }
 
   void _checkCanSubmit() {
@@ -240,6 +259,8 @@ class _DetailSpmPageState extends State<DetailSpmPage> {
               (_canSubmit || _canVerify)) ...{
             DetailSpmFooter(
               spmUuid: widget.spmUuid,
+              spmStatus:
+                  context.watch<DetailSpmCubit>().state.detailSpm?.status ?? '',
               canSubmit: _canSubmit,
               canVerify: _canVerify,
             ),

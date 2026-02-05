@@ -104,23 +104,20 @@ class UpdateFooter extends StatelessWidget {
         SafeArea(
           top: false,
           bottom: mandatoryUpdate,
-          child: SizedBox(
-            height: 40,
+          child: BaseButton(
             width: double.infinity,
-            child: BaseButton(
-              label: 'Perbarui Sekarang',
-              onPressed: () async {
-                final url = Uri.parse(
-                  'https://play.google.com/store/apps/details?id=$packageName',
-                );
+            label: 'Perbarui Sekarang',
+            onPressed: () async {
+              final url = Uri.parse(
+                'https://play.google.com/store/apps/details?id=$packageName',
+              );
 
-                try {
-                  await launchUrl(url);
-                } catch (e) {
-                  if (kDebugMode) print(e);
-                }
-              },
-            ),
+              try {
+                await launchUrl(url);
+              } catch (e) {
+                if (kDebugMode) print(e);
+              }
+            },
           ),
         ),
         if (!mandatoryUpdate) ...{

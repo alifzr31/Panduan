@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:panduan/app/models/opd.dart';
 import 'package:panduan/app/repositories/activity_repository.dart';
-import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 
 part 'activity_state.dart';
 
@@ -14,6 +14,7 @@ class ActivityCubit extends Cubit<ActivityState> {
 
   void createActivity({
     String? spmUuid,
+    String? serviceType,
     String? status,
     String? description,
     List<String>? opdUuids,
@@ -27,6 +28,7 @@ class ActivityCubit extends Cubit<ActivityState> {
     try {
       final response = await _repository.createActivity(
         spmUuid: spmUuid,
+        serviceType: serviceType,
         status: status,
         description: description,
         opdUuids: opdUuids,
@@ -55,7 +57,7 @@ class ActivityCubit extends Cubit<ActivityState> {
       emit(
         state.copyWith(
           formStatus: FormStatus.error,
-          formError: e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          formError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -72,7 +74,7 @@ class ActivityCubit extends Cubit<ActivityState> {
       emit(
         state.copyWith(
           opdStatus: OpdStatus.error,
-          opdError: e.response?.data['meesage'] ?? AppStrings.errorApiMessage,
+          opdError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }

@@ -9,6 +9,7 @@ class HealthPostService extends DioClient {
 
   Future<List<HealthPost>> fetchHealthPosts({
     int? page,
+    int? limit,
     String? keyword,
     String? districtCode,
     String? subDistrictCode,
@@ -18,7 +19,7 @@ class HealthPostService extends DioClient {
         '/health-post',
         queryParams: {
           'page': page,
-          'limit': 10,
+          'limit': limit,
           'order': 'name',
           'sort': 'asc',
           if (keyword != null && keyword.isNotEmpty) ...{'q': keyword},

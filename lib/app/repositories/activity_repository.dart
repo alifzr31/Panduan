@@ -5,6 +5,7 @@ import 'package:panduan/app/services/activity_service.dart';
 abstract class ActivityRepository {
   Future<Response> createActivity({
     String? spmUuid,
+    String? serviceType,
     String? status,
     String? description,
     List<String>? opdUuids,
@@ -24,6 +25,7 @@ class ActivityRepositoryImpl implements ActivityRepository {
   @override
   Future<Response> createActivity({
     String? spmUuid,
+    String? serviceType,
     String? status,
     String? description,
     List<String>? opdUuids,
@@ -34,6 +36,7 @@ class ActivityRepositoryImpl implements ActivityRepository {
   }) async {
     return await _service.createActivity(
       spmUuid: spmUuid,
+      serviceType: serviceType,
       status: status,
       description: description,
       opdUuids: opdUuids,

@@ -14,6 +14,8 @@ enum SpmHpCountStatus { initial, loading, success, error }
 
 enum SpmStatus { initial, loading, success, error }
 
+enum HealthPostStatus { initial, loading, success, error }
+
 class DashboardState extends Equatable {
   final UnreadNotificationStatus unreadNotificationStatus;
   final int unreadNotificationCount;
@@ -34,8 +36,15 @@ class DashboardState extends Equatable {
   final List<SpmHpCount> spmHpCounts;
   final String? spmHpCountError;
   final SpmStatus spmStatus;
+  final bool hasMoreSpm;
   final List<Spm> spm;
   final String? spmError;
+  final String? selectedSpmStatus;
+  final String? selectedSpmField;
+  final HealthPostStatus healthPostStatus;
+  final bool hasMoreHealthPost;
+  final List<HealthPost> healthPosts;
+  final String? healthPostError;
 
   const DashboardState({
     this.unreadNotificationStatus = UnreadNotificationStatus.initial,
@@ -57,8 +66,15 @@ class DashboardState extends Equatable {
     this.spmHpCounts = const [],
     this.spmHpCountError,
     this.spmStatus = SpmStatus.initial,
+    this.hasMoreSpm = true,
     this.spm = const [],
     this.spmError,
+    this.selectedSpmStatus,
+    this.selectedSpmField,
+    this.healthPostStatus = HealthPostStatus.initial,
+    this.hasMoreHealthPost = true,
+    this.healthPosts = const [],
+    this.healthPostError,
   });
 
   DashboardState copyWith({
@@ -81,8 +97,15 @@ class DashboardState extends Equatable {
     List<SpmHpCount>? spmHpCounts,
     String? spmHpCountError,
     SpmStatus? spmStatus,
+    bool? hasMoreSpm,
     List<Spm>? spm,
     String? spmError,
+    String? selectedSpmStatus,
+    String? selectedSpmField,
+    HealthPostStatus? healthPostStatus,
+    bool? hasMoreHealthPost,
+    List<HealthPost>? healthPosts,
+    String? healthPostError,
   }) {
     return DashboardState(
       unreadNotificationStatus:
@@ -108,8 +131,15 @@ class DashboardState extends Equatable {
       spmHpCounts: spmHpCounts ?? this.spmHpCounts,
       spmHpCountError: spmHpCountError,
       spmStatus: spmStatus ?? this.spmStatus,
+      hasMoreSpm: hasMoreSpm ?? this.hasMoreSpm,
       spm: spm ?? this.spm,
       spmError: spmError,
+      selectedSpmStatus: selectedSpmStatus,
+      selectedSpmField: selectedSpmField,
+      healthPostStatus: healthPostStatus ?? this.healthPostStatus,
+      hasMoreHealthPost: hasMoreHealthPost ?? this.hasMoreHealthPost,
+      healthPosts: healthPosts ?? this.healthPosts,
+      healthPostError: healthPostError,
     );
   }
 
@@ -134,7 +164,14 @@ class DashboardState extends Equatable {
     spmHpCounts,
     spmHpCountError,
     spmStatus,
+    hasMoreSpm,
     spm,
     spmError,
+    selectedSpmStatus,
+    selectedSpmField,
+    healthPostStatus,
+    hasMoreHealthPost,
+    healthPosts,
+    healthPostError,
   ];
 }

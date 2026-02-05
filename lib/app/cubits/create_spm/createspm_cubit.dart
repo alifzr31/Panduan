@@ -5,7 +5,7 @@ import 'package:panduan/app/models/resident.dart';
 import 'package:panduan/app/models/service_category.dart';
 import 'package:panduan/app/models/spm_attachment.dart';
 import 'package:panduan/app/repositories/createspm_repository.dart';
-import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 
 part 'createspm_state.dart';
 
@@ -32,8 +32,7 @@ class CreateSpmCubit extends Cubit<CreateSpmState> {
       emit(
         state.copyWith(
           serviceCategoryStatus: ServiceCategoryStatus.error,
-          serviceCategoryError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          serviceCategoryError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -55,8 +54,7 @@ class CreateSpmCubit extends Cubit<CreateSpmState> {
       emit(
         state.copyWith(
           residentStatus: ResidentStatus.error,
-          residentError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          residentError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -95,8 +93,7 @@ class CreateSpmCubit extends Cubit<CreateSpmState> {
         state.copyWith(
           resident: state.resident,
           verifyNikNameStatus: VerifyNikNameStatus.error,
-          verifyNikNameError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          verifyNikNameError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -112,7 +109,6 @@ class CreateSpmCubit extends Cubit<CreateSpmState> {
     String? districtCode,
     String? subDistrictCode,
     String? phone,
-    String? serviceType,
     String? spmFieldUuid,
     String? serviceCategoryUuid,
     String? reportDescription,
@@ -137,7 +133,6 @@ class CreateSpmCubit extends Cubit<CreateSpmState> {
         districtCode: districtCode,
         subDistrictCode: subDistrictCode,
         phone: phone,
-        serviceType: serviceType,
         spmFieldUuid: spmFieldUuid,
         serviceCategoryUuid: serviceCategoryUuid,
         reportDescription: reportDescription,
@@ -161,7 +156,7 @@ class CreateSpmCubit extends Cubit<CreateSpmState> {
           state.copyWith(
             resident: state.resident,
             formStatus: FormStatus.error,
-            formError: response.data['message'] ?? AppStrings.errorApiMessage,
+            formError: response.data['message'],
           ),
         );
       }
@@ -170,7 +165,7 @@ class CreateSpmCubit extends Cubit<CreateSpmState> {
         state.copyWith(
           resident: state.resident,
           formStatus: FormStatus.error,
-          formError: e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          formError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }

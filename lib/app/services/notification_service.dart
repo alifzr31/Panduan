@@ -43,7 +43,7 @@ class NotificationService extends DioClient {
 
   Future<Response> readAllNotification() async {
     try {
-      final response = await get('/notification/read-all');
+      final response = await post('/notification/read-all');
 
       return await compute((message) => message, response);
     } catch (e) {

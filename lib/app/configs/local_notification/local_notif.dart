@@ -68,7 +68,7 @@ class LocalNotif {
         );
 
     await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: (details) async {
         final payload = details.payload;
 
@@ -147,10 +147,10 @@ class LocalNotif {
       );
 
       await _flutterLocalNotificationsPlugin.show(
-        id,
-        title,
-        body,
-        platformChannelSpecifics,
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: platformChannelSpecifics,
         payload: payload,
       );
     } catch (e) {

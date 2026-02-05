@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:panduan/app/cubits/create_spm/createspm_cubit.dart';
-import 'package:panduan/app/cubits/location/location_cubit.dart';
+import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/models/district.dart';
 import 'package:panduan/app/models/resident.dart';
 import 'package:panduan/app/models/subdistrict.dart';
@@ -191,7 +191,7 @@ class PersonalDataSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        BlocBuilder<LocationCubit, LocationState>(
+        BlocBuilder<RegionCubit, RegionState>(
           builder: (context, state) {
             return BaseTypeaHeadGroupField<District>(
               label: 'Kecamatan',
@@ -226,7 +226,7 @@ class PersonalDataSection extends StatelessWidget {
         ),
         if (selectedDistrict != null) ...{
           const SizedBox(height: 10),
-          BlocBuilder<LocationCubit, LocationState>(
+          BlocBuilder<RegionCubit, RegionState>(
             builder: (context, state) {
               return BaseTypeaHeadGroupField<SubDistrict>(
                 label: 'Kelurahan',

@@ -9,6 +9,7 @@ import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
 import 'package:panduan/app/cubits/health_post/health_post_cubit.dart';
 import 'package:panduan/app/cubits/hp_registration/hp_registration_cubit.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
+import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/cubits/notification/notification_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
 import 'package:panduan/app/repositories/activity_repository.dart';
@@ -20,7 +21,7 @@ import 'package:panduan/app/repositories/detailspm_repository.dart';
 import 'package:panduan/app/repositories/editspm_repository.dart';
 import 'package:panduan/app/repositories/healthpost_repository.dart';
 import 'package:panduan/app/repositories/hpregistration_repository.dart';
-import 'package:panduan/app/repositories/location_repository.dart';
+import 'package:panduan/app/repositories/region_repository.dart';
 import 'package:panduan/app/repositories/notification_repository.dart';
 import 'package:panduan/app/repositories/spm_repository.dart';
 import 'package:panduan/app/services/activity_service.dart';
@@ -32,7 +33,7 @@ import 'package:panduan/app/services/detailspm_service.dart';
 import 'package:panduan/app/services/editspm_service.dart';
 import 'package:panduan/app/services/healthpost_service.dart';
 import 'package:panduan/app/services/hpregistration_service.dart';
-import 'package:panduan/app/services/location_service.dart';
+import 'package:panduan/app/services/region_service.dart';
 import 'package:panduan/app/services/notification_service.dart';
 import 'package:panduan/app/services/spm_service.dart';
 
@@ -43,11 +44,11 @@ void init() {
   sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()));
   sl.registerFactory(() => AuthCubit(sl()));
 
-  sl.registerLazySingleton(() => LocationService());
-  sl.registerLazySingleton<LocationRepository>(
-    () => LocationRepositoryImpl(sl()),
-  );
-  sl.registerFactory(() => LocationCubit(sl()));
+  sl.registerLazySingleton(() => RegionService());
+  sl.registerLazySingleton<RegionRepository>(() => RegionRepositoryImpl(sl()));
+  sl.registerFactory(() => RegionCubit(sl()));
+
+  sl.registerFactory(() => LocationCubit());
 
   sl.registerLazySingleton(() => DashboardService());
   sl.registerLazySingleton<DashboardRepository>(
@@ -60,12 +61,6 @@ void init() {
     () => NotificationRepositoryImpl(sl()),
   );
   sl.registerFactory(() => NotificationCubit(sl()));
-
-  sl.registerLazySingleton(() => HealthPostService());
-  sl.registerLazySingleton<HealthPostRepository>(
-    () => HealthPostRepositoryImpl(sl()),
-  );
-  sl.registerFactory(() => HealthPostCubit(sl()));
 
   sl.registerLazySingleton(() => HpRegistrationService());
   sl.registerLazySingleton<HpRegistrationRepository>(
@@ -82,6 +77,12 @@ void init() {
     () => DetailSpmRepositoryImpl(sl()),
   );
   sl.registerFactory(() => DetailSpmCubit(sl()));
+
+  sl.registerLazySingleton(() => HealthPostService());
+  sl.registerLazySingleton<HealthPostRepository>(
+    () => HealthPostRepositoryImpl(sl()),
+  );
+  sl.registerFactory(() => HealthPostCubit(sl()));
 
   sl.registerLazySingleton(() => ActivityService());
   sl.registerLazySingleton<ActivityRepository>(

@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:panduan/app/models/service_category.dart';
 import 'package:panduan/app/models/spm_attachment.dart';
 import 'package:panduan/app/repositories/editspm_repository.dart';
-import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 
 part 'editspm_state.dart';
 
@@ -31,8 +31,7 @@ class EditSpmCubit extends Cubit<EditSpmState> {
       emit(
         state.copyWith(
           serviceCategoryStatus: ServiceCategoryStatus.error,
-          serviceCategoryError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          serviceCategoryError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -49,7 +48,7 @@ class EditSpmCubit extends Cubit<EditSpmState> {
     String? districtCode,
     String? subDistrictCode,
     String? phone,
-    String? serviceType,
+    // String? serviceType,
     String? spmFieldUuid,
     String? serviceCategoryUuid,
     String? reportDescription,
@@ -74,7 +73,7 @@ class EditSpmCubit extends Cubit<EditSpmState> {
         districtCode: districtCode,
         subDistrictCode: subDistrictCode,
         phone: phone,
-        serviceType: serviceType,
+        // serviceType: serviceType,
         spmFieldUuid: spmFieldUuid,
         serviceCategoryUuid: serviceCategoryUuid,
         reportDescription: reportDescription,
@@ -97,7 +96,7 @@ class EditSpmCubit extends Cubit<EditSpmState> {
         emit(
           state.copyWith(
             formStatus: FormStatus.error,
-            formError: response.data['message'] ?? AppStrings.errorApiMessage,
+            formError: response.data['message'],
           ),
         );
       }
@@ -105,7 +104,7 @@ class EditSpmCubit extends Cubit<EditSpmState> {
       emit(
         state.copyWith(
           formStatus: FormStatus.error,
-          formError: e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          formError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }

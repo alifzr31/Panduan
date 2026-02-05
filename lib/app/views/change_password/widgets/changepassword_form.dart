@@ -337,20 +337,18 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
                   );
                 }
               },
-              child: SizedBox(
+              child: BaseButton(
                 width: double.infinity,
-                child: BaseButton(
-                  label: 'Ubah Kata Sandi',
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      context.read<AuthCubit>().changePassword(
-                        currentPassword: _currentPasswordController.text,
-                        newPassword: _newPasswordController.text,
-                        confirmPassword: _confirmPasswordController.text,
-                      );
-                    }
-                  },
-                ),
+                label: 'Ubah Kata Sandi',
+                onPressed: () {
+                  if (_formKey.currentState?.validate() ?? false) {
+                    context.read<AuthCubit>().changePassword(
+                      currentPassword: _currentPasswordController.text,
+                      newPassword: _newPasswordController.text,
+                      confirmPassword: _confirmPasswordController.text,
+                    );
+                  }
+                },
               ),
             ),
           ),

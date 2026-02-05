@@ -1,9 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:panduan/app/models/notification.dart';
 import 'package:panduan/app/repositories/notification_repository.dart';
-import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 
 part 'notification_state.dart';
 
@@ -38,7 +39,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       emit(
         state.copyWith(
           listStatus: ListStatus.error,
-          listError: e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          listError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -46,6 +47,7 @@ class NotificationCubit extends Cubit<NotificationState> {
 
   void refetchNotifications() async {
     currentNotificationPage = 1;
+
     emit(
       state.copyWith(
         listStatus: ListStatus.initial,
@@ -56,6 +58,23 @@ class NotificationCubit extends Cubit<NotificationState> {
     );
 
     await fetchNotifications();
+  }
+
+  void markAsReadNotification(String id) {
+    final updatedList = state.notifications.map((notification) {
+      if (notification.id == id) {
+        return notification.copyWith(readAt: DateTime.now());
+      }
+
+      return notification;
+    }).toList();
+
+    emit(
+      state.copyWith(
+        listStatus: ListStatus.success,
+        notifications: updatedList,
+      ),
+    );
   }
 
   Future<void> fetchDetailNotification({String? notificationUuid}) async {
@@ -76,8 +95,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       emit(
         state.copyWith(
           detailStatus: DetailStatus.error,
-          detailError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          detailError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -108,6 +126,8 @@ class NotificationCubit extends Cubit<NotificationState> {
             readAllResponse: response,
           ),
         );
+
+        markAllAsReadNotification();
       } else {
         emit(
           state.copyWith(
@@ -117,13 +137,27 @@ class NotificationCubit extends Cubit<NotificationState> {
         );
       }
     } on DioException catch (e) {
+      if (kDebugMode) print(e.response?.data);
+
       emit(
         state.copyWith(
           readAllStatus: ReadAllStatus.error,
-          readAllError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          readAllError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
+  }
+
+  void markAllAsReadNotification() {
+    final updatedList = state.notifications.map((notification) {
+      return notification.copyWith(readAt: DateTime.now());
+    }).toList();
+
+    emit(
+      state.copyWith(
+        listStatus: ListStatus.success,
+        notifications: updatedList,
+      ),
+    );
   }
 }

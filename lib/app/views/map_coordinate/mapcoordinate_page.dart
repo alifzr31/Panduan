@@ -2,14 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:panduan/app/cubits/location/location_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
+import 'package:panduan/app/views/map_coordinate/widgets/maplocation_handle.dart';
 import 'package:panduan/app/widgets/base_button.dart';
 import 'package:panduan/app/widgets/base_gmaps.dart';
+import 'package:panduan/app/widgets/show_customtoast.dart';
+import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MapCoordinatePage extends StatefulWidget {
@@ -30,125 +34,57 @@ class MapCoordinatePage extends StatefulWidget {
   State<MapCoordinatePage> createState() => _MapCoordinatePageState();
 }
 
-class _MapCoordinatePageState extends State<MapCoordinatePage> {
-  bool _serviceEnabled = false;
-  bool _hasPermission = false;
+class _MapCoordinatePageState extends State<MapCoordinatePage>
+    with WidgetsBindingObserver {
   Completer<GoogleMapController> _googleMapController =
       Completer<GoogleMapController>();
-  late final GoogleMapController _mapController;
-  late LatLng _center;
-  Set<Marker>? _marker;
-
-  Future<void> _initLocation() async {
-    try {
-      LocationPermission permission;
-
-      final service = await Geolocator.isLocationServiceEnabled();
-
-      setState(() {
-        _serviceEnabled = service;
-      });
-
-      if (_serviceEnabled) {
-        permission = await Geolocator.checkPermission();
-
-        if (permission == LocationPermission.denied) {
-          permission = await Geolocator.requestPermission();
-          if (permission == LocationPermission.denied) {
-            permission = await Geolocator.requestPermission();
-          } else if (permission == LocationPermission.deniedForever) {
-            permission = await Geolocator.requestPermission();
-          } else {
-            setState(() {
-              _hasPermission = true;
-            });
-          }
-        } else {
-          setState(() {
-            _hasPermission = true;
-          });
-        }
-      } else {
-        await Geolocator.openLocationSettings();
-      }
-    } on PlatformException catch (e) {
-      if (kDebugMode) print(e);
-    }
-  }
-
-  Future<void> _fetchMyLocation(
-    Completer<GoogleMapController> googleMapController,
-    GoogleMapController mapController,
-  ) async {
-    try {
-      LocationSettings locationSettings = const LocationSettings(
-        accuracy: LocationAccuracy.best,
-        distanceFilter: 100,
-      );
-
-      Position position = await Geolocator.getCurrentPosition(
-        locationSettings: locationSettings,
-      );
-
-      LatLng nowPosition = LatLng(position.latitude, position.longitude);
-
-      await _mapController.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(zoom: 16, target: nowPosition),
-        ),
-      );
-
-      setState(() {
-        _center = nowPosition;
-      });
-    } on PlatformException catch (e) {
-      if (kDebugMode) print(e);
-    }
-  }
+  GoogleMapController? _mapController;
 
   void _onCameraMove(CameraPosition position) {
-    setState(() {
-      _center = position.target;
-    });
-  }
-
-  void _createMarker() async {
-    Marker newMarker = Marker(
-      markerId: MarkerId(1.toString()),
-      position: LatLng(widget.latitude ?? 0, widget.longitude ?? 0),
-      icon: BitmapDescriptor.defaultMarker,
+    context.read<LocationCubit>().onChangedMyLocation(
+      position.target.latitude,
+      position.target.longitude,
     );
-
-    setState(() {
-      _marker = {newMarker};
-    });
   }
 
   @override
   void initState() {
-    setState(() {
-      _center = LatLng(
-        widget.latitude ?? -6.911642008579426,
-        widget.longitude ?? 107.60975662618876,
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    if (widget.latitude != null && widget.longitude != null) {
+      context.read<LocationCubit>().onChangedMyLocation(
+        widget.latitude ?? 0,
+        widget.longitude ?? 0,
       );
-    });
+    }
 
     if (!widget.viewOnly) {
-      _initLocation();
+      context.read<LocationCubit>().checkLocationService();
     }
-    super.initState();
   }
 
   @override
   void dispose() {
     _googleMapController = Completer();
-    _mapController.dispose();
+    _mapController?.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      if (!widget.viewOnly) {
+        context.read<LocationCubit>().checkLocationService();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         titleSpacing: 0,
         backgroundColor: Colors.white,
@@ -158,115 +94,189 @@ class _MapCoordinatePageState extends State<MapCoordinatePage> {
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
         ),
       ),
-      floatingActionButton: widget.viewOnly
-          ? null
-          : _serviceEnabled && _hasPermission
+      floatingActionButton:
+          !widget.viewOnly &&
+              context.watch<LocationCubit>().state.serviceEnabled &&
+              context.watch<LocationCubit>().state.permissionGranted
           ? Padding(
               padding: const EdgeInsets.only(bottom: 80),
-              child: FloatingActionButton(
-                elevation: 2,
-                backgroundColor: AppColors.pinkColor,
-                foregroundColor: Colors.white,
-                onPressed: () async {
-                  context.loaderOverlay.show();
+              child: BlocListener<LocationCubit, LocationState>(
+                listenWhen: (previous, current) =>
+                    previous.myLocationStatus != current.myLocationStatus,
+                listener: (context, state) {
+                  if (state.myLocationStatus == MyLocationStatus.loading) {
+                    context.loaderOverlay.show();
+                  }
 
-                  await Future.delayed(
-                    const Duration(milliseconds: 1500),
-                    () async {
-                      await _fetchMyLocation(
-                        _googleMapController,
-                        _mapController,
-                      ).then((value) {
-                        if (context.mounted) {
-                          context.loaderOverlay.hide();
-                        }
-                      });
-                    },
-                  );
+                  if (state.myLocationStatus == MyLocationStatus.success) {
+                    context.loaderOverlay.hide();
+
+                    _mapController?.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(zoom: 18, target: state.myLocation),
+                      ),
+                    );
+                  }
+
+                  if (state.myLocationStatus == MyLocationStatus.error) {
+                    context.loaderOverlay.hide();
+                    showCustomToast(
+                      context,
+                      type: ToastificationType.error,
+                      title: 'Gagal Mendapatkan Lokasi',
+                      description: state.myLocationError,
+                    );
+                  }
                 },
-                child: const Icon(MingCute.location_2_fill),
+                child: FloatingActionButton(
+                  elevation: 2,
+                  backgroundColor: AppColors.pinkColor,
+                  foregroundColor: Colors.white,
+                  onPressed: () {
+                    context.read<LocationCubit>().fetchMyLocation();
+                  },
+                  child: const Icon(MingCute.location_2_fill),
+                ),
               ),
             )
           : null,
-      body: Column(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                BaseGmaps(
-                  lat: _center.latitude,
-                  long: _center.longitude,
-                  markers: widget.viewOnly ? _marker : null,
-                  zoom: widget.latitude == null && widget.longitude == null
-                      ? 16
-                      : 18,
-                  onCameraMove: widget.viewOnly ? null : _onCameraMove,
-                  onMapCreated: (mapController) {
-                    if (!_googleMapController.isCompleted) {
-                      _googleMapController.complete(mapController);
-                      _mapController = mapController;
-
-                      if (widget.viewOnly) {
-                        _createMarker();
-                      }
+      body: BlocBuilder<LocationCubit, LocationState>(
+        builder: (context, state) {
+          return !state.serviceEnabled && !widget.viewOnly
+              ? MapLocationHandle(
+                  icon: Iconsax.location_slash_bold,
+                  title: 'Lokasi Tidak Aktif',
+                  description:
+                      'Silahkan nyalakan layanan lokasi pada perangkat anda agar aplikasi dapat mengakses lokasi anda secara akurat.',
+                  buttonLabel: 'Aktifkan Lokasi',
+                  onPressedButton: () async {
+                    try {
+                      await Geolocator.openLocationSettings();
+                    } catch (e) {
+                      rethrow;
                     }
                   },
-                ),
-                if (!widget.viewOnly)
-                  const Center(
-                    child: Icon(Icons.location_on, size: 50, color: Colors.red),
-                  ),
-              ],
-            ),
-          ),
-          Container(
-            width: double.infinity,
-            clipBehavior: Clip.antiAlias,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey,
-                  blurRadius: 2,
-                  offset: Offset(0, 0),
-                  spreadRadius: 0.1,
-                ),
-              ],
-            ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: BaseButtonIcon(
-                    icon: MingCute.map_pin_line,
-                    label: widget.viewOnly ? 'Lihat Rute' : 'Pilih Titik',
-                    onPressed: () async {
-                      if (widget.viewOnly) {
-                        final url = Uri.parse(
-                          'https://www.google.com/maps/dir/?api=1&destination=${widget.latitude},${widget.longitude}&dir_action=driving',
-                        );
+                )
+              : !state.permissionGranted && !widget.viewOnly
+              ? MapLocationHandle(
+                  icon: Iconsax.location_cross_bold,
+                  title: 'Lokasi Tidak Diizinkan',
+                  description:
+                      'Silahkan izinkan aplikasi untuk mengakses lokasi pada perangkat anda agar aplikasi dapat mengakses lokasi anda secara akurat.',
+                  buttonLabel: 'Izinkan Lokasi',
+                  onPressedButton: () async {
+                    try {
+                      final status = await Geolocator.checkPermission();
 
-                        try {
-                          await launchUrl(url);
-                        } catch (e) {
-                          if (kDebugMode) print(e);
+                      if (status == LocationPermission.denied) {
+                        final requestPermission =
+                            await Geolocator.requestPermission();
+
+                        if (requestPermission == LocationPermission.denied ||
+                            requestPermission ==
+                                LocationPermission.deniedForever) {
+                          await Geolocator.openAppSettings();
                         }
-                      } else {
-                        Navigator.pop(context, _center);
                       }
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+
+                      if (status == LocationPermission.deniedForever) {
+                        await Geolocator.openAppSettings();
+                      }
+                    } catch (e) {
+                      rethrow;
+                    }
+                  },
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          BaseGmaps(
+                            lat: state.myLocation.latitude,
+                            long: state.myLocation.longitude,
+                            markers: widget.viewOnly ? state.marker : null,
+                            zoom: 18,
+                            onCameraMove: widget.viewOnly
+                                ? null
+                                : _onCameraMove,
+                            onMapCreated: (mapController) {
+                              if (!_googleMapController.isCompleted) {
+                                _googleMapController.complete(mapController);
+                                _mapController = mapController;
+
+                                if (widget.viewOnly) {
+                                  context.read<LocationCubit>().createMarker(
+                                    widget.latitude ?? 0,
+                                    widget.longitude ?? 0,
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                          if (!widget.viewOnly)
+                            const Center(
+                              child: Icon(
+                                Icons.location_on,
+                                size: 50,
+                                color: Colors.red,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 2,
+                            offset: Offset(0, 0),
+                            spreadRadius: 0.1,
+                          ),
+                        ],
+                      ),
+                      child: SafeArea(
+                        top: false,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: BaseButtonIcon(
+                              icon: MingCute.map_pin_line,
+                              label: widget.viewOnly
+                                  ? 'Lihat Rute'
+                                  : 'Pilih Titik',
+                              onPressed: () async {
+                                if (widget.viewOnly) {
+                                  final url = Uri.parse(
+                                    'https://www.google.com/maps/dir/?api=1&destination=${widget.latitude},${widget.longitude}&dir_action=driving',
+                                  );
+
+                                  try {
+                                    await launchUrl(url);
+                                  } catch (e) {
+                                    if (kDebugMode) print(e);
+                                  }
+                                } else {
+                                  Navigator.pop(context, state.myLocation);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+        },
       ),
     );
   }

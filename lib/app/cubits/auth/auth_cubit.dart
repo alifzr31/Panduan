@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/secure_storage/secure_storage.dart';
 import 'package:panduan/app/models/profile.dart';
 import 'package:panduan/app/repositories/auth_repository.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/app_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -77,7 +78,7 @@ class AuthCubit extends Cubit<AuthState> {
       emit(
         state.copyWith(
           loginStatus: LoginStatus.error,
-          loginError: e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          loginError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -106,8 +107,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(
           state.copyWith(
             profileStatus: ProfileStatus.error,
-            profileError:
-                e.response?.data['message'] ?? AppStrings.errorApiMessage,
+            profileError: AppHelpers.errorHandlingApiMessage(e),
           ),
         );
       }
@@ -201,8 +201,7 @@ class AuthCubit extends Cubit<AuthState> {
           profile: state.profile,
           userPermissions: state.userPermissions,
           changePasswordStatus: ChangePasswordStatus.error,
-          changePasswordError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          changePasswordError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -269,8 +268,7 @@ class AuthCubit extends Cubit<AuthState> {
           profile: state.profile,
           userPermissions: state.userPermissions,
           logoutStatus: LogoutStatus.error,
-          logoutError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          logoutError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }

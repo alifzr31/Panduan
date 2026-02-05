@@ -1,3 +1,4 @@
+import 'package:panduan/app/models/health_post.dart';
 import 'package:panduan/app/models/spm.dart';
 import 'package:panduan/app/models/spm_count.dart';
 import 'package:panduan/app/models/spm_district_count.dart';
@@ -25,7 +26,23 @@ abstract class DashboardRepository {
     DateTime? startDate,
     DateTime? endDate,
   });
-  Future<List<Spm>> fetchSpm();
+  Future<List<Spm>> fetchSpm({
+    int? page,
+    String? keyword,
+    int? month,
+    int? year,
+    String? districtCode,
+    String? subDistrictCode,
+    String? healthPostUuid,
+    String? spmFieldName,
+    Set<String>? statuses,
+  });
+  Future<List<HealthPost>> fetchHealthPosts({
+    int? page,
+    String? keyword,
+    String? districtCode,
+    String? subDistrictCode,
+  });
 }
 
 class DashboardRepositoryImpl implements DashboardRepository {
@@ -91,7 +108,42 @@ class DashboardRepositoryImpl implements DashboardRepository {
   }
 
   @override
-  Future<List<Spm>> fetchSpm() async {
-    return await _service.fetchSpm();
+  Future<List<Spm>> fetchSpm({
+    int? page,
+    String? keyword,
+    int? month,
+    int? year,
+    String? districtCode,
+    String? subDistrictCode,
+    String? healthPostUuid,
+    String? spmFieldName,
+    Set<String>? statuses,
+  }) async {
+    return await _service.fetchSpm(
+      page: page,
+      keyword: keyword,
+      month: month,
+      year: year,
+      districtCode: districtCode,
+      subDistrictCode: subDistrictCode,
+      healthPostUuid: healthPostUuid,
+      spmFieldName: spmFieldName,
+      statuses: statuses,
+    );
+  }
+
+  @override
+  Future<List<HealthPost>> fetchHealthPosts({
+    int? page,
+    String? keyword,
+    String? districtCode,
+    String? subDistrictCode,
+  }) async {
+    return await _service.fetchHealthPosts(
+      page: page,
+      keyword: keyword,
+      districtCode: districtCode,
+      subDistrictCode: subDistrictCode,
+    );
   }
 }

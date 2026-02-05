@@ -42,113 +42,128 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          BaseFormGroupField(
-            label: 'Username/Email',
-            hint: 'Masukkan username atau email anda',
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            prefixIcon: const Icon(
-              MingCute.user_1_fill,
-              size: 18,
-              color: Colors.black,
-            ),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Silakan masukkan username atau email anda';
-              } else {
-                if (value.matches('@')) {
-                  if (!isEmail(value)) {
-                    return 'Email yang anda masukkan tidak benar';
-                  }
-                }
-              }
+    return BlocListener<AuthCubit, AuthState>(
+      listenWhen: (previous, current) =>
+          previous.loginStatus != current.loginStatus,
+      listener: (context, state) {
+        if (state.loginStatus == LoginStatus.loading) {
+          context.loaderOverlay.show();
+        }
 
-              return null;
-            },
-          ),
-          const SizedBox(height: 10),
-          BaseFormGroupField(
-            label: 'Kata Sandi',
-            hint: 'Masukkan kata sandi anda',
-            obscureText: _obscurePass,
-            controller: _passwordController,
-            prefixIcon: const Icon(
-              MingCute.lock_fill,
-              size: 18,
-              color: Colors.black,
-            ),
-            suffixIcon: BaseIconButton(
-              icon: _obscurePass ? MingCute.eye_fill : MingCute.eye_close_line,
-              size: 18,
-              onPressed: () {
-                setState(() {
-                  _obscurePass = !_obscurePass;
-                });
+        if (state.loginStatus == LoginStatus.success) {
+          context.loaderOverlay.hide();
+          Navigator.pushReplacementNamed(context, DashboardPage.routeName);
+          showCustomToast(
+            context,
+            type: ToastificationType.success,
+            title: 'Masuk Berhasil',
+            description: 'Selamat datang!',
+          );
+        }
+
+        if (state.loginStatus == LoginStatus.error) {
+          context.loaderOverlay.hide();
+          showCustomToast(
+            context,
+            type: ToastificationType.error,
+            title: 'Masuk Gagal',
+            description: state.loginError,
+          );
+        }
+      },
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            BlocSelector<AuthCubit, AuthState, LoginStatus>(
+              selector: (state) {
+                return state.loginStatus;
+              },
+              builder: (context, state) {
+                return BaseFormGroupField(
+                  label: 'Username/Email',
+                  hint: 'Masukkan username atau email anda',
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  readOnly: state == LoginStatus.loading,
+                  textInputAction: TextInputAction.next,
+                  prefixIcon: const Icon(
+                    MingCute.user_1_fill,
+                    size: 18,
+                    color: Colors.black,
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Silakan masukkan username atau email anda';
+                    } else {
+                      if (value.matches('@')) {
+                        if (!isEmail(value)) {
+                          return 'Email yang anda masukkan tidak benar';
+                        }
+                      }
+                    }
+
+                    return null;
+                  },
+                );
               },
             ),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Silakan masukkan kata sandi anda';
-              }
+            const SizedBox(height: 10),
+            BlocSelector<AuthCubit, AuthState, LoginStatus>(
+              selector: (state) {
+                return state.loginStatus;
+              },
+              builder: (context, state) {
+                return BaseFormGroupField(
+                  label: 'Kata Sandi',
+                  hint: 'Masukkan kata sandi anda',
+                  obscureText: _obscurePass,
+                  controller: _passwordController,
+                  readOnly: state == LoginStatus.loading,
+                  textInputAction: TextInputAction.done,
+                  prefixIcon: const Icon(
+                    MingCute.lock_fill,
+                    size: 18,
+                    color: Colors.black,
+                  ),
+                  suffixIcon: BaseIconButton(
+                    icon: _obscurePass
+                        ? MingCute.eye_fill
+                        : MingCute.eye_close_line,
+                    size: 18,
+                    onPressed: () {
+                      setState(() {
+                        _obscurePass = !_obscurePass;
+                      });
+                    },
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Silakan masukkan kata sandi anda';
+                    }
 
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          BlocListener<AuthCubit, AuthState>(
-            listenWhen: (previous, current) =>
-                previous.loginStatus != current.loginStatus,
-            listener: (context, state) {
-              if (state.loginStatus == LoginStatus.loading) {
-                context.loaderOverlay.show();
-              }
-
-              if (state.loginStatus == LoginStatus.success) {
-                context.loaderOverlay.hide();
-                Navigator.pushReplacementNamed(
-                  context,
-                  DashboardPage.routeName,
+                    return null;
+                  },
                 );
-                showCustomToast(
-                  context,
-                  type: ToastificationType.success,
-                  title: 'Masuk Berhasil',
-                  description: 'Selamat datang!',
-                );
-              }
-
-              if (state.loginStatus == LoginStatus.error) {
-                context.loaderOverlay.hide();
-                showCustomToast(
-                  context,
-                  type: ToastificationType.error,
-                  title: 'Masuk Gagal',
-                  description: state.loginError,
-                );
-              }
-            },
-            child: SizedBox(
-              width: double.infinity,
-              child: BaseButtonIcon(
-                fgColor: Colors.white,
-                label: 'Masuk',
-                icon: MingCute.entrance_line,
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    context.read<AuthCubit>().login(
-                      email: _emailController.text,
-                      password: _passwordController.text,
-                    );
-                  }
-                },
-              ),
+              },
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            BaseButtonIcon(
+              width: double.infinity,
+              fgColor: Colors.white,
+              label: 'Masuk',
+              icon: MingCute.entrance_line,
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  context.read<AuthCubit>().login(
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                  );
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

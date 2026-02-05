@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:panduan/app/cubits/location/location_cubit.dart';
+import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/models/district.dart';
 import 'package:panduan/app/models/resident.dart';
 import 'package:panduan/app/models/subdistrict.dart';
@@ -157,7 +157,7 @@ class EditPersonalDataSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        BlocBuilder<LocationCubit, LocationState>(
+        BlocBuilder<RegionCubit, RegionState>(
           builder: (context, state) {
             return BaseDropdownSearchGroupField<District>(
               label: 'Kecamatan',
@@ -200,7 +200,7 @@ class EditPersonalDataSection extends StatelessWidget {
         ),
         if (selectedDistrict != null) ...{
           const SizedBox(height: 10),
-          BlocBuilder<LocationCubit, LocationState>(
+          BlocBuilder<RegionCubit, RegionState>(
             builder: (context, state) {
               return BaseDropdownSearchGroupField<SubDistrict>(
                 label: 'Kelurahan',

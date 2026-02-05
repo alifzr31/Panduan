@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
+import 'package:panduan/app/models/health_post.dart';
 import 'package:panduan/app/models/spm.dart';
 import 'package:panduan/app/models/spm_count.dart';
 import 'package:panduan/app/models/spm_district_count.dart';
@@ -9,7 +10,6 @@ import 'package:panduan/app/models/spm_hp_count.dart';
 import 'package:panduan/app/models/spm_subdistrict_count.dart';
 import 'package:panduan/app/repositories/dashboard_repository.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
-import 'package:panduan/app/utils/app_strings.dart';
 
 part 'dashboard_state.dart';
 
@@ -18,7 +18,10 @@ class DashboardCubit extends Cubit<DashboardState> {
 
   final DashboardRepository _repository;
 
-  void initDataByLevel({
+  int _currentSpmPage = 1;
+  int _currentHealthPostPage = 1;
+
+  void initHomeDataByLevel({
     List<String>? userPermissions,
     DateTime? startDate,
     DateTime? endDate,
@@ -32,14 +35,12 @@ class DashboardCubit extends Cubit<DashboardState> {
       await fetchSpmFieldCount(startDate: startDate, endDate: endDate);
       await fetchSpmDistrictCount(startDate: startDate, endDate: endDate);
       await fetchSpmSubDistrictCount(startDate: startDate, endDate: endDate);
-      await fetchSpm();
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-opd',
     )) {
       await fetchSpmCount(startDate: startDate, endDate: endDate);
       await fetchSpmFieldCount(startDate: startDate, endDate: endDate);
-      await fetchSpm();
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-kecamatan',
@@ -47,7 +48,6 @@ class DashboardCubit extends Cubit<DashboardState> {
       await fetchSpmCount(startDate: startDate, endDate: endDate);
       await fetchSpmFieldCount(startDate: startDate, endDate: endDate);
       await fetchSpmSubDistrictCount(startDate: startDate, endDate: endDate);
-      await fetchSpm();
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-kelurahan',
@@ -55,7 +55,6 @@ class DashboardCubit extends Cubit<DashboardState> {
       await fetchSpmCount(startDate: startDate, endDate: endDate);
       await fetchSpmFieldCount(startDate: startDate, endDate: endDate);
       await fetchSpmHpCount(startDate: startDate, endDate: endDate);
-      await fetchSpm();
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-posyandu',
@@ -64,7 +63,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     }
   }
 
-  void refetchDataByLevel({
+  void refetchHomeDataByLevel({
     List<String>? userPermissions,
     DateTime? startDate,
     DateTime? endDate,
@@ -78,14 +77,12 @@ class DashboardCubit extends Cubit<DashboardState> {
       refetchSpmFieldCount(startDate: startDate, endDate: endDate);
       refetchSpmDistrictCount(startDate: startDate, endDate: endDate);
       refetchSpmSubDistrictCount(startDate: startDate, endDate: endDate);
-      refetchSpm();
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-opd',
     )) {
       refetchSpmCount(startDate: startDate, endDate: endDate);
       refetchSpmFieldCount(startDate: startDate, endDate: endDate);
-      refetchSpm();
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-kecamatan',
@@ -93,7 +90,6 @@ class DashboardCubit extends Cubit<DashboardState> {
       refetchSpmCount(startDate: startDate, endDate: endDate);
       refetchSpmFieldCount(startDate: startDate, endDate: endDate);
       refetchSpmSubDistrictCount(startDate: startDate, endDate: endDate);
-      refetchSpm();
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-kelurahan',
@@ -101,7 +97,6 @@ class DashboardCubit extends Cubit<DashboardState> {
       refetchSpmCount(startDate: startDate, endDate: endDate);
       refetchSpmFieldCount(startDate: startDate, endDate: endDate);
       refetchSpmHpCount(startDate: startDate, endDate: endDate);
-      refetchSpm();
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-posyandu',
@@ -137,8 +132,7 @@ class DashboardCubit extends Cubit<DashboardState> {
           spmCount: state.spmCount,
           spmFieldCount: state.spmFieldCount,
           unreadNotificationStatus: UnreadNotificationStatus.error,
-          unreadNotificationError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          unreadNotificationError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -177,8 +171,7 @@ class DashboardCubit extends Cubit<DashboardState> {
       emit(
         state.copyWith(
           spmCountStatus: SpmCountStatus.error,
-          spmCountError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          spmCountError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -226,8 +219,7 @@ class DashboardCubit extends Cubit<DashboardState> {
         state.copyWith(
           spmCount: state.spmCount,
           spmFieldCountStatus: SpmFieldCountStatus.error,
-          spmFieldCountError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          spmFieldCountError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -278,8 +270,7 @@ class DashboardCubit extends Cubit<DashboardState> {
           spmCount: state.spmCount,
           spmFieldCount: state.spmFieldCount,
           spmDistrictCountStatus: SpmDistrictCountStatus.error,
-          spmDistrictCountError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          spmDistrictCountError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -331,8 +322,7 @@ class DashboardCubit extends Cubit<DashboardState> {
           spmCount: state.spmCount,
           spmFieldCount: state.spmFieldCount,
           spmSubDistrictCountStatus: SpmSubDistrictCountStatus.error,
-          spmSubDistrictCountError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          spmSubDistrictCountError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -384,8 +374,7 @@ class DashboardCubit extends Cubit<DashboardState> {
           spmCount: state.spmCount,
           spmFieldCount: state.spmFieldCount,
           spmHpCountStatus: SpmHpCountStatus.error,
-          spmHpCountError:
-              e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          spmHpCountError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
@@ -405,49 +394,227 @@ class DashboardCubit extends Cubit<DashboardState> {
     await fetchSpmHpCount(startDate: startDate, endDate: endDate);
   }
 
-  Future<void> fetchSpm() async {
+  Future<void> fetchSpm({
+    String? keyword,
+    int? month,
+    int? year,
+    String? districtCode,
+    String? subDistrictCode,
+    String? healthPostUuid,
+    String? spmFieldName,
+    Set<String>? statuses,
+  }) async {
     emit(
       state.copyWith(
         spmCount: state.spmCount,
         spmFieldCount: state.spmFieldCount,
-        spmStatus: SpmStatus.loading,
+        spmStatus: _currentSpmPage == 1 ? SpmStatus.loading : null,
       ),
     );
 
     try {
-      final spm = await _repository.fetchSpm();
+      final spm = await _repository.fetchSpm(
+        page: _currentSpmPage,
+        keyword: keyword,
+        month: month,
+        year: year,
+        districtCode: districtCode,
+        subDistrictCode: subDistrictCode,
+        healthPostUuid: healthPostUuid,
+        spmFieldName: spmFieldName,
+        statuses: statuses,
+      );
+
+      if (spm.length < 10) {
+        emit(
+          state.copyWith(
+            spmCount: state.spmCount,
+            spmFieldCount: state.spmFieldCount,
+            hasMoreSpm: false,
+          ),
+        );
+      }
 
       emit(
         state.copyWith(
           spmCount: state.spmCount,
           spmFieldCount: state.spmFieldCount,
           spmStatus: SpmStatus.success,
-          spm: spm,
+          spm: List.of(state.spm)..addAll(spm),
         ),
       );
+      _currentSpmPage++;
     } on DioException catch (e) {
       emit(
         state.copyWith(
           spmCount: state.spmCount,
           spmFieldCount: state.spmFieldCount,
           spmStatus: SpmStatus.error,
-          spmError: e.response?.data['message'] ?? AppStrings.errorApiMessage,
+          spmError: AppHelpers.errorHandlingApiMessage(e),
         ),
       );
     }
   }
 
-  void refetchSpm() async {
+  void refetchSpm({
+    String? keyword,
+    int? month,
+    int? year,
+    String? districtCode,
+    String? subDistrictCode,
+    String? healthPostUuid,
+    String? spmFieldName,
+    Set<String>? statuses,
+  }) async {
+    _currentSpmPage = 1;
     emit(
       state.copyWith(
         spmCount: state.spmCount,
         spmFieldCount: state.spmFieldCount,
         spmStatus: SpmStatus.initial,
+        hasMoreSpm: true,
         spm: const [],
         spmError: null,
       ),
     );
 
-    await fetchSpm();
+    await fetchSpm(
+      keyword: keyword,
+      month: month,
+      year: year,
+      districtCode: districtCode,
+      subDistrictCode: subDistrictCode,
+      healthPostUuid: healthPostUuid,
+      spmFieldName: spmFieldName,
+      statuses: statuses,
+    );
+  }
+
+  void onSelectedSpmStatus(String? spmStatus) {
+    emit(
+      state.copyWith(
+        spmCount: state.spmCount,
+        spmFieldCount: state.spmFieldCount,
+        selectedSpmStatus: spmStatus,
+      ),
+    );
+  }
+
+  void clearSelectedSpmStatus() {
+    emit(
+      state.copyWith(
+        spmCount: state.spmCount,
+        spmFieldCount: state.spmFieldCount,
+        selectedSpmStatus: null,
+      ),
+    );
+  }
+
+  void onSelectedSpmField(String? spmFieldName) {
+    emit(
+      state.copyWith(
+        spmCount: state.spmCount,
+        spmFieldCount: state.spmFieldCount,
+        selectedSpmField: spmFieldName,
+      ),
+    );
+  }
+
+  void clearSelectedSpmField() {
+    emit(
+      state.copyWith(
+        spmCount: state.spmCount,
+        spmFieldCount: state.spmFieldCount,
+        selectedSpmField: null,
+      ),
+    );
+  }
+
+  Future<void> fetchHealthPosts({
+    String? keyword,
+    String? districtCode,
+    String? subDistrictCode,
+  }) async {
+    emit(
+      state.copyWith(
+        spmCount: state.spmCount,
+        spmFieldCount: state.spmFieldCount,
+        selectedSpmField: state.selectedSpmField,
+        selectedSpmStatus: state.selectedSpmStatus,
+        healthPostStatus: _currentHealthPostPage == 1
+            ? HealthPostStatus.loading
+            : null,
+      ),
+    );
+
+    try {
+      final healthPosts = await _repository.fetchHealthPosts(
+        page: _currentHealthPostPage,
+        keyword: keyword,
+        districtCode: districtCode,
+        subDistrictCode: subDistrictCode,
+      );
+
+      if (healthPosts.length < 10) {
+        emit(
+          state.copyWith(
+            spmCount: state.spmCount,
+            spmFieldCount: state.spmFieldCount,
+            selectedSpmField: state.selectedSpmField,
+            selectedSpmStatus: state.selectedSpmStatus,
+            hasMoreHealthPost: false,
+          ),
+        );
+      }
+
+      emit(
+        state.copyWith(
+          spmCount: state.spmCount,
+          spmFieldCount: state.spmFieldCount,
+          selectedSpmField: state.selectedSpmField,
+          selectedSpmStatus: state.selectedSpmStatus,
+          healthPostStatus: HealthPostStatus.success,
+          healthPosts: List.of(state.healthPosts)..addAll(healthPosts),
+        ),
+      );
+      _currentHealthPostPage++;
+    } on DioException catch (e) {
+      emit(
+        state.copyWith(
+          spmCount: state.spmCount,
+          spmFieldCount: state.spmFieldCount,
+          selectedSpmField: state.selectedSpmField,
+          selectedSpmStatus: state.selectedSpmStatus,
+          healthPostStatus: HealthPostStatus.error,
+          healthPostError: AppHelpers.errorHandlingApiMessage(e),
+        ),
+      );
+    }
+  }
+
+  void refetchHealthPosts({
+    String? keyword,
+    String? districtCode,
+    String? subDistrictCode,
+  }) async {
+    _currentHealthPostPage = 1;
+    emit(
+      state.copyWith(
+        spmCount: state.spmCount,
+        spmFieldCount: state.spmFieldCount,
+        selectedSpmField: state.selectedSpmField,
+        selectedSpmStatus: state.selectedSpmStatus,
+        healthPostStatus: HealthPostStatus.initial,
+        hasMoreHealthPost: true,
+        healthPosts: const [],
+        healthPostError: null,
+      ),
+    );
+
+    await fetchHealthPosts(
+      keyword: keyword,
+      districtCode: districtCode,
+      subDistrictCode: subDistrictCode,
+    );
   }
 }

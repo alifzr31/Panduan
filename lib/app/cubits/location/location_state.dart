@@ -1,51 +1,49 @@
 part of 'location_cubit.dart';
 
-enum DistrictStatus { initial, loading, success, error }
-
-enum SubDistrictStatus { initial, loading, success, error }
+enum MyLocationStatus { initial, loading, success, error }
 
 class LocationState extends Equatable {
-  final DistrictStatus districtStatus;
-  final List<District> districts;
-  final String? districtError;
-  final SubDistrictStatus subDistrictStatus;
-  final List<SubDistrict> subDistricts;
-  final String? subDistrictError;
+  final bool serviceEnabled;
+  final bool permissionGranted;
+  final MyLocationStatus myLocationStatus;
+  final LatLng myLocation;
+  final String? myLocationError;
+  final Set<Marker>? marker;
 
   const LocationState({
-    this.districtStatus = DistrictStatus.initial,
-    this.districts = const [],
-    this.districtError,
-    this.subDistrictStatus = SubDistrictStatus.initial,
-    this.subDistricts = const [],
-    this.subDistrictError,
+    this.serviceEnabled = false,
+    this.permissionGranted = false,
+    this.myLocationStatus = MyLocationStatus.initial,
+    this.myLocation = const LatLng(-6.911642008579426, 107.60975662618876),
+    this.myLocationError,
+    this.marker,
   });
 
   LocationState copyWith({
-    DistrictStatus? districtStatus,
-    List<District>? districts,
-    String? districtError,
-    SubDistrictStatus? subDistrictStatus,
-    List<SubDistrict>? subDistricts,
-    String? subDistrictError,
+    bool? serviceEnabled,
+    bool? permissionGranted,
+    MyLocationStatus? myLocationStatus,
+    LatLng? myLocation,
+    String? myLocationError,
+    Set<Marker>? marker,
   }) {
     return LocationState(
-      districtStatus: districtStatus ?? this.districtStatus,
-      districts: districts ?? this.districts,
-      districtError: districtError,
-      subDistrictStatus: subDistrictStatus ?? this.subDistrictStatus,
-      subDistricts: subDistricts ?? this.subDistricts,
-      subDistrictError: subDistrictError,
+      serviceEnabled: serviceEnabled ?? this.serviceEnabled,
+      permissionGranted: permissionGranted ?? this.permissionGranted,
+      myLocationStatus: myLocationStatus ?? this.myLocationStatus,
+      myLocation: myLocation ?? this.myLocation,
+      myLocationError: myLocationError,
+      marker: marker,
     );
   }
 
   @override
   List<Object?> get props => [
-    districtStatus,
-    districts,
-    districtError,
-    subDistrictStatus,
-    subDistricts,
-    subDistrictError,
+    serviceEnabled,
+    permissionGranted,
+    myLocationStatus,
+    myLocation,
+    myLocationError,
+    marker,
   ];
 }

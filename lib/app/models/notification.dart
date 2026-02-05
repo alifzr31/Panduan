@@ -62,6 +62,36 @@ class Notification extends Equatable {
     numbering,
   ];
 
+  Notification copyWith({
+    String? id,
+    int? ownerId,
+    NotificationData? data,
+    String? notifiableType,
+    int? notifiableId,
+    String? notifiableUuid,
+    String? type,
+    dynamic deletedAt,
+    DateTime? readAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? numbering,
+  }) {
+    return Notification(
+      id: id ?? this.id,
+      ownerId: ownerId ?? this.ownerId,
+      data: data ?? this.data,
+      notifiableType: notifiableType ?? this.notifiableType,
+      notifiableId: notifiableId ?? this.notifiableId,
+      notifiableUuid: notifiableUuid ?? this.notifiableUuid,
+      type: type ?? this.type,
+      deletedAt: deletedAt ?? this.deletedAt,
+      readAt: readAt ?? this.readAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      numbering: numbering ?? this.numbering,
+    );
+  }
+
   factory Notification.fromJson(Map<String, dynamic> json) => Notification(
     id: json["id"],
     ownerId: json["owner_id"],
