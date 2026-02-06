@@ -14,7 +14,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:panduan/app/configs/local_notification/local_notif.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/views/change_password/changepassword_page.dart';
+import 'package:panduan/app/views/health_post/healthpost_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/widgets/base_listtile.dart';
 import 'package:panduan/app/widgets/base_skeletonizer.dart';
@@ -257,31 +259,100 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
             Expanded(
               child: Column(
                 children: [
+                  // if (!AppHelpers.hasPermission(
+                  //       context.read<AuthCubit>().state.userPermissions,
+                  //       permissionName: 'level-posyandu',
+                  //     ) &&
+                  //     !AppHelpers.hasPermission(
+                  //       context.read<AuthCubit>().state.userPermissions,
+                  //       permissionName: 'level-opd',
+                  //     )) ...{
+                  //   ...[
+                  //     BaseListTile(
+                  //       leading: const Icon(
+                  //         MingCute.building_5_line,
+                  //         size: 22,
+                  //         color: AppColors.blueColor,
+                  //       ),
+                  //       title: 'Posyandu Binaan',
+                  //       onTap: () {
+                  //         Navigator.pushNamed(
+                  //           context,
+                  //           HealthPostPage.routeName,
+                  //         );
+                  //       },
+                  //     ),
+                  //     Padding(
+                  //       padding: const EdgeInsets.symmetric(horizontal: 16),
+                  //       child: Divider(height: 1, color: Colors.grey.shade300),
+                  //     ),
+                  //   ],
+                  // },
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
-                      return BaseListTile(
-                        leading: const Icon(
-                          MingCute.lock_line,
-                          size: 22,
-                          color: AppColors.blueColor,
-                        ),
-                        title: 'Ubah Kata Sandi',
-                        subtitle: state.profile?.isNeedResetPassword ?? false
-                            ? state.profile?.descriptionResetPassword
-                            : null,
-                        subtitleColor: Colors.red.shade600,
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            ChangePasswordPage.routeName,
-                          );
-                        },
+                      return Column(
+                        children: [
+                          if (!AppHelpers.hasPermission(
+                                state.userPermissions,
+                                permissionName: 'level-posyandu',
+                              ) &&
+                              !AppHelpers.hasPermission(
+                                state.userPermissions,
+                                permissionName: 'level-opd',
+                              )) ...{
+                            BaseListTile(
+                              leading: const Icon(
+                                MingCute.building_5_line,
+                                size: 22,
+                                color: AppColors.blueColor,
+                              ),
+                              title: 'Posyandu Binaan',
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  HealthPostPage.routeName,
+                                );
+                              },
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Divider(
+                                height: 1,
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          },
+                          BaseListTile(
+                            leading: const Icon(
+                              MingCute.lock_line,
+                              size: 22,
+                              color: AppColors.blueColor,
+                            ),
+                            title: 'Ubah Kata Sandi',
+                            subtitle:
+                                state.profile?.isNeedResetPassword ?? false
+                                ? state.profile?.descriptionResetPassword
+                                : null,
+                            subtitleColor: Colors.red.shade600,
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                ChangePasswordPage.routeName,
+                              );
+                            },
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Divider(
+                              height: 1,
+                              color: Colors.grey.shade300,
+                            ),
+                          ),
+                        ],
                       );
                     },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Divider(height: 1, color: Colors.grey.shade300),
                   ),
                   BaseListTile(
                     leading: const Icon(

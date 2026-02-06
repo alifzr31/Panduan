@@ -6,6 +6,7 @@ import 'package:panduan/app/cubits/create_spm/createspm_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/cubits/detail_spm/detailspm_cubit.dart';
 import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
+import 'package:panduan/app/cubits/health_post/health_post_cubit.dart';
 import 'package:panduan/app/cubits/hp_registration/hp_registration_cubit.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
 import 'package:panduan/app/cubits/region/region_cubit.dart';
@@ -18,6 +19,7 @@ import 'package:panduan/app/views/dashboard/dashboard_page.dart';
 import 'package:panduan/app/views/detail_notification/detailnotification_page.dart';
 import 'package:panduan/app/views/detail_spm/detailspm_page.dart';
 import 'package:panduan/app/views/edit_spm/editspm_page.dart';
+import 'package:panduan/app/views/health_post/healthpost_page.dart';
 import 'package:panduan/app/views/hp_registration/hpregistration_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/views/map_coordinate/mapcoordinate_page.dart';
@@ -81,6 +83,15 @@ class AppRouter {
           child: BlocProvider(
             create: (context) => sl<NotificationCubit>(),
             child: const NotificationPage(),
+          ),
+        );
+      case HealthPostPage.routeName:
+        return customPageRouteBuilder(
+          settings,
+          bottomSafeArea: false,
+          child: BlocProvider(
+            create: (context) => sl<HealthPostCubit>(),
+            child: const HealthPostPage(),
           ),
         );
       case CameraPage.routeName:
