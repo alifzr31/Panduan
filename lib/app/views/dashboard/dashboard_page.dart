@@ -108,6 +108,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 )
               : null,
           endDrawer: const DashboardEndDrawer(),
+          endDrawerEnableOpenDragGesture: _currentTab == 0,
           body: IndexedStack(
             index: _currentTab,
             children: [
