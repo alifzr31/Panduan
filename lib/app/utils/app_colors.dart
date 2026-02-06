@@ -15,4 +15,5 @@ class AppColors {
   static const Color redColor = Color(0xFFEA3E32);
   static const Color softRedColor = Color(0xFFFFE7E8);
   static const Color trantibumLinmasColor = Color(0xFFFF547F);
+  static const Color tealColor = Color(0xFF4FB9AF);
 }
