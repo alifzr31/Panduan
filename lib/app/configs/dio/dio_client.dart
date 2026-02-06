@@ -18,9 +18,9 @@ abstract class DioClient {
     dio.options.connectTimeout = const Duration(minutes: 5);
     dio.options.receiveTimeout = const Duration(minutes: 5);
     dio.options.headers.addAll(AppHelpers.addOnHeaders());
-    dio.interceptors.add(DioInterceptors());
-    if (kDebugMode) {
-      dio.interceptors.add(
+    dio.interceptors.addAll([
+      DioInterceptors(),
+      if (kDebugMode) ...{
         PrettyDioLogger(
           requestHeader: true,
           requestBody: true,
@@ -30,8 +30,8 @@ abstract class DioClient {
           compact: true,
           maxWidth: 90,
         ),
-      );
-    }
+      },
+    ]);
   }
 
   Future<Response> get(
