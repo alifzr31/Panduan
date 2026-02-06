@@ -13,6 +13,7 @@ String spmFieldCountToJson(SpmFieldCount data) => json.encode(data.toJson());
 
 class SpmFieldCount extends Equatable {
   final DateTime? date;
+  final int? lainnya;
   final int? pendidikan;
   final int? kesehatan;
   final int? pekerjaanUmum;
@@ -23,6 +24,7 @@ class SpmFieldCount extends Equatable {
 
   const SpmFieldCount({
     this.date,
+    this.lainnya,
     this.pendidikan,
     this.kesehatan,
     this.pekerjaanUmum,
@@ -35,6 +37,7 @@ class SpmFieldCount extends Equatable {
   @override
   List<Object?> get props => [
     date,
+    lainnya,
     pendidikan,
     kesehatan,
     pekerjaanUmum,
@@ -46,6 +49,7 @@ class SpmFieldCount extends Equatable {
 
   factory SpmFieldCount.fromJson(Map<String, dynamic> json) => SpmFieldCount(
     date: json["date"] == null ? null : DateTime.parse(json["date"]),
+    lainnya: json["lainnya"],
     pendidikan: json["pendidikan"],
     kesehatan: json["kesehatan"],
     pekerjaanUmum: json["pekerjaan_umum"],
@@ -57,6 +61,7 @@ class SpmFieldCount extends Equatable {
 
   Map<String, dynamic> toJson() => {
     "date": date?.toIso8601String(),
+    "lainnya": lainnya,
     "pendidikan": pendidikan,
     "kesehatan": kesehatan,
     "pekerjaan_umum": pekerjaanUmum,

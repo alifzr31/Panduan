@@ -221,24 +221,27 @@ class _DashboardHomeState extends State<DashboardHome> {
                             );
                           }
                         default:
-                          return BaseSkeletonizer(
-                            child: Column(
-                              children: List.generate(10, (index) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: Material(
-                                    elevation: 1,
-                                    borderRadius: BorderRadius.circular(10),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Container(
-                                      height: 220,
-                                      width: double.infinity,
-                                      color: Colors.white,
+                          return Column(
+                            children: List.generate(10, (index) {
+                              return BaseSkeletonizer(
+                                child: Card(
+                                  elevation: 1,
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  color: Colors.transparent,
+                                  clipBehavior: Clip.antiAlias,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadiusGeometry.circular(
+                                      10,
                                     ),
                                   ),
-                                );
-                              }),
-                            ),
+                                  child: Container(
+                                    height: 220,
+                                    width: double.infinity,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              );
+                            }),
                           );
                       }
                     },

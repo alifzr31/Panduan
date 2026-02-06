@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_strings.dart';
@@ -35,37 +36,58 @@ class HomeHeader extends StatelessWidget {
               ],
             ),
           ),
-          CupertinoButton(
-            minimumSize: Size.zero,
-            padding: EdgeInsets.zero,
-            onPressed: () {
-              Navigator.pushNamed(context, NotificationPage.routeName);
+          BlocSelector<AuthCubit, AuthState, bool>(
+            selector: (state) {
+              return state.authStatus == AuthStatus.authorized;
             },
-            child: BlocBuilder<DashboardCubit, DashboardState>(
-              builder: (context, state) {
-                return Badge(
-                  label: Text(
-                    state.unreadNotificationCount < 99
-                        ? state.unreadNotificationCount.toString()
-                        : '99+',
-                    style: const TextStyle(fontSize: 10),
+            builder: (context, isAuthorized) {
+              return Row(
+                children: [
+                  CupertinoButton(
+                    minimumSize: Size.zero,
+                    padding: EdgeInsets.zero,
+                    onPressed: isAuthorized
+                        ? () {
+                            Navigator.pushNamed(
+                              context,
+                              NotificationPage.routeName,
+                            );
+                          }
+                        : null,
+                    child: BlocSelector<DashboardCubit, DashboardState, int>(
+                      selector: (state) {
+                        return state.unreadNotificationCount;
+                      },
+                      builder: (context, unreadNotificationCount) {
+                        return Badge(
+                          label: Text(
+                            unreadNotificationCount < 99
+                                ? unreadNotificationCount.toString()
+                                : '99+',
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                          isLabelVisible: unreadNotificationCount > 0,
+                          child: const Icon(
+                            MingCute.notification_line,
+                            size: 22,
+                            color: AppColors.amberColor,
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                  isLabelVisible: state.unreadNotificationCount > 0,
-                  child: const Icon(
-                    MingCute.notification_line,
+                  const SizedBox(width: 10),
+                  BaseIconButton(
+                    icon: MingCute.menu_line,
                     size: 22,
-                    color: AppColors.amberColor,
+                    onPressed: isAuthorized
+                        ? () {
+                            dashboardKey.currentState?.openEndDrawer();
+                          }
+                        : null,
                   ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(width: 10),
-          BaseIconButton(
-            icon: MingCute.menu_line,
-            size: 22,
-            onPressed: () {
-              dashboardKey.currentState?.openEndDrawer();
+                ],
+              );
             },
           ),
         ],

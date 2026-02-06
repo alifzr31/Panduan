@@ -8,7 +8,6 @@ import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/views/dashboard/widgets/dashboard_enddrawer.dart';
-import 'package:panduan/app/views/dashboard/widgets/dashboard_healthpost.dart';
 import 'package:panduan/app/views/dashboard/widgets/dashboard_home.dart';
 import 'package:panduan/app/views/dashboard/widgets/dashboard_spm.dart';
 import 'package:panduan/app/views/login/login_page.dart';
@@ -32,8 +31,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   void initState() {
-    context.read<AuthCubit>().fetchProfile();
     super.initState();
+    context.read<AuthCubit>().fetchProfile();
   }
 
   @override
@@ -140,16 +139,6 @@ class _DashboardPageState extends State<DashboardPage> {
                 },
               ),
               const DashboardSpm(),
-              if (!AppHelpers.hasPermission(
-                    _userPermissions,
-                    permissionName: 'level-posyandu',
-                  ) &&
-                  !AppHelpers.hasPermission(
-                    _userPermissions,
-                    permissionName: 'level-opd',
-                  )) ...{
-                const DashboardHealthPost(),
-              },
             ],
           ),
           bottomNavigationBar: Container(
@@ -186,31 +175,17 @@ class _DashboardPageState extends State<DashboardPage> {
                 color: Colors.grey.shade600,
                 fontFamily: 'Jost',
               ),
-              items: [
-                const BottomNavigationBarItem(
+              items: const [
+                BottomNavigationBarItem(
                   icon: Icon(MingCute.home_3_line),
                   activeIcon: Icon(MingCute.home_3_fill),
                   label: 'Beranda',
                 ),
-                const BottomNavigationBarItem(
+                BottomNavigationBarItem(
                   icon: Icon(MingCute.paper_line),
                   activeIcon: Icon(MingCute.paper_fill),
                   label: 'SPM',
                 ),
-                if (!AppHelpers.hasPermission(
-                      _userPermissions,
-                      permissionName: 'level-posyandu',
-                    ) &&
-                    !AppHelpers.hasPermission(
-                      _userPermissions,
-                      permissionName: 'level-opd',
-                    )) ...{
-                  const BottomNavigationBarItem(
-                    icon: Icon(MingCute.building_1_line),
-                    activeIcon: Icon(MingCute.building_1_fill),
-                    label: 'Posyandu Binaan',
-                  ),
-                },
               ],
             ),
           ),
