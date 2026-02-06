@@ -1,7 +1,9 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const FlutterSecureStorage storage = FlutterSecureStorage(
-  aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  aOptions: AndroidOptions(
+    storageCipherAlgorithm: StorageCipherAlgorithm.AES_CBC_PKCS7Padding,
+  ),
   iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
 );
 
@@ -19,5 +21,9 @@ class SecureStorage {
 
   static Future<void> deleteStorage({required String key}) async {
     return await storage.delete(key: key);
+  }
+
+  static Future<void> deleteAllStorage() async {
+    return await storage.deleteAll();
   }
 }
