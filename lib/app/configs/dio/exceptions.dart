@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 class BadRequestException extends DioException {
   BadRequestException(RequestOptions r, Response<dynamic>? response)
-      : super(requestOptions: r, response: response);
+    : super(requestOptions: r, response: response);
 
   @override
   String toString() {
@@ -12,7 +12,7 @@ class BadRequestException extends DioException {
 
 class InternalServerErrorException extends DioException {
   InternalServerErrorException(RequestOptions r, Response<dynamic>? response)
-      : super(requestOptions: r, response: response);
+    : super(requestOptions: r, response: response);
 
   @override
   String toString() {
@@ -22,7 +22,7 @@ class InternalServerErrorException extends DioException {
 
 class ConflictException extends DioException {
   ConflictException(RequestOptions r, Response<dynamic>? response)
-      : super(requestOptions: r, response: response);
+    : super(requestOptions: r, response: response);
 
   @override
   String toString() {
@@ -32,7 +32,7 @@ class ConflictException extends DioException {
 
 class UnauthorizedException extends DioException {
   UnauthorizedException(RequestOptions r, Response<dynamic>? response)
-      : super(requestOptions: r, response: response);
+    : super(requestOptions: r, response: response);
 
   @override
   String toString() {
@@ -42,7 +42,7 @@ class UnauthorizedException extends DioException {
 
 class NotFoundException extends DioException {
   NotFoundException(RequestOptions r, Response<dynamic>? response)
-      : super(requestOptions: r, response: response);
+    : super(requestOptions: r, response: response);
 
   @override
   String toString() {
@@ -52,7 +52,7 @@ class NotFoundException extends DioException {
 
 class NoInternetConnectionException extends DioException {
   NoInternetConnectionException(RequestOptions r, Response<dynamic>? response)
-      : super(requestOptions: r, response: response);
+    : super(requestOptions: r, response: response);
 
   @override
   String toString() {
@@ -62,7 +62,7 @@ class NoInternetConnectionException extends DioException {
 
 class DeadlineExceededException extends DioException {
   DeadlineExceededException(RequestOptions r, Response<dynamic>? response)
-      : super(requestOptions: r, response: response);
+    : super(requestOptions: r, response: response);
 
   @override
   String toString() {
@@ -72,7 +72,7 @@ class DeadlineExceededException extends DioException {
 
 class BadCertException extends DioException {
   BadCertException(RequestOptions r, Response<dynamic>? response)
-      : super(requestOptions: r, response: response);
+    : super(requestOptions: r, response: response);
 
   @override
   String toString() {
