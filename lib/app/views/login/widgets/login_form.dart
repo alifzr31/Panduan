@@ -27,10 +27,15 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   void initState() {
+    super.initState();
     if (kDebugMode) {
+      // _emailController.text = 'opd.diskominfo';
+      // _emailController.text = 'TPPosyandukotabandung';
+      // _emailController.text = 'kecamatan.arcamanik';
+      // _emailController.text = 'kelurahan.cisarantenendah';
+      _emailController.text = 'Posyanducisarantenendahmerak';
       _passwordController.text = 'bandung123';
     }
-    super.initState();
   }
 
   @override
