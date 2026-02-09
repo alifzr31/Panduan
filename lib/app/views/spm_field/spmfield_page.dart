@@ -19,8 +19,8 @@ class SpmFieldPage extends StatefulWidget {
 class _SpmFieldPageState extends State<SpmFieldPage> {
   @override
   void initState() {
-    context.read<SpmCubit>().fetchSpmFields();
     super.initState();
+    context.read<SpmCubit>().fetchSpmFields();
   }
 
   @override

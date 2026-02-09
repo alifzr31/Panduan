@@ -36,10 +36,10 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   void initState() {
+    super.initState();
     context.read<NotificationCubit>().fetchNotifications().then((value) {
       _scrollController.addListener(_onScrollNotification);
     });
-    super.initState();
   }
 
   @override

@@ -38,6 +38,7 @@ class _HealthPostFilterBottomSheetState
 
   @override
   void initState() {
+    super.initState();
     setState(() {
       _selectedDistrict = widget.selectedDistrictCode;
       _districtController.text = widget.selectedDistrictName ?? '';
@@ -76,7 +77,6 @@ class _HealthPostFilterBottomSheetState
 
       context.read<RegionCubit>().fetchSubDistricts(districtCode: districtCode);
     }
-    super.initState();
   }
 
   @override

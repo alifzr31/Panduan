@@ -125,8 +125,8 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
 
   @override
   void initState() {
-    _initEndDrawer();
     super.initState();
+    _initEndDrawer();
   }
 
   @override

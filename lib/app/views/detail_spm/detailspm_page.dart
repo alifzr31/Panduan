@@ -153,13 +153,13 @@ class _DetailSpmPageState extends State<DetailSpmPage> {
 
   @override
   void initState() {
+    super.initState();
     context.read<DetailSpmCubit>().fetchDetailSpm(uuid: widget.spmUuid).then((
       _,
     ) {
       _checkCanVerify();
       _checkCanSubmit();
     });
-    super.initState();
   }
 
   @override

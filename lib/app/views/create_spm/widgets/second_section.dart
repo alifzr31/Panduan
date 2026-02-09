@@ -296,8 +296,8 @@ class _AddOnFileBottomSheetState extends State<AddOnFileBottomSheet> {
 
   @override
   void initState() {
-    _addForm();
     super.initState();
+    _addForm();
   }
 
   @override

@@ -21,10 +21,10 @@ class DetailNotificationPage extends StatefulWidget {
 class _DetailNotificationPageState extends State<DetailNotificationPage> {
   @override
   void initState() {
+    super.initState();
     context.read<NotificationCubit>().fetchDetailNotification(
       notificationUuid: widget.notificationUuid,
     );
-    super.initState();
   }
 
   @override

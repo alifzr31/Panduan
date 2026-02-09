@@ -91,6 +91,7 @@ class _HealthPostPageState extends State<HealthPostPage> {
 
   @override
   void initState() {
+    super.initState();
     setState(() {
       _userPermissions = context.read<AuthCubit>().state.userPermissions;
       _districtCode = context.read<AuthCubit>().state.profile?.districtCode;
@@ -123,7 +124,6 @@ class _HealthPostPageState extends State<HealthPostPage> {
         .then((_) {
           _scrollController.addListener(_onScroll);
         });
-    super.initState();
   }
 
   @override

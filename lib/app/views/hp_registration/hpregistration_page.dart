@@ -28,10 +28,10 @@ class HpRegistrationPage extends StatefulWidget {
 class _HpRegistrationPageState extends State<HpRegistrationPage> {
   @override
   void initState() {
+    super.initState();
     context.read<HpRegistrationCubit>().fetchHpRegistration(
       healthPostId: widget.healthPostId,
     );
-    super.initState();
   }
 
   @override

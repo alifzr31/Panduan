@@ -54,8 +54,8 @@ class _DashboardHomeState extends State<DashboardHome> {
 
   @override
   void initState() {
-    _initRangeDate();
     super.initState();
+    _initRangeDate();
   }
 
   @override

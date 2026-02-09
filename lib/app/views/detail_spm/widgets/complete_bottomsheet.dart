@@ -53,8 +53,8 @@ class _CompleteBottomSheetState extends State<CompleteBottomSheet> {
 
   @override
   void initState() {
-    _addFile();
     super.initState();
+    _addFile();
   }
 
   @override

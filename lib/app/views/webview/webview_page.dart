@@ -79,8 +79,8 @@ class _WebviewPageState extends State<WebviewPage> {
 
   @override
   void initState() {
-    _initWebView();
     super.initState();
+    _initWebView();
   }
 
   @override

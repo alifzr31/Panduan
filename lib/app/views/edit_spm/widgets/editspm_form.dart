@@ -211,10 +211,10 @@ class _EditSpmFormState extends State<EditSpmForm> {
 
   @override
   void initState() {
+    super.initState();
     context.read<SpmCubit>().fetchSpmFields().then((_) {
       _initEditSpmData();
     });
-    super.initState();
   }
 
   @override
