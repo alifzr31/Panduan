@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:panduan/app/configs/get_it/service_locator.dart';
+import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/cubits/health_post/health_post_cubit.dart';
 import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
@@ -17,6 +18,7 @@ class SpmHeader extends StatelessWidget {
   const SpmHeader({
     required this.searchSpmController,
     required this.onSearchSpm,
+    required this.spmKeyword,
     required this.selectedDistrictCode,
     required this.selectedSubDistrictCode,
     required this.selectedHealthPostUuid,
@@ -35,6 +37,7 @@ class SpmHeader extends StatelessWidget {
 
   final TextEditingController searchSpmController;
   final void Function(String? value) onSearchSpm;
+  final String? spmKeyword;
   final String? selectedDistrictCode;
   final String? selectedSubDistrictCode;
   final String? selectedHealthPostUuid;
@@ -128,6 +131,36 @@ class SpmHeader extends StatelessWidget {
                             : MingCute.filter_fill,
                         size: 22,
                         color: AppColors.amberColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  CupertinoButton(
+                    alignment: Alignment.center,
+                    minimumSize: Size.zero,
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      context.read<DashboardCubit>().refetchSpm(
+                        keyword: spmKeyword,
+                        month: selectedMonth,
+                        year: selectedYear,
+                        districtCode: selectedDistrictCode,
+                        subDistrictCode: selectedSubDistrictCode,
+                        healthPostUuid: selectedHealthPostUuid,
+                        spmFieldName: selectedSpmField,
+                        statuses: selectedStatus,
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.softBlueColor,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        MingCute.refresh_2_line,
+                        size: 22,
+                        color: AppColors.blueColor,
                       ),
                     ),
                   ),

@@ -167,6 +167,7 @@ class _DashboardSpmState extends State<DashboardSpm> {
           SpmHeader(
             searchSpmController: _searchSpmController,
             onSearchSpm: _onSearchSpm,
+            spmKeyword: _spmKeyword,
             selectedDistrictCode: _selectedDistrictCode,
             selectedSubDistrictCode: _selectedSubDistrictCode,
             selectedHealthPostUuid: _selectedHealthPostUuid,
