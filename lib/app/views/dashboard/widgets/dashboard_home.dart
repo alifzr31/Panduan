@@ -160,7 +160,10 @@ class _DashboardHomeState extends State<DashboardHome> {
                             state.userPermissions,
                             permissionName: 'level-superadmin',
                           )) {
-                            return const Center(child: Text('Superadmin'));
+                            return HomeWalikota(
+                              selectedRangeDates: _selectedRangeDates,
+                              onTapSpmFieldCounter: widget.onTapSpmFieldCounter,
+                            );
                           } else if (AppHelpers.hasPermission(
                             state.userPermissions,
                             permissionName: 'level-walikota',
