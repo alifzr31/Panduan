@@ -115,11 +115,13 @@ class AppHelpers {
       'NEED_VERIFICATION_OPD',
       'NEED_APPROVAL_DISTRICT',
       'VERIFICATION_SUB_DISTRICT',
+      'PROCESS_BY_DISTRICT',
       'PROCESS_BY_SUB_DISTRICT',
       'PROCESS_BY_OPD',
       'FORWARD_TO_DISTRICT',
       'FORWARD_TO_TP_POSYANDU_KOTA',
       'FORWARD_TO_OPD',
+      'FINISH_BY_DISTRICT',
       'FINISH_BY_SUB_DISTRICT',
       'FINISH_BY_OPD',
       'DECLINE_BY_SUB_DISTRICT',
@@ -133,12 +135,16 @@ class AppHelpers {
 
   static String statusLabel(String status) {
     switch (status) {
+      case "FINISH_BY_DISTRICT":
+        return "Selesai oleh Kecamatan";
       case "FINISH_BY_SUB_DISTRICT":
         return "Selesai oleh Kelurahan";
       case "FINISH_BY_OPD":
         return "Selesai oleh OPD";
       case "VERIFICATION_SUB_DISTRICT":
         return "Verifikasi Kelurahan";
+      case "PROCESS_BY_DISTRICT":
+        return "Diproses Kecamatan";
       case "PROCESS_BY_SUB_DISTRICT":
         return "Diproses Kelurahan";
       case "PROCESS_BY_OPD":
@@ -174,12 +180,14 @@ class AppHelpers {
 
   static Color statusColor(String status) {
     switch (status) {
+      case "FINISH_BY_DISTRICT":
       case "FINISH_BY_SUB_DISTRICT":
       case "FINISH_BY_OPD":
         return Colors.green.shade500;
       case "VERIFICATION_SUB_DISTRICT":
       case "NEED_VERIFICATION_SUB_DISTRICT":
         return Colors.amber.shade500;
+      case "PROCESS_BY_DISTRICT":
       case "PROCESS_BY_SUB_DISTRICT":
       case "PROCESS_BY_OPD":
         return Colors.blue.shade500;

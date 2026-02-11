@@ -135,6 +135,23 @@ class _DetailSpmPageState extends State<DetailSpmPage> {
 
     if (AppHelpers.hasPermission(
       context.read<AuthCubit>().state.userPermissions,
+      permissionName: 'level-kecamatan',
+    )) {
+      final possible =
+          context.read<DetailSpmCubit>().state.detailSpm?.status ==
+              'PROCESS_BY_DISTRICT' &&
+          AppHelpers.hasPermission(
+            context.read<AuthCubit>().state.userPermissions,
+            permissionName: 'user-submission-submit',
+          );
+
+      setState(() {
+        _canSubmit = possible;
+      });
+    }
+
+    if (AppHelpers.hasPermission(
+      context.read<AuthCubit>().state.userPermissions,
       permissionName: 'level-kelurahan',
     )) {
       final possible =

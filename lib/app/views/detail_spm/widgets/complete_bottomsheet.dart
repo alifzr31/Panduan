@@ -298,6 +298,12 @@ class _CompleteBottomSheetState extends State<CompleteBottomSheet> {
                                           .read<AuthCubit>()
                                           .state
                                           .userPermissions
+                                          .contains('level-kecamatan')
+                                    ? 'FINISH_BY_DISTRICT'
+                                    : context
+                                          .read<AuthCubit>()
+                                          .state
+                                          .userPermissions
                                           .contains('level-kelurahan')
                                     ? 'FINISH_BY_SUB_DISTRICT'
                                     : null,

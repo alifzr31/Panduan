@@ -126,6 +126,7 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
     )) {
       setState(() {
         _verificationResults = const [
+          'PROCESS_BY_DISTRICT',
           'DECLINE_BY_DISTRICT',
           'FORWARD_TO_TP_POSYANDU_KOTA',
         ];
