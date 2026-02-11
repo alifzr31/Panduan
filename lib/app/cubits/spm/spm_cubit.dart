@@ -18,12 +18,33 @@ class SpmCubit extends Cubit<SpmState> {
     try {
       final spmFields = await _repository.fetchSpmFields();
 
-      emit(
-        state.copyWith(
-          spmFieldStatus: SpmFieldStatus.success,
-          spmFields: spmFields,
-        ),
-      );
+      if (spmFields.isNotEmpty &&
+          spmFields.any(
+            (element) => element.name?.toLowerCase() == 'lainnya',
+          )) {
+        final updatedList = List.of(spmFields);
+        final lainnyaField = updatedList.firstWhere(
+          (element) => element.name?.toLowerCase() == 'lainnya',
+        );
+
+        updatedList
+          ..remove(lainnyaField)
+          ..add(lainnyaField);
+
+        emit(
+          state.copyWith(
+            spmFieldStatus: SpmFieldStatus.success,
+            spmFields: updatedList,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            spmFieldStatus: SpmFieldStatus.success,
+            spmFields: spmFields,
+          ),
+        );
+      }
     } on DioException catch (e) {
       emit(
         state.copyWith(
