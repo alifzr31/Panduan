@@ -1,3 +1,4 @@
+import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -141,53 +142,33 @@ class _DashboardPageState extends State<DashboardPage> {
               const DashboardSpm(),
             ],
           ),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade300,
-                  blurRadius: 2,
-                  spreadRadius: 1,
-                  offset: const Offset(0, -1),
-                ),
-              ],
-            ),
-            child: BottomNavigationBar(
-              currentIndex: _currentTab,
-              iconSize: 24,
-              onTap: (index) {
-                setState(() {
-                  _currentTab = index;
-                });
-              },
-              backgroundColor: Colors.white,
-              unselectedItemColor: Colors.grey.shade600,
-              selectedItemColor: AppColors.blueColor,
-              type: BottomNavigationBarType.shifting,
-              selectedLabelStyle: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: AppColors.blueColor,
-                fontFamily: 'Jost',
+          bottomNavigationBar: FlashyTabBar(
+            selectedIndex: _currentTab,
+            iconSize: 24,
+            showElevation: true,
+            backgroundColor: Colors.white,
+            height: kBottomNavigationBarHeight,
+            animationCurve: Curves.easeInOutCubic,
+            animationDuration: const Duration(milliseconds: 300),
+            onItemSelected: (index) {
+              setState(() {
+                _currentTab = index;
+              });
+            },
+            items: [
+              FlashyTabBarItem(
+                activeColor: AppColors.blueColor,
+                inactiveColor: Colors.grey.shade600,
+                icon: const Icon(MingCute.home_3_line),
+                title: const Text('Beranda'),
               ),
-              unselectedLabelStyle: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-                fontFamily: 'Jost',
+              FlashyTabBarItem(
+                activeColor: AppColors.blueColor,
+                inactiveColor: Colors.grey.shade600,
+                icon: const Icon(MingCute.paper_line),
+                title: const Text('SPM'),
               ),
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(MingCute.home_3_line),
-                  activeIcon: Icon(MingCute.home_3_fill),
-                  label: 'Beranda',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(MingCute.paper_line),
-                  activeIcon: Icon(MingCute.paper_fill),
-                  label: 'SPM',
-                ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
