@@ -161,7 +161,7 @@ class DashboardService extends DioClient {
           'page': page,
           'limit': 10,
           if (keyword != null || (keyword?.isNotEmpty ?? false)) 'q': keyword,
-          if (month != null) 'month': month,
+          'month': ?month,
           'year': year,
           if (districtCode != null) ...{'district_code': districtCode},
           if (subDistrictCode != null) ...{

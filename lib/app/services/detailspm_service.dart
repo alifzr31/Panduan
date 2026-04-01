@@ -12,7 +12,7 @@ class DetailSpmService extends DioClient {
     try {
       final response = await get(
         '/user-submission/$uuid',
-        queryParams: {if (isEdit != null) 'is_edit': isEdit},
+        queryParams: {'is_edit': ?isEdit},
       );
 
       return await compute(
