@@ -1,40 +1,41 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 
-class BaseDropdownField extends StatelessWidget {
+class BaseDropdownField<T> extends StatelessWidget {
   const BaseDropdownField({
     required this.hint,
     required this.items,
     required this.onChanged,
     this.value,
+    this.multiValue,
     this.validator,
     this.helperText,
     this.helperTextColor,
     this.prefixIcon,
     this.suffixIcon,
-    this.menuItemStyleHeight = kMinInteractiveDimension,
     this.menuItemStylePadding = const EdgeInsets.symmetric(horizontal: 16),
     this.selectedItemBuilder,
     super.key,
   });
 
   final String hint;
-  final List<DropdownMenuItem<Object>>? items;
-  final void Function(Object?)? onChanged;
-  final Object? value;
-  final String? Function(Object?)? validator;
+  final List<DropdownItem<T>>? items;
+  final ValueChanged<T?>? onChanged;
+  final ValueListenable<T?>? value;
+  final ValueListenable<Iterable<T>>? multiValue;
+  final String? Function(T? value)? validator;
   final String? helperText;
   final Color? helperTextColor;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
-  final double menuItemStyleHeight;
   final EdgeInsetsGeometry? menuItemStylePadding;
   final List<Widget> Function(BuildContext)? selectedItemBuilder;
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField2(
+    return DropdownButtonFormField2<T>(
       isExpanded: true,
       isDense: true,
       style: const TextStyle(
@@ -42,17 +43,14 @@ class BaseDropdownField extends StatelessWidget {
         color: Colors.black,
         fontFamily: 'Jost',
       ),
-      buttonStyleData: const ButtonStyleData(width: double.infinity),
-      menuItemStyleData: MenuItemStyleData(
-        height: menuItemStyleHeight,
-        padding: menuItemStylePadding,
-      ),
+      buttonStyleData: const FormFieldButtonStyleData(width: double.infinity),
+      menuItemStyleData: MenuItemStyleData(padding: menuItemStylePadding),
       dropdownStyleData: DropdownStyleData(
         maxHeight: 200,
         elevation: 1,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
       hint: Text(
@@ -64,7 +62,8 @@ class BaseDropdownField extends StatelessWidget {
           fontFamily: 'Jost',
         ),
       ),
-      value: value,
+      valueListenable: value,
+      multiValueListenable: multiValue,
       items: items,
       validator: validator,
       onChanged: onChanged,
@@ -127,7 +126,7 @@ class BaseDropdownField extends StatelessWidget {
   }
 }
 
-class BaseDropdownGroupField extends StatelessWidget {
+class BaseDropdownGroupField<T> extends StatelessWidget {
   const BaseDropdownGroupField({
     required this.label,
     required this.hint,
@@ -135,30 +134,30 @@ class BaseDropdownGroupField extends StatelessWidget {
     required this.onChanged,
     this.mandatory = false,
     this.value,
+    this.multiValue,
     this.validator,
     this.helperText,
     this.helperTextColor,
     this.prefixIcon,
-    this.menuItemStyleHeight = kMinInteractiveDimension,
-    this.menuItemStylePadding = const EdgeInsets.symmetric(horizontal: 16),
     this.suffixIcon,
+    this.menuItemStylePadding = const EdgeInsets.symmetric(horizontal: 16),
     this.selectedItemBuilder,
     super.key,
   });
 
   final String label;
   final String hint;
-  final List<DropdownMenuItem<Object>>? items;
-  final void Function(Object?)? onChanged;
+  final List<DropdownItem<T>>? items;
+  final ValueChanged<T?>? onChanged;
   final bool mandatory;
-  final Object? value;
-  final String? Function(Object?)? validator;
+  final ValueListenable<T?>? value;
+  final ValueListenable<Iterable<T>>? multiValue;
+  final String? Function(T? value)? validator;
   final String? helperText;
   final Color? helperTextColor;
   final Widget? prefixIcon;
-  final double menuItemStyleHeight;
-  final EdgeInsetsGeometry? menuItemStylePadding;
   final Widget? suffixIcon;
+  final EdgeInsetsGeometry? menuItemStylePadding;
   final List<Widget> Function(BuildContext)? selectedItemBuilder;
 
   @override
@@ -192,7 +191,7 @@ class BaseDropdownGroupField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        DropdownButtonFormField2(
+        DropdownButtonFormField2<T>(
           isExpanded: true,
           isDense: true,
           style: const TextStyle(
@@ -200,17 +199,16 @@ class BaseDropdownGroupField extends StatelessWidget {
             color: Colors.black,
             fontFamily: 'Jost',
           ),
-          buttonStyleData: const ButtonStyleData(width: double.infinity),
-          menuItemStyleData: MenuItemStyleData(
-            height: menuItemStyleHeight,
-            padding: menuItemStylePadding,
+          buttonStyleData: const FormFieldButtonStyleData(
+            width: double.infinity,
           ),
+          menuItemStyleData: MenuItemStyleData(padding: menuItemStylePadding),
           dropdownStyleData: DropdownStyleData(
             maxHeight: 200,
             elevation: 1,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
           hint: Text(
@@ -222,12 +220,19 @@ class BaseDropdownGroupField extends StatelessWidget {
               fontFamily: 'Jost',
             ),
           ),
-          value: value,
+          valueListenable: value,
+          multiValueListenable: multiValue,
           items: items,
           validator: validator,
           onChanged: onChanged,
           selectedItemBuilder: selectedItemBuilder,
           decoration: InputDecoration(
+            hintStyle: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade500,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Jost',
+            ),
             helperText: helperText,
             helperMaxLines: 2,
             errorMaxLines: 2,
@@ -286,39 +291,39 @@ class BaseDropdownSearchField<T> extends StatelessWidget {
     required this.hint,
     required this.items,
     required this.onChanged,
-    this.mandatory = false,
+    required this.searchHint,
+    required this.searchController,
+    required this.searchMatchFn,
+    required this.emptySearchHint,
     this.value,
+    this.multiValue,
     this.validator,
     this.helperText,
     this.helperTextColor,
     this.prefixIcon,
-    this.menuItemStyleHeight = kMinInteractiveDimension,
-    this.menuItemStylePadding = const EdgeInsets.symmetric(horizontal: 16),
     this.suffixIcon,
+    this.menuItemStylePadding = const EdgeInsets.symmetric(horizontal: 16),
     this.selectedItemBuilder,
-    this.searchHint,
-    this.searchController,
-    this.searchMatchFn,
     this.onMenuStateChange,
     super.key,
   });
 
   final String hint;
-  final List<DropdownMenuItem<T>>? items;
-  final void Function(Object?)? onChanged;
-  final bool mandatory;
-  final T? value;
-  final String? Function(Object?)? validator;
+  final List<DropdownItem<T>>? items;
+  final ValueChanged<T?>? onChanged;
+  final String searchHint;
+  final TextEditingController searchController;
+  final SearchMatchFn<T> searchMatchFn;
+  final String emptySearchHint;
+  final ValueListenable<T?>? value;
+  final ValueListenable<Iterable<T>>? multiValue;
+  final String? Function(T? value)? validator;
   final String? helperText;
   final Color? helperTextColor;
   final Widget? prefixIcon;
-  final double menuItemStyleHeight;
-  final EdgeInsetsGeometry? menuItemStylePadding;
   final Widget? suffixIcon;
+  final EdgeInsetsGeometry? menuItemStylePadding;
   final List<Widget> Function(BuildContext)? selectedItemBuilder;
-  final String? searchHint;
-  final TextEditingController? searchController;
-  final bool Function(DropdownMenuItem<T>, String)? searchMatchFn;
   final void Function(bool)? onMenuStateChange;
 
   @override
@@ -331,17 +336,14 @@ class BaseDropdownSearchField<T> extends StatelessWidget {
         color: Colors.black,
         fontFamily: 'Jost',
       ),
-      buttonStyleData: const ButtonStyleData(width: double.infinity),
-      menuItemStyleData: MenuItemStyleData(
-        height: menuItemStyleHeight,
-        padding: menuItemStylePadding,
-      ),
+      buttonStyleData: const FormFieldButtonStyleData(width: double.infinity),
+      menuItemStyleData: MenuItemStyleData(padding: menuItemStylePadding),
       dropdownStyleData: DropdownStyleData(
         maxHeight: 200,
         elevation: 1,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
       hint: Text(
@@ -353,12 +355,19 @@ class BaseDropdownSearchField<T> extends StatelessWidget {
           fontFamily: 'Jost',
         ),
       ),
-      value: value,
+      valueListenable: value,
+      multiValueListenable: multiValue,
       items: items,
       validator: validator,
       onChanged: onChanged,
       selectedItemBuilder: selectedItemBuilder,
       decoration: InputDecoration(
+        hintStyle: TextStyle(
+          fontSize: 14,
+          color: Colors.grey.shade500,
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Jost',
+        ),
         helperText: helperText,
         helperMaxLines: 2,
         errorMaxLines: 2,
@@ -408,8 +417,8 @@ class BaseDropdownSearchField<T> extends StatelessWidget {
       ),
       dropdownSearchData: DropdownSearchData(
         searchController: searchController,
-        searchInnerWidgetHeight: 100,
-        searchInnerWidget: Padding(
+        searchBarWidgetHeight: 100,
+        searchBarWidget: Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: TextFormField(
             controller: searchController,
@@ -438,6 +447,14 @@ class BaseDropdownSearchField<T> extends StatelessWidget {
             ),
           ),
         ),
+        noResultsWidget: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            emptySearchHint,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+        ),
         searchMatchFn: searchMatchFn,
       ),
       onMenuStateChange: onMenuStateChange,
@@ -451,40 +468,42 @@ class BaseDropdownSearchGroupField<T> extends StatelessWidget {
     required this.hint,
     required this.items,
     required this.onChanged,
+    required this.searchHint,
+    required this.searchController,
+    required this.searchMatchFn,
+    required this.emptySearchHint,
     this.mandatory = false,
     this.value,
+    this.multiValue,
     this.validator,
     this.helperText,
     this.helperTextColor,
     this.prefixIcon,
-    this.menuItemStyleHeight = kMinInteractiveDimension,
-    this.menuItemStylePadding = const EdgeInsets.symmetric(horizontal: 16),
     this.suffixIcon,
+    this.menuItemStylePadding = const EdgeInsets.symmetric(horizontal: 16),
     this.selectedItemBuilder,
-    this.searchHint,
-    this.searchController,
-    this.searchMatchFn,
     this.onMenuStateChange,
     super.key,
   });
 
   final String label;
   final String hint;
-  final List<DropdownMenuItem<T>>? items;
-  final void Function(Object?)? onChanged;
+  final List<DropdownItem<T>>? items;
+  final ValueChanged<T?>? onChanged;
+  final String searchHint;
+  final TextEditingController searchController;
+  final SearchMatchFn<T> searchMatchFn;
+  final String emptySearchHint;
   final bool mandatory;
-  final T? value;
-  final String? Function(Object?)? validator;
+  final ValueListenable<T?>? value;
+  final ValueListenable<Iterable<T>>? multiValue;
+  final String? Function(T? value)? validator;
   final String? helperText;
   final Color? helperTextColor;
   final Widget? prefixIcon;
-  final double menuItemStyleHeight;
-  final EdgeInsetsGeometry? menuItemStylePadding;
   final Widget? suffixIcon;
+  final EdgeInsetsGeometry? menuItemStylePadding;
   final List<Widget> Function(BuildContext)? selectedItemBuilder;
-  final String? searchHint;
-  final TextEditingController? searchController;
-  final bool Function(DropdownMenuItem<T>, String)? searchMatchFn;
   final void Function(bool)? onMenuStateChange;
 
   @override
@@ -526,17 +545,16 @@ class BaseDropdownSearchGroupField<T> extends StatelessWidget {
             color: Colors.black,
             fontFamily: 'Jost',
           ),
-          buttonStyleData: const ButtonStyleData(width: double.infinity),
-          menuItemStyleData: MenuItemStyleData(
-            height: menuItemStyleHeight,
-            padding: menuItemStylePadding,
+          buttonStyleData: const FormFieldButtonStyleData(
+            width: double.infinity,
           ),
+          menuItemStyleData: MenuItemStyleData(padding: menuItemStylePadding),
           dropdownStyleData: DropdownStyleData(
             maxHeight: 200,
             elevation: 1,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
           hint: Text(
@@ -548,12 +566,19 @@ class BaseDropdownSearchGroupField<T> extends StatelessWidget {
               fontFamily: 'Jost',
             ),
           ),
-          value: value,
+          valueListenable: value,
+          multiValueListenable: multiValue,
           items: items,
           validator: validator,
           onChanged: onChanged,
           selectedItemBuilder: selectedItemBuilder,
           decoration: InputDecoration(
+            hintStyle: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade500,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Jost',
+            ),
             helperText: helperText,
             helperMaxLines: 2,
             errorMaxLines: 2,
@@ -603,8 +628,8 @@ class BaseDropdownSearchGroupField<T> extends StatelessWidget {
           ),
           dropdownSearchData: DropdownSearchData(
             searchController: searchController,
-            searchInnerWidgetHeight: 100,
-            searchInnerWidget: Padding(
+            searchBarWidgetHeight: 100,
+            searchBarWidget: Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
               child: TextFormField(
                 controller: searchController,
@@ -630,6 +655,17 @@ class BaseDropdownSearchGroupField<T> extends StatelessWidget {
                     borderSide: const BorderSide(color: AppColors.blueColor),
                     borderRadius: BorderRadius.circular(8),
                   ),
+                ),
+              ),
+            ),
+            noResultsWidget: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                emptySearchHint,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

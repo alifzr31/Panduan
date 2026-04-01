@@ -60,18 +60,18 @@ class _EditSpmFormState extends State<EditSpmForm> {
     50,
     (index) => (index + 1).toString().padLeft(3, '0'),
   );
-  String? _selectedRt;
+  final _selectedRt = ValueNotifier<String?>(null);
   final rw = List.generate(
     50,
     (index) => (index + 1).toString().padLeft(3, '0'),
   );
-  String? _selectedRw;
+  final _selectedRw = ValueNotifier<String?>(null);
   final _districtController = TextEditingController();
   District? _selectedDistrict;
   final _subDistrictController = TextEditingController();
   SubDistrict? _selectedSubDistrict;
   final _phoneController = TextEditingController();
-  String? _selectedServiceCategory;
+  final _selectedServiceCategory = ValueNotifier<String?>(null);
   // final _serviceTypes = const [
   //   ServiceType(nameIndonesian: 'Perencanaan', nameEnglish: 'Planning'),
   //   ServiceType(nameIndonesian: 'Pelaksanaan', nameEnglish: 'Implementation'),
@@ -107,8 +107,8 @@ class _EditSpmFormState extends State<EditSpmForm> {
     _currentSpmField = detailSpm?.spmField;
     _selectedSpmField = detailSpm?.spmField;
     _selectedSubmissionDate = detailSpm?.date ?? DateTime(0000);
-    _selectedRt = detailSpm?.user?.rt;
-    _selectedRw = detailSpm?.user?.rw;
+    _selectedRt.value = detailSpm?.user?.rt;
+    _selectedRw.value = detailSpm?.user?.rw;
     _submissionDateController.text = AppHelpers.dmyhmDateFormat(
       _selectedSubmissionDate,
     );
@@ -120,6 +120,7 @@ class _EditSpmFormState extends State<EditSpmForm> {
     _selectedDistrict = regionCubit.state.districts.firstWhere((element) {
       return element.code == detailSpm?.user?.district?.code;
     });
+    _districtController.text = _selectedDistrict?.name?.capitalize() ?? '';
 
     await regionCubit.fetchSubDistricts(
       districtCode: _selectedDistrict?.code?.split('.').last,
@@ -127,16 +128,18 @@ class _EditSpmFormState extends State<EditSpmForm> {
     _selectedSubDistrict = regionCubit.state.subDistricts.firstWhere((element) {
       return element.code == detailSpm?.user?.subDistrict?.code;
     });
+    _subDistrictController.text =
+        _selectedSubDistrict?.name?.capitalize() ?? '';
 
     _phoneController.text = detailSpm?.user?.phone ?? '';
     await editSpmCubit.fetchServiceCategories(
       spmFieldUuid: widget.spmFieldUuid,
     );
-    _selectedServiceCategory = editSpmCubit.state.serviceCategories.firstWhere((
-      element,
-    ) {
-      return element.uuid == detailSpm?.serviceCategory?.uuid;
-    }).uuid;
+    _selectedServiceCategory.value = editSpmCubit.state.serviceCategories
+        .firstWhere((element) {
+          return element.uuid == detailSpm?.serviceCategory?.uuid;
+        })
+        .uuid;
     // setState(() {
     //   _selectedServiceType = detailSpm?.type?.capitalize();
     // });
@@ -224,9 +227,12 @@ class _EditSpmFormState extends State<EditSpmForm> {
     _nikController.dispose();
     _fullNameController.dispose();
     _addressController.dispose();
+    _selectedRt.dispose();
+    _selectedRw.dispose();
     _districtController.dispose();
     _subDistrictController.dispose();
     _phoneController.dispose();
+    _selectedServiceCategory.dispose();
     _reportDescriptionController.dispose();
 
     for (var attachmentController in _attachmentControllers) {
@@ -393,7 +399,7 @@ class _EditSpmFormState extends State<EditSpmForm> {
                                       onTap: () {
                                         setState(() {
                                           _selectedSpmField = spmField;
-                                          _selectedServiceCategory = null;
+                                          _selectedServiceCategory.value = null;
 
                                           for (
                                             int i = 0;
@@ -626,8 +632,8 @@ class _EditSpmFormState extends State<EditSpmForm> {
                     _addressController.text = resident?.address ?? '';
                     _phoneController.text = resident?.phone ?? '';
                     setState(() {
-                      _selectedRt = resident?.rt;
-                      _selectedRw = resident?.rw;
+                      _selectedRt.value = resident?.rt;
+                      _selectedRw.value = resident?.rw;
                       _selectedDistrict = null;
                       _selectedSubDistrict = null;
                     });
@@ -673,14 +679,14 @@ class _EditSpmFormState extends State<EditSpmForm> {
                   selectedRt: _selectedRt,
                   onSelectedRt: (value) {
                     setState(() {
-                      _selectedRt = value as String;
+                      _selectedRt.value = value;
                     });
                   },
                   rw: rw,
                   selectedRw: _selectedRw,
                   onSelectedRw: (value) {
                     setState(() {
-                      _selectedRw = value as String;
+                      _selectedRw.value = value;
                     });
                   },
                   selectedDistrict: _selectedDistrict,
@@ -706,14 +712,14 @@ class _EditSpmFormState extends State<EditSpmForm> {
                   selectedServiceCategory: _selectedServiceCategory,
                   onSelectedServiceCategory: (value) {
                     setState(() {
-                      _selectedServiceCategory = value as String;
+                      _selectedServiceCategory.value = value;
                     });
                   },
                   // serviceTypes: _serviceTypes,
                   // selectedServiceType: _selectedServiceType,
                   // onSelectedServiceType: (value) {
                   //   setState(() {
-                  //     _selectedServiceType = value as String;
+                  //     _selectedServiceType = value;
                   //   });
                   // },
                   reportDescriptionController: _reportDescriptionController,
@@ -847,14 +853,14 @@ class _EditSpmFormState extends State<EditSpmForm> {
                             nik: _nikController.text,
                             name: _fullNameController.text,
                             address: _addressController.text,
-                            rt: _selectedRt,
-                            rw: _selectedRw,
+                            rt: _selectedRt.value,
+                            rw: _selectedRw.value,
                             districtCode: _selectedDistrict?.code,
                             subDistrictCode: _selectedSubDistrict?.code,
                             phone: _phoneController.text,
                             // serviceType: _selectedServiceType,
                             spmFieldUuid: _selectedSpmField?.uuid,
-                            serviceCategoryUuid: _selectedServiceCategory,
+                            serviceCategoryUuid: _selectedServiceCategory.value,
                             reportDescription:
                                 _reportDescriptionController.text,
                             latitude: _latitude,

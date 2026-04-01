@@ -52,11 +52,11 @@ class FirstSection extends StatelessWidget {
   final TextEditingController fullNameController;
   final TextEditingController addressController;
   final List<String> rt;
-  final String? selectedRt;
-  final void Function(Object?)? onSelectedRt;
+  final ValueNotifier<String?>? selectedRt;
+  final void Function(String?)? onSelectedRt;
   final List<String> rw;
-  final String? selectedRw;
-  final void Function(Object?)? onSelectedRw;
+  final ValueNotifier<String?>? selectedRw;
+  final void Function(String?)? onSelectedRw;
   final District? selectedDistrict;
   final TextEditingController districtController;
   final void Function(District value)? onSelectedDistrict;
@@ -64,8 +64,8 @@ class FirstSection extends StatelessWidget {
   final TextEditingController subDistrictController;
   final void Function(SubDistrict value)? onSelectedSubDistrict;
   final TextEditingController phoneController;
-  final String? selectedServiceCategory;
-  final void Function(Object?)? onSelectedServiceCategory;
+  final ValueNotifier<String?>? selectedServiceCategory;
+  final void Function(String?)? onSelectedServiceCategory;
   // final List<ServiceType> serviceTypes;
   // final String? selectedServiceType;
   // final void Function(Object?)? onSelectedServiceType;

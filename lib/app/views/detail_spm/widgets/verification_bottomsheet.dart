@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -44,10 +45,10 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
     ServiceType(nameIndonesian: 'Pengawasan', nameEnglish: 'Surveillance'),
     ServiceType(nameIndonesian: 'Layanan', nameEnglish: 'Service'),
   ];
-  String? _selectedServiceType;
+  final _selectedServiceType = ValueNotifier<String?>(null);
   late final List<String> _verificationResults;
-  String? _selectedVerificationResult;
-  String? _selectedOpd;
+  final _selectedVerificationResult = ValueNotifier<String?>(null);
+  final _selectedOpd = ValueNotifier<String?>(null);
   final _noteController = TextEditingController();
   double? _latitude;
   double? _longitude;
@@ -158,6 +159,9 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
 
   @override
   void dispose() {
+    _selectedServiceType.dispose();
+    _selectedVerificationResult.dispose();
+    _selectedOpd.dispose();
     _noteController.dispose();
     _coordinateController.dispose();
     for (var i = 0; i < _attachmentKeyControllers.length; i++) {
@@ -198,7 +202,7 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                       mandatory: true,
                       value: _selectedServiceType,
                       items: _serviceTypes.map((e) {
-                        return DropdownMenuItem(
+                        return DropdownItem(
                           value: e.nameEnglish,
                           child: Text(e.nameIndonesian ?? ''),
                         );
@@ -212,7 +216,7 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                       },
                       onChanged: (value) {
                         setState(() {
-                          _selectedServiceType = value as String;
+                          _selectedServiceType.value = value;
                         });
                       },
                     ),
@@ -225,23 +229,24 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                       mandatory: true,
                       value: _selectedVerificationResult,
                       items: _verificationResults.map((e) {
-                        return DropdownMenuItem(
+                        return DropdownItem(
                           value: e,
                           child: Text(AppHelpers.statusLabel(e)),
                         );
                       }).toList(),
                       onChanged: (value) {
                         setState(() {
-                          _selectedOpd = null;
-                          _selectedVerificationResult = value as String;
+                          _selectedOpd.value = null;
+                          _selectedVerificationResult.value = value;
                         });
 
-                        if (_selectedVerificationResult == 'FORWARD_TO_OPD') {
+                        if (_selectedVerificationResult.value ==
+                            'FORWARD_TO_OPD') {
                           context.read<ActivityCubit>().fetchOpd();
                         }
                       },
                       validator: (value) {
-                        if (_selectedVerificationResult == null) {
+                        if (_selectedVerificationResult.value == null) {
                           return 'Silahkan pilih hasil verifikasi';
                         }
 
@@ -250,7 +255,8 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                     ),
                   },
                   if (_showOpdDropdown ||
-                      _selectedVerificationResult == 'FORWARD_TO_OPD') ...{
+                      _selectedVerificationResult.value ==
+                          'FORWARD_TO_OPD') ...{
                     const SizedBox(height: 10),
                     BlocBuilder<ActivityCubit, ActivityState>(
                       builder: (context, state) {
@@ -262,18 +268,18 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                           mandatory: true,
                           value: _selectedOpd,
                           items: state.opd.map((e) {
-                            return DropdownMenuItem(
+                            return DropdownItem(
                               value: e.uuid,
                               child: Text(e.name ?? ''),
                             );
                           }).toList(),
                           onChanged: (value) {
                             setState(() {
-                              _selectedOpd = value as String;
+                              _selectedOpd.value = value;
                             });
                           },
                           validator: (value) {
-                            if (_selectedOpd == null) {
+                            if (_selectedOpd.value == null) {
                               return 'Silahkan pilih OPD tujuan';
                             }
 
@@ -526,7 +532,7 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                             if (_formKey.currentState?.validate() ?? false) {
                               context.read<ActivityCubit>().createActivity(
                                 spmUuid: widget.spmUuid,
-                                serviceType: _selectedServiceType,
+                                serviceType: _selectedServiceType.value,
                                 status: !_showVerificationResult
                                     ? AppHelpers.hasPermission(
                                             context
@@ -537,11 +543,11 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                                           )
                                           ? 'NEED_VERIFICATION_SUB_DISTRICT'
                                           : 'FORWARD_TO_OPD'
-                                    : _selectedVerificationResult,
+                                    : _selectedVerificationResult.value,
                                 description: _noteController.text,
-                                opdUuids: _selectedOpd == null
+                                opdUuids: _selectedOpd.value == null
                                     ? null
-                                    : [_selectedOpd ?? ''],
+                                    : [_selectedOpd.value ?? ''],
                                 latitude: _latitude,
                                 longitude: _longitude,
                                 attachmentKeys: _attachmentKeyControllers.map((

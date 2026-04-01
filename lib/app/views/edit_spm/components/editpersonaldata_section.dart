@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:panduan/app/models/subdistrict.dart';
 import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/widgets/base_dropdownfield.dart';
 import 'package:panduan/app/widgets/base_formfield.dart';
+import 'package:panduan/app/widgets/base_typeaheadfield.dart';
 
 class EditPersonalDataSection extends StatelessWidget {
   const EditPersonalDataSection({
@@ -36,11 +38,11 @@ class EditPersonalDataSection extends StatelessWidget {
   final TextEditingController fullNameController;
   final TextEditingController addressController;
   final List<String> rt;
-  final String? selectedRt;
-  final void Function(Object?)? onSelectedRt;
+  final ValueNotifier<String?>? selectedRt;
+  final void Function(String?)? onSelectedRt;
   final List<String> rw;
-  final void Function(Object?)? onSelectedRw;
-  final String? selectedRw;
+  final void Function(String?)? onSelectedRw;
+  final ValueNotifier<String?>? selectedRw;
   final District? selectedDistrict;
   final TextEditingController districtController;
   final void Function(Object?)? onSelectedDistrict;
@@ -116,10 +118,7 @@ class EditPersonalDataSection extends StatelessWidget {
                 mandatory: true,
                 value: selectedRt,
                 items: List.generate(rt.length, (index) {
-                  return DropdownMenuItem(
-                    value: rt[index],
-                    child: Text(rt[index]),
-                  );
+                  return DropdownItem(value: rt[index], child: Text(rt[index]));
                 }),
                 onChanged: onSelectedRt,
                 validator: (value) {
@@ -139,10 +138,7 @@ class EditPersonalDataSection extends StatelessWidget {
                 mandatory: true,
                 value: selectedRw,
                 items: List.generate(rw.length, (index) {
-                  return DropdownMenuItem(
-                    value: rw[index],
-                    child: Text(rw[index]),
-                  );
+                  return DropdownItem(value: rw[index], child: Text(rw[index]));
                 }),
                 onChanged: onSelectedRw,
                 validator: (value) {
@@ -159,41 +155,33 @@ class EditPersonalDataSection extends StatelessWidget {
         const SizedBox(height: 10),
         BlocBuilder<RegionCubit, RegionState>(
           builder: (context, state) {
-            return BaseDropdownSearchGroupField<District>(
+            return BaseTypeaHeadGroupField<District>(
               label: 'Kecamatan',
-              hint: state.districtStatus == DistrictStatus.success
-                  ? 'Pilih kecamatan'
-                  : 'Mohon tunggu...',
-              searchHint: 'Cari nama kecamatan',
+              hint: 'Pilih kecamatan',
               mandatory: true,
-              value: selectedDistrict,
-              items: state.districtStatus == DistrictStatus.success
-                  ? state.districts.map((e) {
-                      return DropdownMenuItem(
-                        value: e,
-                        child: Text(e.name?.capitalize() ?? ''),
-                      );
-                    }).toList()
-                  : const [],
-              onChanged: onSelectedDistrict,
+              controller: districtController,
+              emptyLabel: 'Kecamatan Tidak Ditemukan',
+              itemBuilder: (context, value) {
+                return Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Text(value.name?.capitalize() ?? ''),
+                );
+              },
+              onSelected: onSelectedDistrict,
+              suggestionsCallback: (keyword) {
+                return state.districts.where((element) {
+                  return element.name?.toLowerCase().contains(
+                        keyword.toLowerCase(),
+                      ) ??
+                      false;
+                }).toList();
+              },
               validator: (value) {
-                if (selectedDistrict == null) {
+                if (value!.isEmpty) {
                   return 'Silahkan pilih kecamatan';
                 }
 
                 return null;
-              },
-              searchController: districtController,
-              searchMatchFn: (item, keyword) {
-                return item.value?.name?.toLowerCase().contains(
-                      keyword.toLowerCase(),
-                    ) ??
-                    false;
-              },
-              onMenuStateChange: (isOpen) {
-                if (!isOpen) {
-                  districtController.clear();
-                }
               },
             );
           },
@@ -202,41 +190,33 @@ class EditPersonalDataSection extends StatelessWidget {
           const SizedBox(height: 10),
           BlocBuilder<RegionCubit, RegionState>(
             builder: (context, state) {
-              return BaseDropdownSearchGroupField<SubDistrict>(
+              return BaseTypeaHeadGroupField<SubDistrict>(
                 label: 'Kelurahan',
-                hint: state.subDistrictStatus == SubDistrictStatus.success
-                    ? 'Pilih kelurahan'
-                    : 'Mohon tunggu...',
-                searchHint: 'Cari nama kelurahan',
+                hint: 'Pilih kelurahan',
                 mandatory: true,
-                value: selectedSubDistrict,
-                items: state.subDistrictStatus == SubDistrictStatus.success
-                    ? state.subDistricts.map((e) {
-                        return DropdownMenuItem(
-                          value: e,
-                          child: Text(e.name?.capitalize() ?? ''),
-                        );
-                      }).toList()
-                    : const [],
-                onChanged: onSelectedSubDistrict,
+                controller: subDistrictController,
+                emptyLabel: 'Kelurahan Tidak Ditemukan',
+                itemBuilder: (context, value) {
+                  return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(value.name?.capitalize() ?? ''),
+                  );
+                },
+                onSelected: onSelectedSubDistrict,
+                suggestionsCallback: (keyword) {
+                  return state.subDistricts.where((element) {
+                    return element.name?.toLowerCase().contains(
+                          keyword.toLowerCase(),
+                        ) ??
+                        false;
+                  }).toList();
+                },
                 validator: (value) {
-                  if (selectedSubDistrict == null) {
+                  if (value!.isEmpty) {
                     return 'Silahkan pilih kelurahan';
                   }
 
                   return null;
-                },
-                searchController: subDistrictController,
-                searchMatchFn: (item, keyword) {
-                  return item.value?.name?.toLowerCase().contains(
-                        keyword.toLowerCase(),
-                      ) ??
-                      false;
-                },
-                onMenuStateChange: (isOpen) {
-                  if (!isOpen) {
-                    subDistrictController.clear();
-                  }
                 },
               );
             },

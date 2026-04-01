@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,12 +46,12 @@ class SpmHeader extends StatelessWidget {
   final Set<String> selectedStatus;
   final void Function(Map<String, dynamic> value) onAppliedFilter;
   final List<String> months;
-  final int? selectedMonth;
-  final void Function(Object? value) onSelectedMonth;
+  final ValueNotifier<int?> selectedMonth;
+  final void Function(int? value) onSelectedMonth;
   final void Function() onRemoveMonth;
   final List<int> years;
-  final int selectedYear;
-  final void Function(Object? value) onSelectedYear;
+  final ValueNotifier<int> selectedYear;
+  final void Function(int? value) onSelectedYear;
 
   @override
   Widget build(BuildContext context) {
@@ -142,8 +143,8 @@ class SpmHeader extends StatelessWidget {
                     onPressed: () {
                       context.read<DashboardCubit>().refetchSpm(
                         keyword: spmKeyword,
-                        month: selectedMonth,
-                        year: selectedYear,
+                        month: selectedMonth.value,
+                        year: selectedYear.value,
                         districtCode: selectedDistrictCode,
                         subDistrictCode: selectedSubDistrictCode,
                         healthPostUuid: selectedHealthPostUuid,
@@ -173,7 +174,7 @@ class SpmHeader extends StatelessWidget {
                     child: BaseDropdownField(
                       hint: 'Pilih bulan',
                       value: selectedMonth,
-                      prefixIcon: selectedMonth == null
+                      prefixIcon: selectedMonth.value == null
                           ? null
                           : BaseIconButton(
                               icon: MingCute.close_circle_line,
@@ -182,7 +183,7 @@ class SpmHeader extends StatelessWidget {
                               onPressed: onRemoveMonth,
                             ),
                       items: List.generate(months.length, (index) {
-                        return DropdownMenuItem(
+                        return DropdownItem(
                           value: index + 1,
                           child: Text(months[index]),
                         );
@@ -196,7 +197,7 @@ class SpmHeader extends StatelessWidget {
                       hint: 'Pilih tahun',
                       value: selectedYear,
                       items: List.generate(years.length, (index) {
-                        return DropdownMenuItem(
+                        return DropdownItem(
                           value: years[index],
                           child: Text(years[index].toString()),
                         );

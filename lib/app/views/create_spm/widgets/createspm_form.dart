@@ -47,18 +47,18 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
     50,
     (index) => (index + 1).toString().padLeft(3, '0'),
   );
-  String? _selectedRt;
+  final _selectedRt = ValueNotifier<String?>(null);
   final rw = List.generate(
     50,
     (index) => (index + 1).toString().padLeft(3, '0'),
   );
-  String? _selectedRw;
+  final _selectedRw = ValueNotifier<String?>(null);
   final _districtController = TextEditingController();
   District? _selectedDistrict;
   final _subDistrictController = TextEditingController();
   SubDistrict? _selectedSubDistrict;
   final _phoneController = TextEditingController();
-  String? _selectedServiceCategory;
+  final _selectedServiceCategory = ValueNotifier<String?>(null);
   final _reportDescriptionController = TextEditingController();
 
   final _formKeyAttachment = GlobalKey<FormState>();
@@ -102,9 +102,12 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
     _nikController.dispose();
     _fullNameController.dispose();
     _addressController.dispose();
+    _selectedRt.dispose();
+    _selectedRw.dispose();
     _districtController.dispose();
     _subDistrictController.dispose();
     _phoneController.dispose();
+    _selectedServiceCategory.dispose();
     _reportDescriptionController.dispose();
 
     for (var attachmentController in _attachmentControllers) {
@@ -219,8 +222,8 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                     _addressController.text = resident?.address ?? '';
                     _phoneController.text = resident?.phone ?? '';
                     setState(() {
-                      _selectedRt = resident?.rt;
-                      _selectedRw = resident?.rw;
+                      _selectedRt.value = resident?.rt;
+                      _selectedRw.value = resident?.rw;
                     });
 
                     final regionCubit = context.read<RegionCubit>();
@@ -270,14 +273,14 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                   selectedRt: _selectedRt,
                   onSelectedRt: (value) {
                     setState(() {
-                      _selectedRt = value as String;
+                      _selectedRt.value = value;
                     });
                   },
                   rw: rw,
                   selectedRw: _selectedRw,
                   onSelectedRw: (value) {
                     setState(() {
-                      _selectedRw = value as String;
+                      _selectedRw.value = value;
                     });
                   },
                   selectedDistrict: _selectedDistrict,
@@ -307,7 +310,7 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                   selectedServiceCategory: _selectedServiceCategory,
                   onSelectedServiceCategory: (value) {
                     setState(() {
-                      _selectedServiceCategory = value as String;
+                      _selectedServiceCategory.value = value;
                     });
                   },
                   reportDescriptionController: _reportDescriptionController,
@@ -501,13 +504,13 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                           nik: _nikController.text,
                           name: _fullNameController.text,
                           address: _addressController.text,
-                          rt: _selectedRt,
-                          rw: _selectedRw,
+                          rt: _selectedRt.value,
+                          rw: _selectedRw.value,
                           districtCode: _selectedDistrict?.code,
                           subDistrictCode: _selectedSubDistrict?.code,
                           phone: _phoneController.text,
                           spmFieldUuid: widget.spmFieldUuid,
-                          serviceCategoryUuid: _selectedServiceCategory,
+                          serviceCategoryUuid: _selectedServiceCategory.value,
                           reportDescription: _reportDescriptionController.text,
                           latitude: _latitude,
                           longitude: _longitude,

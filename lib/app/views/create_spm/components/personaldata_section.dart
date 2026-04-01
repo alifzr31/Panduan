@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,11 +42,11 @@ class PersonalDataSection extends StatelessWidget {
   final TextEditingController fullNameController;
   final TextEditingController addressController;
   final List<String> rt;
-  final String? selectedRt;
-  final void Function(Object?)? onSelectedRt;
+  final ValueNotifier<String?>? selectedRt;
+  final void Function(String?)? onSelectedRt;
   final List<String> rw;
-  final void Function(Object?)? onSelectedRw;
-  final String? selectedRw;
+  final void Function(String?)? onSelectedRw;
+  final ValueNotifier<String?>? selectedRw;
   final District? selectedDistrict;
   final TextEditingController districtController;
   final void Function(District value)? onSelectedDistrict;
@@ -150,10 +151,7 @@ class PersonalDataSection extends StatelessWidget {
                 mandatory: true,
                 value: selectedRt,
                 items: List.generate(rt.length, (index) {
-                  return DropdownMenuItem(
-                    value: rt[index],
-                    child: Text(rt[index]),
-                  );
+                  return DropdownItem(value: rt[index], child: Text(rt[index]));
                 }),
                 onChanged: onSelectedRt,
                 validator: (value) {
@@ -173,10 +171,7 @@ class PersonalDataSection extends StatelessWidget {
                 mandatory: true,
                 value: selectedRw,
                 items: List.generate(rw.length, (index) {
-                  return DropdownMenuItem(
-                    value: rw[index],
-                    child: Text(rw[index]),
-                  );
+                  return DropdownItem(value: rw[index], child: Text(rw[index]));
                 }),
                 onChanged: onSelectedRw,
                 validator: (value) {

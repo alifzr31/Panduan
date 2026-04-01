@@ -32,7 +32,7 @@ class _DashboardSpmState extends State<DashboardSpm> {
   final _years = List.generate(3, (index) {
     return DateTime.now().year - index;
   });
-  int _selectedYear = DateTime.now().year;
+  final _selectedYear = ValueNotifier<int>(DateTime.now().year);
   final _months = const [
     'Januari',
     'Februari',
@@ -47,7 +47,7 @@ class _DashboardSpmState extends State<DashboardSpm> {
     'November',
     'Desember',
   ];
-  int? _selectedMonth;
+  final _selectedMonth = ValueNotifier<int?>(null);
 
   void _onScrollSpm() {
     if (_spmScrollController.hasClients) {
@@ -58,8 +58,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
           context.read<DashboardCubit>().state.hasMoreSpm) {
         context.read<DashboardCubit>().fetchSpm(
           keyword: _spmKeyword,
-          year: _selectedYear,
-          month: _selectedMonth,
+          year: _selectedYear.value,
+          month: _selectedMonth.value,
           districtCode: _selectedDistrictCode,
           subDistrictCode: _selectedSubDistrictCode,
           healthPostUuid: _selectedHealthPostUuid,
@@ -79,8 +79,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
     _spmDebounce = Timer(const Duration(milliseconds: 500), () {
       context.read<DashboardCubit>().refetchSpm(
         keyword: _spmKeyword,
-        month: _selectedMonth,
-        year: _selectedYear,
+        month: _selectedMonth.value,
+        year: _selectedYear.value,
         districtCode: _selectedDistrictCode,
         subDistrictCode: _selectedSubDistrictCode,
         healthPostUuid: _selectedHealthPostUuid,
@@ -97,6 +97,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
       ..dispose();
     _searchSpmController.dispose();
     _spmDebounce?.cancel();
+    _selectedYear.dispose();
+    _selectedMonth.dispose();
     super.dispose();
   }
 
@@ -113,8 +115,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
                   .read<DashboardCubit>()
                   .fetchSpm(
                     keyword: _spmKeyword,
-                    year: _selectedYear,
-                    month: _selectedMonth,
+                    year: _selectedYear.value,
+                    month: _selectedMonth.value,
                     districtCode: _selectedDistrictCode,
                     subDistrictCode: _selectedSubDistrictCode,
                     healthPostUuid: _selectedHealthPostUuid,
@@ -151,8 +153,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
             }
             context.read<DashboardCubit>().refetchSpm(
               keyword: _spmKeyword,
-              year: _selectedYear,
-              month: _selectedMonth,
+              year: _selectedYear.value,
+              month: _selectedMonth.value,
               districtCode: _selectedDistrictCode,
               subDistrictCode: _selectedSubDistrictCode,
               healthPostUuid: _selectedHealthPostUuid,
@@ -197,8 +199,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
 
               context.read<DashboardCubit>().refetchSpm(
                 keyword: _spmKeyword,
-                month: _selectedMonth,
-                year: _selectedYear,
+                month: _selectedMonth.value,
+                year: _selectedYear.value,
                 districtCode: _selectedDistrictCode,
                 subDistrictCode: _selectedSubDistrictCode,
                 healthPostUuid: _selectedHealthPostUuid,
@@ -209,14 +211,13 @@ class _DashboardSpmState extends State<DashboardSpm> {
             months: _months,
             selectedMonth: _selectedMonth,
             onSelectedMonth: (value) {
-              setState(() {
-                _selectedMonth = value as int;
-              });
+              _selectedMonth.value = value;
+              setState(() {});
 
               context.read<DashboardCubit>().refetchSpm(
                 keyword: _spmKeyword,
-                month: _selectedMonth,
-                year: _selectedYear,
+                month: _selectedMonth.value,
+                year: _selectedYear.value,
                 districtCode: _selectedDistrictCode,
                 subDistrictCode: _selectedSubDistrictCode,
                 healthPostUuid: _selectedHealthPostUuid,
@@ -225,14 +226,13 @@ class _DashboardSpmState extends State<DashboardSpm> {
               );
             },
             onRemoveMonth: () {
-              setState(() {
-                _selectedMonth = null;
-              });
+              _selectedMonth.value = null;
+              setState(() {});
 
               context.read<DashboardCubit>().refetchSpm(
                 keyword: _spmKeyword,
-                month: _selectedMonth,
-                year: _selectedYear,
+                month: _selectedMonth.value,
+                year: _selectedYear.value,
                 districtCode: _selectedDistrictCode,
                 subDistrictCode: _selectedSubDistrictCode,
                 healthPostUuid: _selectedHealthPostUuid,
@@ -243,14 +243,12 @@ class _DashboardSpmState extends State<DashboardSpm> {
             years: _years,
             selectedYear: _selectedYear,
             onSelectedYear: (value) {
-              setState(() {
-                _selectedYear = value as int;
-              });
+              _selectedYear.value = value as int;
 
               context.read<DashboardCubit>().refetchSpm(
                 keyword: _spmKeyword,
-                month: _selectedMonth,
-                year: _selectedYear,
+                month: _selectedMonth.value,
+                year: _selectedYear.value,
                 districtCode: _selectedDistrictCode,
                 subDistrictCode: _selectedSubDistrictCode,
                 healthPostUuid: _selectedHealthPostUuid,
@@ -272,8 +270,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
                         onRefetch: () {
                           context.read<DashboardCubit>().refetchSpm(
                             keyword: _spmKeyword,
-                            month: _selectedMonth,
-                            year: _selectedYear,
+                            month: _selectedMonth.value,
+                            year: _selectedYear.value,
                             districtCode: _selectedDistrictCode,
                             subDistrictCode: _selectedSubDistrictCode,
                             healthPostUuid: _selectedHealthPostUuid,
@@ -293,8 +291,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
                               onRefetch: () {
                                 context.read<DashboardCubit>().refetchSpm(
                                   keyword: _spmKeyword,
-                                  month: _selectedMonth,
-                                  year: _selectedYear,
+                                  month: _selectedMonth.value,
+                                  year: _selectedYear.value,
                                   districtCode: _selectedDistrictCode,
                                   subDistrictCode: _selectedSubDistrictCode,
                                   healthPostUuid: _selectedHealthPostUuid,
@@ -313,8 +311,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
                                   if (context.mounted) {
                                     context.read<DashboardCubit>().refetchSpm(
                                       keyword: _spmKeyword,
-                                      month: _selectedMonth,
-                                      year: _selectedYear,
+                                      month: _selectedMonth.value,
+                                      year: _selectedYear.value,
                                       districtCode: _selectedDistrictCode,
                                       subDistrictCode: _selectedSubDistrictCode,
                                       healthPostUuid: _selectedHealthPostUuid,
@@ -376,8 +374,9 @@ class _DashboardSpmState extends State<DashboardSpm> {
                                                     .read<DashboardCubit>()
                                                     .refetchSpm(
                                                       keyword: _spmKeyword,
-                                                      month: _selectedMonth,
-                                                      year: _selectedYear,
+                                                      month:
+                                                          _selectedMonth.value,
+                                                      year: _selectedYear.value,
                                                       districtCode:
                                                           _selectedDistrictCode,
                                                       subDistrictCode:

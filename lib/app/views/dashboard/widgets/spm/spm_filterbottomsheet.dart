@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -39,14 +39,14 @@ class SpmFilterBottomsheet extends StatefulWidget {
 class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
   final _userPermissions = <String>[];
   bool _canSelectDistrict = false;
-  District? _selectedDistrict;
+  final _selectedDistrict = ValueNotifier<District?>(null);
   bool _canSelectSubDistrict = false;
-  SubDistrict? _selectedSubDistrict;
+  final _selectedSubDistrict = ValueNotifier<SubDistrict?>(null);
   bool _canSelectHealthPost = false;
-  String? _selectedHealthPostUuid;
-  String? _selectedSpmField;
+  final _selectedHealthPostUuid = ValueNotifier<String?>(null);
+  final _selectedSpmField = ValueNotifier<String?>(null);
   final List<String> _listStatus = AppHelpers.listStatus();
-  final Set<String> _selectedStatus = {};
+  final _selectedStatus = ValueNotifier<Set<String>>({});
   bool _isFiltered = false;
 
   Future<void> _initFilter() async {
@@ -82,42 +82,43 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
 
       final districts = regionCubit.state.districts;
 
-      _selectedDistrict = widget.selectedDistrictCode == null
+      _selectedDistrict.value = widget.selectedDistrictCode == null
           ? null
           : districts.firstWhere((e) => e.code == widget.selectedDistrictCode);
     } else {
-      _selectedDistrict = authCubit.state.profile?.district;
+      _selectedDistrict.value = authCubit.state.profile?.district;
     }
 
-    if (_selectedDistrict != null) {
+    if (_selectedDistrict.value != null) {
       if (_canSelectSubDistrict) {
-        final districtCode = _selectedDistrict?.code?.split('.').last;
+        final districtCode = _selectedDistrict.value?.code?.split('.').last;
 
         await regionCubit.fetchSubDistricts(districtCode: districtCode);
         if (!mounted) return;
 
         final subDistricts = regionCubit.state.subDistricts;
 
-        _selectedSubDistrict = widget.selectedSubDistrictCode == null
+        _selectedSubDistrict.value = widget.selectedSubDistrictCode == null
             ? null
             : subDistricts.firstWhere(
                 (e) => e.code == widget.selectedSubDistrictCode,
               );
       } else {
-        _selectedSubDistrict = authCubit.state.profile?.subDistrict;
+        _selectedSubDistrict.value = authCubit.state.profile?.subDistrict;
       }
 
-      if (_selectedSubDistrict != null) {
+      if (_selectedSubDistrict.value != null) {
         if (_canSelectHealthPost) {
           await healthPostCubit.fetchAllHealthPosts(
-            districtCode: _selectedDistrict?.code,
-            subDistrictCode: _selectedSubDistrict?.code,
+            districtCode: _selectedDistrict.value?.code,
+            subDistrictCode: _selectedSubDistrict.value?.code,
           );
           if (!mounted) return;
 
-          _selectedHealthPostUuid = widget.selectedHealthPostUuid;
+          _selectedHealthPostUuid.value = widget.selectedHealthPostUuid;
         } else {
-          _selectedHealthPostUuid = authCubit.state.profile?.healthPost?.uuid;
+          _selectedHealthPostUuid.value =
+              authCubit.state.profile?.healthPost?.uuid;
         }
       }
     }
@@ -125,21 +126,21 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
     await spmCubit.fetchSpmFields();
     if (!mounted) return;
 
-    _selectedSpmField = widget.selectedSpmField;
-    _selectedStatus
+    _selectedSpmField.value = widget.selectedSpmField;
+    _selectedStatus.value
       ..clear()
       ..addAll(widget.selectedStatus);
 
     final locationFilterActived =
-        (_canSelectDistrict && _selectedDistrict != null) ||
-        (_canSelectSubDistrict && _selectedSubDistrict != null) ||
-        (_canSelectHealthPost && _selectedHealthPostUuid != null);
+        (_canSelectDistrict && _selectedDistrict.value != null) ||
+        (_canSelectSubDistrict && _selectedSubDistrict.value != null) ||
+        (_canSelectHealthPost && _selectedHealthPostUuid.value != null);
 
     setState(() {
       _isFiltered =
           locationFilterActived ||
-          _selectedSpmField != null ||
-          _selectedStatus.isNotEmpty;
+          _selectedSpmField.value != null ||
+          _selectedStatus.value.isNotEmpty;
     });
   }
 
@@ -150,6 +151,16 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
       _userPermissions.addAll(context.read<AuthCubit>().state.userPermissions);
     });
     _initFilter();
+  }
+
+  @override
+  void dispose() {
+    _selectedDistrict.dispose();
+    _selectedSubDistrict.dispose();
+    _selectedHealthPostUuid.dispose();
+    _selectedSpmField.dispose();
+    _selectedStatus.dispose();
+    super.dispose();
   }
 
   @override
@@ -182,12 +193,12 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                             ? 'Mohon tunggu...'
                             : 'Pilih kecamatan',
                         items: state.districts.map((e) {
-                          return DropdownMenuItem(
+                          return DropdownItem(
                             value: e,
                             child: Text(e.name?.capitalize() ?? ''),
                           );
                         }).toList(),
-                        prefixIcon: _selectedDistrict == null
+                        prefixIcon: _selectedDistrict.value == null
                             ? null
                             : BaseIconButton(
                                 icon: MingCute.close_circle_fill,
@@ -195,20 +206,20 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                                 color: Colors.red.shade600,
                                 onPressed: () {
                                   setState(() {
-                                    _selectedSubDistrict = null;
-                                    _selectedHealthPostUuid = null;
-                                    _selectedDistrict = null;
+                                    _selectedSubDistrict.value = null;
+                                    _selectedHealthPostUuid.value = null;
+                                    _selectedDistrict.value = null;
                                   });
                                 },
                               ),
                         onChanged: (value) {
                           setState(() {
-                            _selectedSubDistrict = null;
-                            _selectedHealthPostUuid = null;
-                            _selectedDistrict = value as District;
+                            _selectedSubDistrict.value = null;
+                            _selectedHealthPostUuid.value = null;
+                            _selectedDistrict.value = value;
                           });
 
-                          final districtCode = _selectedDistrict?.code
+                          final districtCode = _selectedDistrict.value?.code
                               ?.split('.')
                               .last;
 
@@ -220,7 +231,8 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                     },
                   ),
                 },
-                if (_canSelectSubDistrict && _selectedDistrict != null) ...{
+                if (_canSelectSubDistrict &&
+                    _selectedDistrict.value != null) ...{
                   const SizedBox(height: 10),
                   BlocBuilder<RegionCubit, RegionState>(
                     builder: (context, state) {
@@ -232,12 +244,12 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                             ? 'Mohon tunggu...'
                             : 'Pilih kelurahan',
                         items: state.subDistricts.map((e) {
-                          return DropdownMenuItem(
+                          return DropdownItem(
                             value: e,
                             child: Text(e.name?.capitalize() ?? ''),
                           );
                         }).toList(),
-                        prefixIcon: _selectedSubDistrict == null
+                        prefixIcon: _selectedSubDistrict.value == null
                             ? null
                             : BaseIconButton(
                                 icon: MingCute.close_circle_fill,
@@ -245,27 +257,28 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                                 color: Colors.red.shade600,
                                 onPressed: () {
                                   setState(() {
-                                    _selectedHealthPostUuid = null;
-                                    _selectedSubDistrict = null;
+                                    _selectedHealthPostUuid.value = null;
+                                    _selectedSubDistrict.value = null;
                                   });
                                 },
                               ),
                         onChanged: (value) {
                           setState(() {
-                            _selectedHealthPostUuid = null;
-                            _selectedSubDistrict = value as SubDistrict;
+                            _selectedHealthPostUuid.value = null;
+                            _selectedSubDistrict.value = value;
                           });
 
                           context.read<HealthPostCubit>().fetchAllHealthPosts(
-                            districtCode: _selectedDistrict?.code,
-                            subDistrictCode: _selectedSubDistrict?.code,
+                            districtCode: _selectedDistrict.value?.code,
+                            subDistrictCode: _selectedSubDistrict.value?.code,
                           );
                         },
                       );
                     },
                   ),
                 },
-                if (_canSelectHealthPost && _selectedSubDistrict != null) ...{
+                if (_canSelectHealthPost &&
+                    _selectedSubDistrict.value != null) ...{
                   const SizedBox(height: 10),
                   BlocBuilder<HealthPostCubit, HealthPostState>(
                     builder: (context, state) {
@@ -276,12 +289,12 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                             ? 'Mohon tunggu...'
                             : 'Pilih posyandu',
                         items: state.healthPosts.map((e) {
-                          return DropdownMenuItem(
+                          return DropdownItem(
                             value: e.uuid,
                             child: Text(e.name?.capitalize() ?? ''),
                           );
                         }).toList(),
-                        prefixIcon: _selectedHealthPostUuid == null
+                        prefixIcon: _selectedHealthPostUuid.value == null
                             ? null
                             : BaseIconButton(
                                 icon: MingCute.close_circle_fill,
@@ -289,13 +302,13 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                                 color: Colors.red.shade600,
                                 onPressed: () {
                                   setState(() {
-                                    _selectedHealthPostUuid = null;
+                                    _selectedHealthPostUuid.value = null;
                                   });
                                 },
                               ),
                         onChanged: (value) {
                           setState(() {
-                            _selectedHealthPostUuid = value as String;
+                            _selectedHealthPostUuid.value = value;
                           });
                         },
                       );
@@ -312,12 +325,12 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                           ? 'Mohon tunggu...'
                           : 'Pilih bidang SPM',
                       items: state.spmFields.map((e) {
-                        return DropdownMenuItem(
+                        return DropdownItem(
                           value: e.name,
                           child: Text(e.name ?? ''),
                         );
                       }).toList(),
-                      prefixIcon: _selectedSpmField == null
+                      prefixIcon: _selectedSpmField.value == null
                           ? null
                           : BaseIconButton(
                               icon: MingCute.close_circle_fill,
@@ -325,13 +338,13 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                               color: Colors.red.shade600,
                               onPressed: () {
                                 setState(() {
-                                  _selectedSpmField = null;
+                                  _selectedSpmField.value = null;
                                 });
                               },
                             ),
                       onChanged: (value) {
                         setState(() {
-                          _selectedSpmField = value as String;
+                          _selectedSpmField.value = value;
                         });
                       },
                     );
@@ -341,47 +354,33 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                 BaseDropdownGroupField(
                   label: 'Status SPM',
                   hint: 'Pilih status SPM',
-                  value: _selectedStatus.isEmpty ? null : _selectedStatus.last,
+                  multiValue: _selectedStatus,
                   items: _listStatus.map((e) {
-                    return DropdownMenuItem(
-                      enabled: false,
+                    return DropdownItem(
+                      closeOnTap: false,
                       value: e,
-                      child: StatefulBuilder(
-                        builder: (context, menuSetState) {
-                          final isSelected = _selectedStatus.contains(e);
+                      child: ValueListenableBuilder(
+                        valueListenable: _selectedStatus,
+                        builder: (context, value, child) {
+                          final isSelected = value.contains(e);
 
-                          return InkWell(
-                            onTap: () {
-                              if (isSelected) {
-                                _selectedStatus.remove(e);
-                              } else {
-                                _selectedStatus.add(e);
-                              }
-                              setState(() {});
-                              menuSetState(() {});
-                            },
-
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    isSelected
-                                        ? MingCute.checkbox_fill
-                                        : MingCute.square_line,
-                                    size: 18,
-                                    color: isSelected
-                                        ? AppColors.blueColor
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    AppHelpers.statusLabel(e),
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                ],
+                          return Row(
+                            children: [
+                              Icon(
+                                isSelected
+                                    ? MingCute.checkbox_fill
+                                    : MingCute.square_line,
+                                size: 18,
+                                color: isSelected ? AppColors.blueColor : null,
                               ),
-                            ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  AppHelpers.statusLabel(e),
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
@@ -389,48 +388,92 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                   }).toList(),
                   selectedItemBuilder: (context) {
                     return _listStatus.map((e) {
-                      return ListView(
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.horizontal,
-                        physics: const ClampingScrollPhysics(),
-                        children: List.generate(_selectedStatus.length, (
-                          index,
-                        ) {
-                          return Row(
-                            children: [
-                              Material(
-                                shape: const StadiumBorder(),
-                                clipBehavior: Clip.antiAlias,
-                                color: AppColors.softBlueColor,
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 2,
-                                      horizontal: 10,
-                                    ),
-                                    child: Text(
-                                      AppHelpers.statusLabel(
-                                        _selectedStatus.toList()[index],
-                                      ),
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.blueColor,
+                      // return ValueListenableBuilder(
+                      //   valueListenable: _selectedStatus,
+                      //   builder: (context, value, child) {
+                      //     return SingleChildScrollView(
+                      //       scrollDirection: Axis.horizontal,
+                      //       child: Row(
+                      //         children: [
+                      //           Material(
+                      //             shape: const StadiumBorder(),
+                      //             clipBehavior: Clip.antiAlias,
+                      //             color: AppColors.softBlueColor,
+                      //             child: Center(
+                      //               child: Padding(
+                      //                 padding: const EdgeInsets.symmetric(
+                      //                   vertical: 2,
+                      //                   horizontal: 10,
+                      //                 ),
+                      //                 child: Text(
+                      //                   AppHelpers.statusLabel(
+                      //                     value.toList()[index],
+                      //                   ),
+                      //                   style: const TextStyle(
+                      //                     fontSize: 14,
+                      //                     fontWeight: FontWeight.w500,
+                      //                     color: AppColors.blueColor,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ),
+                      //           if (index != (_selectedStatus.length - 1))
+                      //             const SizedBox(width: 4),
+                      //         ],
+                      //       ),
+                      //     );
+                      //   },
+                      // );
+                      return ValueListenableBuilder(
+                        valueListenable: _selectedStatus,
+                        builder: (context, value, child) {
+                          return ListView(
+                            padding: EdgeInsets.zero,
+                            scrollDirection: Axis.horizontal,
+                            physics: const ClampingScrollPhysics(),
+                            children: List.generate(value.length, (index) {
+                              return Row(
+                                children: [
+                                  Material(
+                                    shape: const StadiumBorder(),
+                                    clipBehavior: Clip.antiAlias,
+                                    color: AppColors.softBlueColor,
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 2,
+                                          horizontal: 10,
+                                        ),
+                                        child: Text(
+                                          AppHelpers.statusLabel(
+                                            value.toList()[index],
+                                          ),
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColors.blueColor,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              if (index != (_selectedStatus.length - 1))
-                                const SizedBox(width: 4),
-                            ],
+                                  if (index != (value.length - 1))
+                                    const SizedBox(width: 4),
+                                ],
+                              );
+                            }),
                           );
-                        }),
+                        },
                       );
                     }).toList();
                   },
                   onChanged: (value) {
-                    if (kDebugMode) print(value);
+                    final isSelected = _selectedStatus.value.contains(value);
+
+                    _selectedStatus.value = isSelected
+                        ? ({..._selectedStatus.value}..remove(value))
+                        : {..._selectedStatus.value, value!};
                   },
                 ),
               ],
@@ -456,19 +499,20 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                     onPressed: () {
                       setState(() {
                         _isFiltered =
-                            _selectedDistrict != null ||
-                            _selectedSubDistrict != null ||
-                            _selectedHealthPostUuid != null ||
-                            _selectedSpmField != null ||
-                            _selectedStatus.isNotEmpty;
+                            _selectedDistrict.value != null ||
+                            _selectedSubDistrict.value != null ||
+                            _selectedHealthPostUuid.value != null ||
+                            _selectedSpmField.value != null ||
+                            _selectedStatus.value.isNotEmpty;
                       });
 
                       final data = {
-                        'selectedDistrictCode': _selectedDistrict?.code,
-                        'selectedSubDistrictCode': _selectedSubDistrict?.code,
-                        'selectedHealthPostUuid': _selectedHealthPostUuid,
-                        'selectedSpmField': _selectedSpmField,
-                        'selectedStatus': _selectedStatus,
+                        'selectedDistrictCode': _selectedDistrict.value?.code,
+                        'selectedSubDistrictCode':
+                            _selectedSubDistrict.value?.code,
+                        'selectedHealthPostUuid': _selectedHealthPostUuid.value,
+                        'selectedSpmField': _selectedSpmField.value,
+                        'selectedStatus': _selectedStatus.value,
                       };
 
                       Navigator.pop(context, data);
@@ -482,20 +526,22 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                       color: AppColors.pinkColor,
                       onPressed: () {
                         setState(() {
-                          _selectedDistrict = null;
-                          _selectedSubDistrict = null;
-                          _selectedHealthPostUuid = null;
-                          _selectedSpmField = null;
-                          _selectedStatus.clear();
+                          _selectedDistrict.value = null;
+                          _selectedSubDistrict.value = null;
+                          _selectedHealthPostUuid.value = null;
+                          _selectedSpmField.value = null;
+                          _selectedStatus.value.clear();
                           _isFiltered = false;
                         });
 
                         Navigator.pop(context, {
-                          'selectedDistrictCode': _selectedDistrict?.code,
-                          'selectedSubDistrictCode': _selectedSubDistrict?.code,
-                          'selectedHealthPostUuid': _selectedHealthPostUuid,
-                          'selectedSpmField': _selectedSpmField,
-                          'selectedStatus': _selectedStatus,
+                          'selectedDistrictCode': _selectedDistrict.value?.code,
+                          'selectedSubDistrictCode':
+                              _selectedSubDistrict.value?.code,
+                          'selectedHealthPostUuid':
+                              _selectedHealthPostUuid.value,
+                          'selectedSpmField': _selectedSpmField.value,
+                          'selectedStatus': _selectedStatus.value,
                         });
                       },
                     ),

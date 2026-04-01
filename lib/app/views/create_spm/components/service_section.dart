@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:panduan/app/cubits/create_spm/createspm_cubit.dart';
@@ -12,8 +13,8 @@ class ServiceSection extends StatelessWidget {
     super.key,
   });
 
-  final String? selectedServiceCategory;
-  final void Function(Object?)? onSelectedServiceCategory;
+  final ValueNotifier<String?>? selectedServiceCategory;
+  final void Function(String?)? onSelectedServiceCategory;
   final TextEditingController reportDescriptionController;
 
   @override
@@ -22,7 +23,7 @@ class ServiceSection extends StatelessWidget {
       children: [
         BlocBuilder<CreateSpmCubit, CreateSpmState>(
           builder: (context, state) {
-            return BaseDropdownGroupField(
+            return BaseDropdownGroupField<String?>(
               label: 'Kategori Layanan',
               hint: state.serviceCategoryStatus == ServiceCategoryStatus.success
                   ? 'Pilih kategori layanan'
@@ -32,7 +33,7 @@ class ServiceSection extends StatelessWidget {
               items:
                   state.serviceCategoryStatus == ServiceCategoryStatus.success
                   ? state.serviceCategories.map((e) {
-                      return DropdownMenuItem(
+                      return DropdownItem(
                         value: e.uuid,
                         child: Text(e.name ?? ''),
                       );
