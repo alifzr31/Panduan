@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:panduan/app/configs/get_it/service_locator.dart';
 import 'package:panduan/app/configs/router/custompageroute_builder.dart';
+import 'package:panduan/app/cubits/asset/asset_cubit.dart';
 import 'package:panduan/app/cubits/create_spm/createspm_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/cubits/detail_spm/detailspm_cubit.dart';
@@ -207,9 +208,12 @@ class AppRouter {
         return customPageRouteBuilder(
           settings,
           bottomSafeArea: false,
-          child: WebviewPage(
-            fileName: args?['fileName'],
-            filePath: args?['filePath'],
+          child: BlocProvider(
+            create: (context) => sl<AssetCubit>(),
+            child: WebviewPage(
+              fileName: args?['fileName'],
+              filePath: args?['filePath'],
+            ),
           ),
         );
       default:

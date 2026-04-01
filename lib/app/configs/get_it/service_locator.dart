@@ -42,7 +42,7 @@ final sl = GetIt.instance;
 void init() {
   sl.registerLazySingleton(() => AuthService());
   sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()));
-  sl.registerFactory(() => AuthCubit(sl()));
+  sl.registerLazySingleton(() => AuthCubit(sl()));
 
   sl.registerLazySingleton(() => RegionService());
   sl.registerLazySingleton<RegionRepository>(() => RegionRepositoryImpl(sl()));
@@ -92,7 +92,7 @@ void init() {
 
   sl.registerLazySingleton(() => AssetService());
   sl.registerLazySingleton<AssetRepository>(() => AssetRepositoryImpl(sl()));
-  sl.registerLazySingleton(() => AssetCubit(sl()));
+  sl.registerFactory(() => AssetCubit(sl()));
 
   sl.registerLazySingleton(() => CreateSpmService());
   sl.registerLazySingleton<CreateSpmRepository>(

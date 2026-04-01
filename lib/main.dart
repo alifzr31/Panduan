@@ -13,7 +13,6 @@ import 'package:panduan/app/configs/firebase/firebase_options.dart';
 import 'package:panduan/app/configs/get_it/service_locator.dart' as di;
 import 'package:panduan/app/configs/local_notification/local_notif.dart';
 import 'package:panduan/app/configs/router/app_router.dart';
-import 'package:panduan/app/cubits/asset/asset_cubit.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
@@ -66,11 +65,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => di.sl<AuthCubit>()),
-        BlocProvider(create: (context) => di.sl<AssetCubit>()),
-      ],
+    return BlocProvider.value(
+      value: di.sl<AuthCubit>(),
       child: GlobalLoaderOverlay(
         overlayColor: Colors.black.withValues(alpha: 0.4),
         disableBackButton: true,
