@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/dio/dio_client.dart';
 import 'package:panduan/app/models/health_post.dart';
@@ -13,6 +14,7 @@ class HealthPostService extends DioClient {
     String? keyword,
     String? districtCode,
     String? subDistrictCode,
+    CancelToken? cancelToken,
   }) async {
     try {
       final response = await get(
@@ -28,6 +30,7 @@ class HealthPostService extends DioClient {
             'sub_district_code': subDistrictCode,
           },
         },
+        cancelToken: cancelToken,
       );
 
       return await compute(

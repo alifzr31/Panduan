@@ -23,23 +23,22 @@ class _NotificationPageState extends State<NotificationPage> {
   final _scrollController = ScrollController();
 
   void _onScrollNotification() {
-    if (_scrollController.hasClients) {
-      final currentScroll = _scrollController.position.pixels;
-      final maxScroll = _scrollController.position.maxScrollExtent;
+    if (!mounted || !_scrollController.hasClients) return;
 
-      if (currentScroll == maxScroll &&
-          context.read<NotificationCubit>().state.hasMoreNotification) {
-        context.read<NotificationCubit>().fetchNotifications();
-      }
+    final currentScroll = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (currentScroll == maxScroll &&
+        context.read<NotificationCubit>().state.hasMoreNotification) {
+      context.read<NotificationCubit>().fetchNotifications();
     }
   }
 
   @override
   void initState() {
     super.initState();
-    context.read<NotificationCubit>().fetchNotifications().then((value) {
-      _scrollController.addListener(_onScrollNotification);
-    });
+    _scrollController.addListener(_onScrollNotification);
+    context.read<NotificationCubit>().fetchNotifications();
   }
 
   @override

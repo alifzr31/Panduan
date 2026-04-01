@@ -12,12 +12,18 @@ class HealthPostCubit extends Cubit<HealthPostState> {
 
   final HealthPostRepository _repository;
   int _currentHealthPostPage = 1;
+  final Map<String, CancelToken> _cancelTokens = {};
 
   Future<void> fetchHealthPosts({
     String? keyword,
     String? districtCode,
     String? subDistrictCode,
   }) async {
+    final cancelToken = AppHelpers.createCancelToken(
+      _cancelTokens,
+      key: 'healthPosts',
+    );
+
     if (_currentHealthPostPage == 1) {
       emit(state.copyWith(listStatus: ListStatus.loading));
     }
@@ -29,6 +35,7 @@ class HealthPostCubit extends Cubit<HealthPostState> {
         keyword: keyword,
         districtCode: districtCode,
         subDistrictCode: subDistrictCode,
+        cancelToken: cancelToken,
       );
 
       if (healthPosts.length < 10) {
@@ -43,6 +50,10 @@ class HealthPostCubit extends Cubit<HealthPostState> {
       );
       _currentHealthPostPage++;
     } on DioException catch (e) {
+      if (CancelToken.isCancel(e)) {
+        return;
+      }
+
       emit(
         state.copyWith(
           listStatus: ListStatus.error,
@@ -102,5 +113,11 @@ class HealthPostCubit extends Cubit<HealthPostState> {
         ),
       );
     }
+  }
+
+  @override
+  Future<void> close() {
+    AppHelpers.removeAllCancelToken(_cancelTokens);
+    return super.close();
   }
 }

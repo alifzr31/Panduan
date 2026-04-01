@@ -35,30 +35,30 @@ class _HealthPostPageState extends State<HealthPostPage> {
   String? _subDistrictCode;
 
   void _onScroll() {
-    if (_scrollController.hasClients) {
-      final currentScroll = _scrollController.position.pixels;
-      final maxScroll = _scrollController.position.maxScrollExtent;
+    if (!mounted || !_scrollController.hasClients) return;
 
-      if (currentScroll == maxScroll &&
-          context.read<HealthPostCubit>().state.hasMoreHealthPost) {
-        context.read<HealthPostCubit>().fetchHealthPosts(
-          keyword: _healthPostKeyword,
-          districtCode:
-              AppHelpers.hasPermission(
-                _userPermissions,
-                permissionName: 'level-kecamatan',
-              )
-              ? _districtCode
-              : _selectedDistrictCodeFilter,
-          subDistrictCode:
-              AppHelpers.hasPermission(
-                _userPermissions,
-                permissionName: 'level-kelurahan',
-              )
-              ? _subDistrictCode
-              : _selectedSubDistrictCodeFilter,
-        );
-      }
+    final currentScroll = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (currentScroll == maxScroll &&
+        context.read<HealthPostCubit>().state.hasMoreHealthPost) {
+      context.read<HealthPostCubit>().fetchHealthPosts(
+        keyword: _healthPostKeyword,
+        districtCode:
+            AppHelpers.hasPermission(
+              _userPermissions,
+              permissionName: 'level-kecamatan',
+            )
+            ? _districtCode
+            : _selectedDistrictCodeFilter,
+        subDistrictCode:
+            AppHelpers.hasPermission(
+              _userPermissions,
+              permissionName: 'level-kelurahan',
+            )
+            ? _subDistrictCode
+            : _selectedSubDistrictCodeFilter,
+      );
     }
   }
 
@@ -102,28 +102,24 @@ class _HealthPostPageState extends State<HealthPostPage> {
           ?.subDistrictCode;
     });
 
-    context
-        .read<HealthPostCubit>()
-        .fetchHealthPosts(
-          keyword: _healthPostKeyword,
-          districtCode:
-              AppHelpers.hasPermission(
-                _userPermissions,
-                permissionName: 'level-kecamatan',
-              )
-              ? _districtCode
-              : null,
-          subDistrictCode:
-              AppHelpers.hasPermission(
-                _userPermissions,
-                permissionName: 'level-kelurahan',
-              )
-              ? _subDistrictCode
-              : null,
-        )
-        .then((_) {
-          _scrollController.addListener(_onScroll);
-        });
+    _scrollController.addListener(_onScroll);
+    context.read<HealthPostCubit>().fetchHealthPosts(
+      keyword: _healthPostKeyword,
+      districtCode:
+          AppHelpers.hasPermission(
+            _userPermissions,
+            permissionName: 'level-kecamatan',
+          )
+          ? _districtCode
+          : null,
+      subDistrictCode:
+          AppHelpers.hasPermission(
+            _userPermissions,
+            permissionName: 'level-kelurahan',
+          )
+          ? _subDistrictCode
+          : null,
+    );
   }
 
   @override

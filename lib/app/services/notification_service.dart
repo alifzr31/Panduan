@@ -8,11 +8,15 @@ class NotificationService extends DioClient {
   @override
   String get baseUrl => AppEnv.baseOwnerUrl;
 
-  Future<List<Notification>> fetchNotifications({int? page}) async {
+  Future<List<Notification>> fetchNotifications({
+    int? page,
+    CancelToken? cancelToken,
+  }) async {
     try {
       final response = await get(
         '/notification',
         queryParams: {'page': page, 'limit': 10},
+        cancelToken: cancelToken,
       );
 
       return response.data['data'] == null

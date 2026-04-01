@@ -14,8 +14,14 @@ class NotificationCubit extends Cubit<NotificationState> {
   final NotificationRepository _repository;
 
   int currentNotificationPage = 1;
+  final Map<String, CancelToken> _cancelTokens = {};
 
   Future<void> fetchNotifications() async {
+    final cancelToken = AppHelpers.createCancelToken(
+      _cancelTokens,
+      key: 'notifications',
+    );
+
     if (currentNotificationPage == 1) {
       emit(state.copyWith(listStatus: ListStatus.loading));
     }
@@ -23,6 +29,7 @@ class NotificationCubit extends Cubit<NotificationState> {
     try {
       final notifications = await _repository.fetchNotifications(
         page: currentNotificationPage,
+        cancelToken: cancelToken,
       );
       if (notifications.length < 10) {
         emit(state.copyWith(hasMoreNotification: false));
@@ -36,6 +43,10 @@ class NotificationCubit extends Cubit<NotificationState> {
       );
       currentNotificationPage++;
     } on DioException catch (e) {
+      if (CancelToken.isCancel(e)) {
+        return;
+      }
+
       emit(
         state.copyWith(
           listStatus: ListStatus.error,
@@ -159,5 +170,11 @@ class NotificationCubit extends Cubit<NotificationState> {
         notifications: updatedList,
       ),
     );
+  }
+
+  @override
+  Future<void> close() {
+    AppHelpers.removeAllCancelToken(_cancelTokens);
+    return super.close();
   }
 }

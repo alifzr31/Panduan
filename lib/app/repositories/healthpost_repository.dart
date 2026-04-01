@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:panduan/app/models/health_post.dart';
 import 'package:panduan/app/services/healthpost_service.dart';
 
@@ -8,6 +9,7 @@ abstract class HealthPostRepository {
     String? keyword,
     String? districtCode,
     String? subDistrictCode,
+    CancelToken? cancelToken,
   });
 }
 
@@ -23,6 +25,7 @@ class HealthPostRepositoryImpl implements HealthPostRepository {
     String? keyword,
     String? districtCode,
     String? subDistrictCode,
+    CancelToken? cancelToken,
   }) async {
     return await _service.fetchHealthPosts(
       page: page,
@@ -30,6 +33,7 @@ class HealthPostRepositoryImpl implements HealthPostRepository {
       keyword: keyword,
       districtCode: districtCode,
       subDistrictCode: subDistrictCode,
+      cancelToken: cancelToken,
     );
   }
 }
