@@ -1,10 +1,8 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const FlutterSecureStorage storage = FlutterSecureStorage(
-  aOptions: AndroidOptions(
-    storageCipherAlgorithm: StorageCipherAlgorithm.AES_CBC_PKCS7Padding,
-  ),
-  iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+  aOptions: AndroidOptions(),
+  iOptions: IOSOptions(),
 );
 
 class SecureStorage {
