@@ -101,16 +101,12 @@ class AuthCubit extends Cubit<AuthState> {
         ),
       );
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        refreshToken();
-      } else {
-        emit(
-          state.copyWith(
-            profileStatus: ProfileStatus.error,
-            profileError: AppHelpers.errorHandlingApiMessage(e),
-          ),
-        );
-      }
+      emit(
+        state.copyWith(
+          profileStatus: ProfileStatus.error,
+          profileError: AppHelpers.errorHandlingApiMessage(e),
+        ),
+      );
     }
   }
 
@@ -145,14 +141,10 @@ class AuthCubit extends Cubit<AuthState> {
           ),
         ]);
 
-        refetchProfile();
+        // refetchProfile();
       }
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        logoutSession();
-      } else {
-        if (kDebugMode) print(e.response?.data);
-      }
+      if (kDebugMode) print(e.response?.data);
     }
   }
 
