@@ -18,6 +18,36 @@ class AppHelpers {
     return MediaQuery.of(context).viewPadding.bottom;
   }
 
+  static CancelToken createCancelToken(
+    Map<String, CancelToken> cancelTokens, {
+    required String key,
+  }) {
+    if (cancelTokens.containsKey(key)) {
+      cancelTokens[key]?.cancel();
+    }
+
+    final cancelToken = CancelToken();
+    cancelTokens[key] = cancelToken;
+
+    return cancelToken;
+  }
+
+  static void removeCancelToken(
+    Map<String, CancelToken> cancelTokens, {
+    required String key,
+  }) {
+    cancelTokens[key]?.cancel();
+    cancelTokens.remove(key);
+  }
+
+  static void removeAllCancelToken(Map<String, CancelToken> cancelTokens) {
+    for (final cancelToken in cancelTokens.values) {
+      cancelToken.cancel();
+    }
+
+    cancelTokens.clear();
+  }
+
   static String errorHandlingApiMessage(DioException e) {
     final type = e.type;
     final statusCode = e.response?.statusCode;
