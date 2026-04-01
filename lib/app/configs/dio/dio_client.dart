@@ -19,7 +19,7 @@ abstract class DioClient {
     dio.options.receiveTimeout = const Duration(minutes: 5);
     dio.options.headers.addAll(AppHelpers.addOnHeaders());
     dio.interceptors.addAll([
-      DioInterceptors(),
+      DioInterceptors(dio),
       if (kDebugMode) ...{
         PrettyDioLogger(
           requestHeader: true,
@@ -38,12 +38,14 @@ abstract class DioClient {
     String path, {
     Map<String, dynamic>? queryParams,
     Map<String, dynamic>? headers,
+    CancelToken? cancelToken,
   }) async {
     try {
       final response = await dio.get(
         path,
         queryParameters: queryParams,
         options: Options(headers: headers),
+        cancelToken: cancelToken,
       );
 
       return response;
