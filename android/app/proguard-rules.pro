@@ -70,7 +70,17 @@
 ## Secure Storage & Keystore
 ##############################################
 -keep class io.flutter.plugins.fluttersecurestorage.** { *; }
+-keep class com.it_nomads.fluttersecurestorage.** { *; }
 -keep class androidx.security.crypto.** { *; }
+-keep class android.security.keystore.** { *; }
+-keep class android.security.** { *; }
+
+##############################################
+## local_auth & biometric_storage
+##############################################
+-keep class io.flutter.plugins.localauth.** { *; }
+-keep class androidx.biometric.** { *; }
+-keep class design.codeux.biometric_storage.** { *; }
 
 ##############################################
 ## Shared Preferences
@@ -88,12 +98,6 @@
 ## Geolocator
 ##############################################
 -keep class com.baseflow.geolocator.** { *; }
-
-##############################################
-## local_auth
-##############################################
--keep class io.flutter.plugins.localauth.** { *; }
--keep class androidx.biometric.** { *; }
 
 ##############################################
 ## flutter_local_notifications
