@@ -90,7 +90,7 @@ Future<Object?> showFileSourceBottomSheet(BuildContext context) {
                     minimumSize: Size.zero,
                     padding: const EdgeInsets.all(2),
                     onPressed: () async {
-                      final pickedFile = await FilePicker.platform.pickFiles(
+                      final pickedFile = await FilePicker.pickFiles(
                         type: FileType.custom,
                         allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
                       );

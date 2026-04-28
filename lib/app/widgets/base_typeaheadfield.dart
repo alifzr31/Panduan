@@ -45,7 +45,6 @@ class BaseTypeaHeadField<T> extends StatelessWidget {
           child: child,
         );
       },
-      hideWithKeyboard: false,
       constraints: const BoxConstraints(maxHeight: 200),
       loadingBuilder: (context) {
         return const CircularProgressIndicator();
@@ -140,7 +139,6 @@ class BaseTypeaHeadGroupField<T> extends StatelessWidget {
               child: child,
             );
           },
-          hideWithKeyboard: false,
           constraints: const BoxConstraints(maxHeight: 200),
           loadingBuilder: (context) {
             return const CircularProgressIndicator();
