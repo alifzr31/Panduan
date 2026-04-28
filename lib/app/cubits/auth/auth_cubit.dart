@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:panduan/app/configs/secure_storage/secure_storage.dart';
+import 'package:panduan/app/configs/storage/biom_storage/biom_storage.dart';
+import 'package:panduan/app/configs/storage/secure_storage/secure_storage.dart';
+import 'package:panduan/app/configs/storage/storage_service.dart';
 import 'package:panduan/app/models/profile.dart';
 import 'package:panduan/app/repositories/auth_repository.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
@@ -15,6 +18,9 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit(this._repository) : super(const AuthState());
 
   final AuthRepository _repository;
+
+  String? accessToken;
+  String? refreshToken;
 
   void resetState() async {
     await Future.delayed(const Duration(milliseconds: 500), () {
@@ -39,6 +45,19 @@ class AuthCubit extends Cubit<AuthState> {
     });
   }
 
+  void setTokens({
+    required String newAccessToken,
+    required String newRefreshToken,
+  }) {
+    accessToken = newAccessToken;
+    refreshToken = newRefreshToken;
+  }
+
+  void clearTokens() {
+    accessToken = null;
+    refreshToken = null;
+  }
+
   void login({String? email, String? password}) async {
     emit(state.copyWith(loginStatus: LoginStatus.loading));
 
@@ -49,16 +68,21 @@ class AuthCubit extends Cubit<AuthState> {
       );
 
       if (response.data['status']) {
-        await Future.wait([
-          SecureStorage.writeStorage(
-            key: AppStrings.accessToken,
-            value: response.data['data']['access_token'],
-          ),
-          SecureStorage.writeStorage(
-            key: AppStrings.refreshToken,
-            value: response.data['data']['refresh_token'],
-          ),
-        ]);
+        final sharedPreferences = await SharedPreferences.getInstance();
+        sharedPreferences.setBool('biometrics_enabled', false);
+        sharedPreferences.reload();
+
+        final rawToken = {
+          AppStrings.accessToken: response.data['data'][AppStrings.accessToken],
+          AppStrings.refreshToken:
+              response.data['data'][AppStrings.refreshToken],
+        };
+        final token = jsonEncode(rawToken);
+        await StorageService.writeAppToken(newAppToken: token);
+        setTokens(
+          newAccessToken: response.data['data'][AppStrings.accessToken],
+          newRefreshToken: response.data['data'][AppStrings.refreshToken],
+        );
 
         emit(
           state.copyWith(
@@ -123,31 +147,6 @@ class AuthCubit extends Cubit<AuthState> {
     await fetchProfile();
   }
 
-  void refreshToken() async {
-    emit(state.copyWith(authStatus: AuthStatus.loading));
-
-    try {
-      final response = await _repository.refreshToken();
-
-      if (response.data['status']) {
-        await Future.wait([
-          SecureStorage.writeStorage(
-            key: AppStrings.accessToken,
-            value: response.data['data']['access_token'],
-          ),
-          SecureStorage.writeStorage(
-            key: AppStrings.refreshToken,
-            value: response.data['data']['refresh_token'],
-          ),
-        ]);
-
-        // refetchProfile();
-      }
-    } on DioException catch (e) {
-      if (kDebugMode) print(e.response?.data);
-    }
-  }
-
   void changePassword({
     String? currentPassword,
     String? newPassword,
@@ -203,9 +202,10 @@ class AuthCubit extends Cubit<AuthState> {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
 
+    clearTokens();
     await Future.wait([
-      SecureStorage.deleteStorage(key: AppStrings.accessToken),
-      SecureStorage.deleteStorage(key: AppStrings.refreshToken),
+      SecureStorage.deleteStorage(key: AppStrings.appToken),
+      BiomStorage().delete(),
       sharedPreferences.setBool('biometrics_enabled', false),
     ]);
     await sharedPreferences.reload();
@@ -228,9 +228,10 @@ class AuthCubit extends Cubit<AuthState> {
       final response = await _repository.logout();
 
       if (response.data['status']) {
+        clearTokens();
         await Future.wait([
-          SecureStorage.deleteStorage(key: AppStrings.accessToken),
-          SecureStorage.deleteStorage(key: AppStrings.refreshToken),
+          SecureStorage.deleteStorage(key: AppStrings.appToken),
+          BiomStorage().delete(),
           sharedPreferences.setBool('biometrics_enabled', false),
         ]);
         await sharedPreferences.reload();

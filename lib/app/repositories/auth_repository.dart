@@ -5,7 +5,6 @@ import 'package:panduan/app/services/auth_service.dart';
 abstract class AuthRepository {
   Future<Response> login({String? email, String? password});
   Future<Profile?> fetchProfile();
-  Future<Response> refreshToken();
   Future<Response> changePassword({
     String? currentPassword,
     String? newPassword,
@@ -27,11 +26,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Profile?> fetchProfile() async {
     return await _service.fetchProfile();
-  }
-
-  @override
-  Future<Response> refreshToken() async {
-    return await _service.refreshToken();
   }
 
   @override

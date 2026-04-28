@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/dio/dio_client.dart';
 import 'package:panduan/app/configs/firebase/firebase_notif.dart';
-import 'package:panduan/app/configs/secure_storage/secure_storage.dart';
+import 'package:panduan/app/configs/get_it/service_locator.dart';
+import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/models/profile.dart';
 import 'package:panduan/app/utils/app_env.dart';
-import 'package:panduan/app/utils/app_strings.dart';
 
 class AuthService extends DioClient {
   @override
@@ -41,22 +41,24 @@ class AuthService extends DioClient {
     }
   }
 
-  Future<Response> refreshToken() async {
-    String? refreshToken = await SecureStorage.readStorage(
-      key: AppStrings.refreshToken,
-    );
+  // Future<Response> refreshToken() async {
+  //   String? accessToken = sl<AuthCubit>().accessToken;
+  //   String? refreshToken = await SecureStorage.readStorage(
+  //     key: AppStrings.refreshToken,
+  //   );
 
-    try {
-      final response = await post(
-        '/refresh-token',
-        headers: {'Authorization': 'Bearer $refreshToken'},
-      );
+  //   try {
+  //     final response = await post(
+  //       '/refresh-token',
+  //       headers: {'Authorization': 'Bearer $accessToken'},
+  //       data: {'refresh_token': 'Bearer $refreshToken'},
+  //     );
 
-      return await compute((message) => message, response);
-    } catch (e) {
-      rethrow;
-    }
-  }
+  //     return await compute((message) => message, response);
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 
   Future<Response> changePassword({
     String? currentPassword,
@@ -80,14 +82,12 @@ class AuthService extends DioClient {
   }
 
   Future<Response> logout() async {
+    final refreshToken = sl<AuthCubit>().refreshToken;
+
     try {
       final response = await post(
         '/logout',
-        headers: {
-          'Authorization-Refresh': await SecureStorage.readStorage(
-            key: AppStrings.refreshToken,
-          ),
-        },
+        headers: {'Authorization-Refresh': refreshToken},
       );
 
       return await compute((message) => message, response);
