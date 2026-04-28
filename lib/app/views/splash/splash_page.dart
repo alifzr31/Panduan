@@ -1,18 +1,22 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:local_auth_android/local_auth_android.dart';
 import 'package:open_settings_plus/core/open_settings_plus.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:panduan/app/configs/firebase/remoteconfig_service.dart';
-import 'package:panduan/app/configs/secure_storage/secure_storage.dart';
+import 'package:panduan/app/configs/storage/biom_storage/biom_storage.dart';
+import 'package:panduan/app/configs/storage/storage_service.dart';
+import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
+import 'package:panduan/app/utils/app_env.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/app_strings.dart';
 import 'package:panduan/app/views/dashboard/dashboard_page.dart';
@@ -20,6 +24,7 @@ import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/views/update/update_page.dart';
 import 'package:panduan/app/widgets/base_button.dart';
 import 'package:panduan/app/widgets/base_textbutton.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashPage extends StatefulWidget {
@@ -32,277 +37,279 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  Timer? _timer;
-  bool _isLoggedIn = false;
   final LocalAuthentication _localAuthentication = LocalAuthentication();
   bool? _hasAuth;
   String? _appName;
   String? _appVersion;
 
-  void _initTimer() async {
-    final packageInfo = await _getPackageInfo();
-    final isLoggedIn = await _checkLoggedIn();
+  Future<void> _initSplash() async {
+    try {
+      final packageInfo = await _getPackageInfo();
+      await RemoteConfigService.instance.init();
 
-    setState(() {
-      _isLoggedIn = isLoggedIn;
-    });
+      if (!mounted) return;
 
-    _timer = Timer(const Duration(milliseconds: 1500), () async {
-      try {
-        await _initRemoteConfig(isLoggedIn, packageInfo);
-      } catch (e) {
-        if (kDebugMode) print(e);
+      if (_shouldUpdate(packageInfo)) {
+        final isLoggedIn = await _handleAuthFlow();
+
+        if (!mounted) return;
+
+        _goToUpdatePage(packageInfo, isLoggedIn);
+        return;
       }
-    });
+
+      final isLoggedIn = await _handleAuthFlow();
+
+      if (!mounted) return;
+
+      if (_hasAuth == false) return;
+
+      _navigatePage(isLoggedIn: isLoggedIn);
+    } catch (e) {
+      if (kDebugMode) print(e);
+      _navigatePage(isLoggedIn: false);
+    }
   }
 
   Future<PackageInfo> _getPackageInfo() async {
-    try {
-      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final packageInfo = await PackageInfo.fromPlatform();
 
+    if (mounted) {
       setState(() {
         _appName = packageInfo.appName;
         _appVersion = packageInfo.version;
       });
+    }
 
-      return packageInfo;
-    } catch (e) {
-      if (kDebugMode) print(e);
-      rethrow;
+    return packageInfo;
+  }
+
+  bool _shouldUpdate(PackageInfo packageInfo) {
+    final currentBuild = int.tryParse(packageInfo.buildNumber) ?? 0;
+    final latestBuild = RemoteConfigService.instance.latestBuildNumber;
+
+    return currentBuild < latestBuild;
+  }
+
+  Future<bool> _handleAuthFlow() async {
+    final prefs = await SharedPreferences.getInstance();
+    final biometricsEnabled = prefs.getBool('biometrics_enabled') ?? false;
+
+    if (biometricsEnabled) {
+      final canAuthenticate = await _checkBiometrics();
+
+      if (!canAuthenticate) {
+        return await _handleBiometricFailure();
+      }
+
+      final success = await _refreshToken();
+
+      if (!mounted) return false;
+
+      setState(() => _hasAuth = success);
+
+      return success;
+    } else {
+      return await _refreshToken();
     }
   }
 
-  Future<bool> _checkLoggedIn() async {
+  Future<bool> _handleBiometricFailure() async {
+    final isLoggedIn = await _refreshToken();
+
+    if (!mounted) return false;
+
+    _showBiometricsAlert(isLoggedIn: isLoggedIn);
+
+    return isLoggedIn;
+  }
+
+  Future<bool> _refreshToken() async {
+    final appTokenString = await StorageService.readAppToken();
+
+    if (appTokenString == null) return false;
+
+    final appToken = jsonDecode(appTokenString);
+
+    final accessToken = appToken[AppStrings.accessToken];
+    final refreshToken = appToken[AppStrings.refreshToken];
+
+    if (accessToken == null || refreshToken == null) return false;
+
     try {
-      final accessToken = await SecureStorage.readStorage(
-        key: AppStrings.accessToken,
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: AppEnv.baseOwnerUrl,
+          headers: AppHelpers.addOnHeaders(),
+        ),
       );
 
-      if (accessToken != null) {
+      if (kDebugMode) {
+        dio.interceptors.add(
+          PrettyDioLogger(
+            requestHeader: true,
+            requestBody: true,
+            responseBody: false,
+            error: true,
+          ),
+        );
+      }
+
+      final response = await dio.post(
+        '/refresh-token',
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+        data: {'refresh_token': refreshToken},
+      );
+
+      if (response.data['status']) {
+        final newAccessToken = response.data['data']['access_token'];
+        final newRefreshToken = response.data['data']['refresh_token'];
+
+        final rawToken = {
+          AppStrings.accessToken: newAccessToken,
+          AppStrings.refreshToken: newRefreshToken,
+        };
+        final token = jsonEncode(rawToken);
+
+        final isSaved = await StorageService.writeAppToken(newAppToken: token);
+
+        if (!isSaved) return false;
+
+        if (mounted) {
+          context.read<AuthCubit>().setTokens(
+            newAccessToken: newAccessToken,
+            newRefreshToken: newRefreshToken,
+          );
+        }
+
         return true;
       }
 
       return false;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<void> _initRemoteConfig(
-    bool isLoggedIn,
-    PackageInfo packageInfo,
-  ) async {
-    try {
-      await RemoteConfigService.instance.init();
-
-      final packageName = packageInfo.packageName;
-      final currentVersion = packageInfo.version;
-      final currentBuildNumber = int.tryParse(packageInfo.buildNumber) ?? 0;
-      final latestVersion = RemoteConfigService.instance.latestVersion;
-      final latestBuildNumber = RemoteConfigService.instance.latestBuildNumber;
-      final mandatoryUpdate = RemoteConfigService.instance.mandatoryUpdate;
-      final updateDescription = RemoteConfigService.instance.updateDescription;
-      final shouldUpdate = currentBuildNumber < latestBuildNumber;
-
-      if (shouldUpdate) {
-        if (mounted) {
-          Navigator.pushReplacementNamed(
-            context,
-            UpdatePage.routeName,
-            arguments: {
-              'isLoggedIn': isLoggedIn,
-              'packageName': packageName,
-              'currentVersion': currentVersion,
-              'currentBuildNumber': currentBuildNumber,
-              'latestVersion': latestVersion,
-              'latestBuildNumber': latestBuildNumber,
-              'mandatoryUpdate': mandatoryUpdate,
-              'updateDescription': updateDescription,
-            },
-          );
-        }
-      } else {
-        _didBiometricsAuth(isLoggedIn: isLoggedIn);
+    } catch (_) {
+      if (mounted) {
+        context.read<AuthCubit>().logoutSession();
       }
-    } catch (e) {
-      if (kDebugMode) print(e);
-    }
-  }
 
-  Future<bool> _checkBiometricsHardware() async {
-    try {
-      return await _localAuthentication.canCheckBiometrics;
-    } on PlatformException catch (e) {
-      if (kDebugMode) print(e.message);
       return false;
     }
   }
 
   Future<bool> _checkBiometrics() async {
     try {
-      final canAuthenticateWithBiometrics = await _checkBiometricsHardware();
-      final canAuthenticate =
-          canAuthenticateWithBiometrics ||
-          await _localAuthentication.isDeviceSupported();
-      final availableBiometrics = await _localAuthentication
-          .getAvailableBiometrics();
+      final canCheck = await BiomStorage().checkBiometricHardware();
+      final supported = await _localAuthentication.isDeviceSupported();
+      final available = await BiomStorage().checkAvailableBiometrics();
 
-      return availableBiometrics.isEmpty ? false : canAuthenticate;
-    } on PlatformException catch (e) {
-      if (kDebugMode) print(e.message);
+      return available.isNotEmpty && (canCheck || supported);
+    } catch (_) {
       return false;
     }
   }
 
-  Future<bool> _authBiometrics() async {
-    try {
-      final didAuthFingerprint = await _localAuthentication.authenticate(
-        localizedReason:
-            'Silahkan pindai sidik jari/deteksi wajah anda untuk melanjutkan',
-        authMessages: const [
-          AndroidAuthMessages(
-            signInTitle: 'Panduan',
-            signInHint: 'Masuk dengan biometrik',
-            cancelButton: 'Batal',
+  void _navigatePage({required bool isLoggedIn}) {
+    if (!mounted) return;
+
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      isLoggedIn ? DashboardPage.routeName : LoginPage.routeName,
+      (_) => false,
+    );
+  }
+
+  void _goToUpdatePage(PackageInfo packageInfo, bool isLoggedIn) {
+    Navigator.pushReplacementNamed(
+      context,
+      UpdatePage.routeName,
+      arguments: {
+        'isLoggedIn': isLoggedIn,
+        'packageName': packageInfo.packageName,
+        'currentVersion': packageInfo.version,
+        'currentBuildNumber': int.tryParse(packageInfo.buildNumber) ?? 0,
+        'latestVersion': RemoteConfigService.instance.latestVersion,
+        'latestBuildNumber': RemoteConfigService.instance.latestBuildNumber,
+        'mandatoryUpdate': RemoteConfigService.instance.mandatoryUpdate,
+        'updateDescription': RemoteConfigService.instance.updateDescription,
+      },
+    );
+  }
+
+  void _showBiometricsAlert({required bool isLoggedIn}) {
+    if (!mounted) return;
+
+    showAdaptiveDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          clipBehavior: Clip.antiAlias,
+          elevation: 1,
+          surfaceTintColor: Colors.white,
+          titleTextStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Jost',
+            color: Colors.black,
           ),
-        ],
-        biometricOnly: false,
-        sensitiveTransaction: true,
-      );
-
-      return didAuthFingerprint;
-    } on LocalAuthException catch (e) {
-      switch (e.code) {
-        case LocalAuthExceptionCode.userCanceled:
-          return false;
-        default:
-          if (kDebugMode) print(e.code);
-          if (kDebugMode) print(e.description);
-          if (kDebugMode) print(e.details);
-          rethrow;
-      }
-    }
-  }
-
-  void _didBiometricsAuth({bool isLoggedIn = false}) async {
-    final canAuthenticate = await _checkBiometrics();
-    final hasBiometricsHardware = await _checkBiometricsHardware();
-    final sharedPreferences = await SharedPreferences.getInstance();
-    final biometricsEnabled =
-        sharedPreferences.getBool('biometrics_enabled') ?? false;
-
-    if (isLoggedIn) {
-      if (hasBiometricsHardware) {
-        if (canAuthenticate) {
-          if (biometricsEnabled) {
-            final didAuthFingerprint = await _authBiometrics();
-
-            setState(() {
-              _hasAuth = didAuthFingerprint;
-            });
-
-            if (_hasAuth ?? false) {
-              _navigatePage(isLoggedIn: isLoggedIn);
-            }
-          } else {
-            _navigatePage(isLoggedIn: isLoggedIn);
-          }
-        } else {
-          _showBiometricsAlert(isLoggedIn: isLoggedIn);
-        }
-      } else {
-        _navigatePage(isLoggedIn: isLoggedIn);
-      }
-    } else {
-      _navigatePage(isLoggedIn: isLoggedIn);
-    }
-  }
-
-  void _navigatePage({bool isLoggedIn = false}) {
-    if (mounted) {
-      if (isLoggedIn) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          DashboardPage.routeName,
-          (route) => false,
+          contentTextStyle: const TextStyle(
+            fontSize: 14,
+            fontFamily: 'Jost',
+            color: Colors.black,
+          ),
+          title: const Text('Informasi Keamanan'),
+          content: const Text(
+            'Perangkat anda mendukung keamanan biometrik tetapi anda belum mengaturnya. '
+            'Silahkan atur keamanan biometrik dengan cara menambahkan sidik jari atau deteksi wajah '
+            'di pengaturan perangkat anda sebagai keamanan tambahan. Terima kasih!',
+          ),
+          actions: [
+            BaseTextButton(
+              size: 14,
+              text: 'Atur Sekarang',
+              color: AppColors.blueColor,
+              onPressed: () {
+                switch (OpenSettingsPlus.shared) {
+                  case OpenSettingsPlusAndroid android:
+                    android.biometricEnroll();
+                    break;
+                  case OpenSettingsPlusIOS ios:
+                    ios.faceIDAndPasscode();
+                    break;
+                  default:
+                    if (kDebugMode) print('Platform not supported');
+                }
+              },
+            ),
+            const SizedBox(width: 6),
+            BaseTextButton(
+              size: 14,
+              text: 'Nanti Saja',
+              onPressed: () {
+                Navigator.of(context).pop(); // tutup dialog
+                _navigatePage(isLoggedIn: isLoggedIn);
+              },
+            ),
+          ],
         );
-      } else {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          LoginPage.routeName,
-          (route) => false,
-        );
-      }
-    }
+      },
+    );
   }
 
-  void _showBiometricsAlert({bool isLoggedIn = false}) {
-    if (mounted) {
-      showAdaptiveDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            clipBehavior: Clip.antiAlias,
-            elevation: 1,
-            surfaceTintColor: Colors.white,
-            titleTextStyle: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Jost',
-              color: Colors.black,
-            ),
-            contentTextStyle: const TextStyle(
-              fontSize: 14,
-              fontFamily: 'Jost',
-              color: Colors.black,
-            ),
-            title: const Text('Informasi Keamanan'),
-            content: const Text(
-              'Perangkat anda mendukung keamanan biometrik tetapi anda belum mengaturnya. Silahkan atur keamanan biometrik dengan cara menambahkan sidik jari atau deteksi wajah di pengaturan perangkat anda sebagai keamanan tambahan. Terima kasih!',
-            ),
-            actions: [
-              BaseTextButton(
-                size: 14,
-                text: 'Atur Sekarang',
-                color: AppColors.blueColor,
-                onPressed: () {
-                  switch (OpenSettingsPlus.shared) {
-                    case OpenSettingsPlusAndroid openSettingsPlusAndroid:
-                      openSettingsPlusAndroid.biometricEnroll();
-                    case OpenSettingsPlusIOS openSettingsPlusIOS:
-                      openSettingsPlusIOS.faceIDAndPasscode();
-                    default:
-                      if (kDebugMode) print('Platform not supported');
-                  }
-                },
-              ),
-              const SizedBox(width: 6),
-              BaseTextButton(
-                size: 14,
-                text: 'Nanti Saja',
-                onPressed: () {
-                  _navigatePage(isLoggedIn: isLoggedIn);
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
+  Future<void> _retryBiometric() async {
+    final success = await _refreshToken();
+
+    if (!mounted) return;
+
+    setState(() => _hasAuth = success);
+
+    _navigatePage(isLoggedIn: success);
   }
 
   @override
   void initState() {
     super.initState();
-    _initTimer();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+    _initSplash();
   }
 
   @override
@@ -330,9 +337,7 @@ class _SplashPageState extends State<SplashPage> {
                           BaseButtonIcon(
                             label: 'Masuk',
                             icon: MingCute.fingerprint_line,
-                            onPressed: () {
-                              _didBiometricsAuth(isLoggedIn: _isLoggedIn);
-                            },
+                            onPressed: _retryBiometric,
                           ),
                         },
                       ],
