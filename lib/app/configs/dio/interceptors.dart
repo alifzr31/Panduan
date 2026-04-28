@@ -1,12 +1,13 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:panduan/app/configs/dio/exceptions.dart';
-import 'package:panduan/app/configs/get_it/service_locator.dart' as di;
-import 'package:panduan/app/configs/secure_storage/secure_storage.dart';
+import 'package:panduan/app/configs/get_it/service_locator.dart';
+import 'package:panduan/app/configs/storage/storage_service.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_env.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
@@ -27,61 +28,120 @@ class DioInterceptors extends InterceptorsWrapper {
 
   DioInterceptors(this.dio);
 
+  void _onUnauthorized(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final request = err.requestOptions.copyWith();
+
+    if (request.extra['isRetry'] == true) {
+      sl<AuthCubit>().logoutSession();
+      return handler.reject(err);
+    }
+
+    if (isRefreshing) {
+      final completer = Completer<Response>();
+
+      requestQueue.add((token) async {
+        try {
+          final newRequest = request.copyWith(
+            headers: {...request.headers, 'Authorization': 'Bearer $token'},
+            extra: {...request.extra, 'isRetry': true},
+          );
+
+          final response = await dio.fetch(newRequest);
+          completer.complete(response);
+        } catch (e) {
+          completer.completeError(e);
+        }
+      });
+
+      return handler.resolve(await completer.future);
+    }
+
+    isRefreshing = true;
+
+    await _onRefreshToken(request, err, handler);
+    return;
+  }
+
   Future<void> _onRefreshToken(
     RequestOptions request,
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
     try {
-      final refreshToken = await SecureStorage.readStorage(
-        key: AppStrings.refreshToken,
-      );
+      final accessToken = sl<AuthCubit>().accessToken;
+      final refreshToken = sl<AuthCubit>().refreshToken;
 
-      if (refreshToken == null) {
+      if (accessToken == null || refreshToken == null) {
         requestQueue.clear();
-        di.sl<AuthCubit>().logoutSession();
+        sl<AuthCubit>().logoutSession();
 
-        return handler.next(err);
+        return handler.reject(
+          UnauthorizedException(err.requestOptions, err.response),
+        );
       }
 
       final response = await refreshDio.post(
         '/refresh-token',
-        options: Options(headers: {'Authorization': 'Bearer $refreshToken'}),
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+        data: {'refresh_token': refreshToken},
       );
 
       if (response.data['status']) {
         final newAccessToken = response.data['data']['access_token'];
         final newRefreshToken = response.data['data']['refresh_token'];
 
-        await Future.wait([
-          SecureStorage.writeStorage(
-            key: AppStrings.accessToken,
-            value: newAccessToken,
-          ),
-          SecureStorage.writeStorage(
-            key: AppStrings.refreshToken,
-            value: newRefreshToken,
-          ),
-        ]);
+        final rawToken = {
+          AppStrings.accessToken: newAccessToken,
+          AppStrings.refreshToken: newRefreshToken,
+        };
+        final token = jsonEncode(rawToken);
 
-        request.headers['Authorization'] = 'Bearer $newAccessToken';
-        final retryResponse = await dio.fetch(request);
+        final isSaved = await StorageService.writeAppToken(newAppToken: token);
 
-        await Future.wait(
-          requestQueue.map((callback) => callback(newAccessToken)),
+        if (isSaved) {
+          sl<AuthCubit>().setTokens(
+            newAccessToken: newAccessToken,
+            newRefreshToken: newRefreshToken,
+          );
+        }
+
+        final newRequest = request.copyWith(
+          headers: {
+            ...request.headers,
+            'Authorization': 'Bearer $newAccessToken',
+          },
+          extra: {...request.extra, 'isRetry': true},
         );
+
+        final retryResponse = await dio.fetch(newRequest);
+
+        for (final callback in requestQueue) {
+          try {
+            await callback(newAccessToken);
+          } catch (_) {}
+        }
 
         requestQueue.clear();
 
         return handler.resolve(retryResponse);
       } else {
-        return handler.next(err);
+        requestQueue.clear();
+        sl<AuthCubit>().logoutSession();
+
+        return handler.reject(
+          UnauthorizedException(err.requestOptions, err.response),
+        );
       }
     } catch (e) {
       requestQueue.clear();
-      di.sl<AuthCubit>().logoutSession();
+      sl<AuthCubit>().logoutSession();
 
-      return handler.next(err);
+      return handler.reject(
+        UnauthorizedException(err.requestOptions, err.response),
+      );
     } finally {
       isRefreshing = false;
     }
@@ -91,30 +151,6 @@ class DioInterceptors extends InterceptorsWrapper {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // print('ERROR STATUS CODE: ${err.response?.statusCode}');
     // print('ERROR STATUS DATA: ${err.response?.data}');
-
-    if (err.response?.statusCode == 401) {
-      final request = err.requestOptions;
-
-      if (isRefreshing) {
-        final completer = Completer<Response>();
-
-        requestQueue.add((token) async {
-          try {
-            request.headers['Authorization'] = 'Bearer $token';
-            final response = await dio.fetch(request);
-            completer.complete(response);
-          } catch (e) {
-            completer.completeError(e);
-          }
-        });
-
-        return handler.resolve(await completer.future);
-      }
-
-      isRefreshing = true;
-
-      await _onRefreshToken(request, err, handler);
-    }
 
     if (err.error is SocketException) {
       return handler.reject(
@@ -136,9 +172,7 @@ class DioInterceptors extends InterceptorsWrapper {
                 BadRequestException(err.requestOptions, err.response),
               );
             case 401:
-              return handler.reject(
-                UnauthorizedException(err.requestOptions, err.response),
-              );
+              return _onUnauthorized(err, handler);
             case 404:
               return handler.reject(
                 NotFoundException(err.requestOptions, err.response),
@@ -153,18 +187,16 @@ class DioInterceptors extends InterceptorsWrapper {
               );
           }
           break;
-        case DioExceptionType.cancel:
+        case DioExceptionType.badCertificate:
           return handler.next(err);
         case DioExceptionType.unknown:
-          return handler.reject(
-            NoInternetConnectionException(err.requestOptions, err.response),
-          );
-        case DioExceptionType.badCertificate:
-          break;
+          return handler.next(err);
+        case DioExceptionType.cancel:
+          return handler.next(err);
       }
     }
 
-    handler.next(err);
+    return handler.next(err);
   }
 
   @override
@@ -175,9 +207,7 @@ class DioInterceptors extends InterceptorsWrapper {
     // print("--> ${options.method} ${options.uri}");
     // print("Headers: ${options.headers}");
     // print("Body: ${options.data}");
-    String? accessToken = await SecureStorage.readStorage(
-      key: AppStrings.accessToken,
-    );
+    final accessToken = sl<AuthCubit>().accessToken;
 
     if (accessToken != null) {
       if (options.path != '/refresh-token') {

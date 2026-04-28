@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/dio/interceptors.dart';
+import 'package:panduan/app/configs/firebase/remoteconfig_service.dart';
+import 'package:panduan/app/utils/app_env.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
@@ -18,6 +24,39 @@ abstract class DioClient {
     dio.options.connectTimeout = const Duration(minutes: 5);
     dio.options.receiveTimeout = const Duration(minutes: 5);
     dio.options.headers.addAll(AppHelpers.addOnHeaders());
+    dio.httpClientAdapter = IOHttpClientAdapter(
+      createHttpClient: () {
+        final client = HttpClient();
+
+        // if (kDebugMode) {
+        //   client.findProxy = (uri) => "PROXY 192.168.1.X:8888";
+        //   client.badCertificateCallback = (cert, host, port) => true;
+        // }
+
+        return client;
+      },
+      validateCertificate: (X509Certificate? cert, String host, int port) {
+        final pinnedFingerprints = AppEnv.pinnedFingerprints;
+        final sslPinningActived =
+            RemoteConfigService.instance.sslPinningActived;
+
+        if (!sslPinningActived) {
+          debugPrint("⚠️ SSL Pinning Bypass: Dimatikan via Remote Config");
+
+          return true;
+        }
+
+        if (cert == null) return false;
+
+        final certBytes = cert.der;
+        final digest = sha256.convert(certBytes);
+        final serverFingerprint = digest.bytes
+            .map((b) => b.toRadixString(16).padLeft(2, '0').toUpperCase())
+            .join(':');
+
+        return pinnedFingerprints.contains(serverFingerprint);
+      },
+    );
     dio.interceptors.addAll([
       DioInterceptors(dio),
       if (kDebugMode) ...{
