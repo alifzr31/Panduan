@@ -11,11 +11,11 @@ class RemoteConfigService {
   final FirebaseRemoteConfig _remote;
 
   static const _kDefault = {
-    'latest_version': '1.0.6',
-    'latest_build_number': 7,
+    'ssl_pinning_actived': true,
+    'latest_version': '1.0.7',
+    'latest_build_number': 8,
     'mandatory_update': true,
-    'update_description':
-        '- Penambahan opsi verifikasi SPM\n- Perubahan tampilan data spm\n- Perubahan tampilan posyandu binaan\n- Perbaikan bugs\n- Optimalisasi performa aplikasi.',
+    'update_description': 'Perbaikan bugs dan ptimalisasi performa aplikasi.',
   };
 
   Future<void> init() async {
@@ -39,6 +39,7 @@ class RemoteConfigService {
     }
   }
 
+  bool get sslPinningActived => _remote.getBool('ssl_pinning_actived');
   String get latestVersion => _remote.getString('latest_version');
   int get latestBuildNumber => _remote.getInt('latest_build_number');
   bool get mandatoryUpdate => _remote.getBool('mandatory_update');
