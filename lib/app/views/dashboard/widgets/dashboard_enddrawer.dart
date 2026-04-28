@@ -7,11 +7,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:local_auth_android/local_auth_android.dart';
 import 'package:open_settings_plus/core/open_settings_plus.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:panduan/app/configs/local_notification/local_notif.dart';
+import 'package:panduan/app/configs/storage/biom_storage/biom_storage.dart';
+import 'package:panduan/app/configs/storage/storage_service.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
@@ -32,7 +33,6 @@ class DashboardEndDrawer extends StatefulWidget {
 }
 
 class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
-  final LocalAuthentication _localAuthentication = LocalAuthentication();
   bool _hasBiometricsHardware = false;
   List<BiometricType> _availableBiometrics = const [];
   bool _biometricsEnabled = false;
@@ -43,10 +43,9 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
     try {
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-      setState(() {
-        _appName = packageInfo.appName;
-        _appVersion = packageInfo.version;
-      });
+      _appName = packageInfo.appName;
+      _appVersion = packageInfo.version;
+      setState(() {});
     } catch (e) {
       if (kDebugMode) print(e);
     }
@@ -54,15 +53,14 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
 
   Future<void> _checkBiometricsHardware() async {
     try {
-      final canAuthenticateWithBiometrics =
-          await _localAuthentication.canCheckBiometrics;
-      final availableBiometrics = await _localAuthentication
-          .getAvailableBiometrics();
+      final canAuthenticateWithBiometrics = await BiomStorage()
+          .checkBiometricHardware();
+      final availableBiometrics = await BiomStorage()
+          .checkAvailableBiometrics();
 
-      setState(() {
-        _hasBiometricsHardware = canAuthenticateWithBiometrics;
-        _availableBiometrics = availableBiometrics;
-      });
+      _hasBiometricsHardware = canAuthenticateWithBiometrics;
+      _availableBiometrics = availableBiometrics;
+      setState(() {});
     } on PlatformException catch (e) {
       if (kDebugMode) print(e.message);
     }
@@ -71,50 +69,9 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
   Future<void> _checkBiometricsEnabled() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    setState(() {
-      _biometricsEnabled =
-          sharedPreferences.getBool('biometrics_enabled') ?? false;
-    });
-  }
-
-  Future<bool> _authBiometrics() async {
-    try {
-      final didAuthFingerprint = await _localAuthentication.authenticate(
-        localizedReason:
-            'Silahkan pindai sidik jari/deteksi wajah anda untuk melanjutkan',
-        authMessages: const [
-          AndroidAuthMessages(
-            signInTitle: 'Panduan',
-            signInHint: 'Masuk dengan biometrik',
-            cancelButton: 'Batal',
-          ),
-        ],
-        biometricOnly: true,
-        sensitiveTransaction: true,
-      );
-
-      return didAuthFingerprint;
-    } on LocalAuthException catch (e) {
-      switch (e.code) {
-        case LocalAuthExceptionCode.userCanceled:
-          return false;
-        default:
-          if (kDebugMode) print(e.code);
-          if (kDebugMode) print(e.description);
-          if (kDebugMode) print(e.details);
-          rethrow;
-      }
-    }
-  }
-
-  Future<void> _setBiometrics(bool value) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.setBool('biometrics_enabled', value);
-    await sharedPreferences.reload();
-
-    setState(() {
-      _biometricsEnabled = value;
-    });
+    _biometricsEnabled =
+        sharedPreferences.getBool('biometrics_enabled') ?? false;
+    setState(() {});
   }
 
   void _initEndDrawer() async {
@@ -259,35 +216,6 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
             Expanded(
               child: Column(
                 children: [
-                  // if (!AppHelpers.hasPermission(
-                  //       context.read<AuthCubit>().state.userPermissions,
-                  //       permissionName: 'level-posyandu',
-                  //     ) &&
-                  //     !AppHelpers.hasPermission(
-                  //       context.read<AuthCubit>().state.userPermissions,
-                  //       permissionName: 'level-opd',
-                  //     )) ...{
-                  //   ...[
-                  //     BaseListTile(
-                  //       leading: const Icon(
-                  //         MingCute.building_5_line,
-                  //         size: 22,
-                  //         color: AppColors.blueColor,
-                  //       ),
-                  //       title: 'Posyandu Binaan',
-                  //       onTap: () {
-                  //         Navigator.pushNamed(
-                  //           context,
-                  //           HealthPostPage.routeName,
-                  //         );
-                  //       },
-                  //     ),
-                  //     Padding(
-                  //       padding: const EdgeInsets.symmetric(horizontal: 16),
-                  //       child: Divider(height: 1, color: Colors.grey.shade300),
-                  //     ),
-                  //   ],
-                  // },
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       return Column(
@@ -393,7 +321,7 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
                       },
                     ),
                   },
-                  if (_hasBiometricsHardware && Platform.isAndroid) ...{
+                  if (_hasBiometricsHardware) ...{
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Divider(height: 1, color: Colors.grey.shade300),
@@ -426,15 +354,17 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
                                   AppColors.pinkColor,
                                 ),
                                 value: _biometricsEnabled,
-                                onChanged: (value) {
-                                  if (_biometricsEnabled) {
-                                    _setBiometrics(value);
-                                  } else {
-                                    _authBiometrics().then((didAuth) {
-                                      if (didAuth) {
-                                        _setBiometrics(value);
-                                      }
-                                    });
+                                onChanged: (value) async {
+                                  final isSuccess =
+                                      await StorageService.setupBiometric(
+                                        value,
+                                      );
+
+                                  if (!context.mounted) return;
+
+                                  if (isSuccess) {
+                                    _biometricsEnabled = value;
+                                    setState(() {});
                                   }
                                 },
                                 padding: EdgeInsets.zero,
