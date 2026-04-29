@@ -45,6 +45,7 @@ app.*.map.json
 /android/app/release
 
 # Custom Ignore
+.env
 command_list.txt
-/lib/app/utils/app_env.dart
+/lib/app/utils/app_env.g.dart
 /lib/tes_page.dart
