@@ -188,6 +188,8 @@ class DioInterceptors extends InterceptorsWrapper {
           }
           break;
         case DioExceptionType.badCertificate:
+          sl<AuthCubit>().logoutSession();
+
           return handler.next(err);
         case DioExceptionType.unknown:
           return handler.next(err);
