@@ -36,7 +36,7 @@ abstract class DioClient {
         return client;
       },
       validateCertificate: (X509Certificate? cert, String host, int port) {
-        final pinnedFingerprints = AppEnv.pinnedFingerprints;
+        final pinnedFingerprints = [AppEnv.panduanSignature];
         final sslPinningActived =
             RemoteConfigService.instance.sslPinningActived;
 
