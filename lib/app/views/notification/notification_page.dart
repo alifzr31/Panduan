@@ -102,65 +102,6 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ],
       ),
-      // appBar: AppBar(
-      //   titleSpacing: 0,
-      //   backgroundColor: Colors.white,
-      //   surfaceTintColor: Colors.white,
-      //   title: const Text(
-      //     'Notifikasi',
-      //     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-      //   ),
-      //   actionsPadding: const EdgeInsets.only(right: 16),
-      //   actions:
-      //       context.watch<NotificationCubit>().state.listStatus ==
-      //               ListStatus.success &&
-      //           context
-      //               .watch<NotificationCubit>()
-      //               .state
-      //               .notifications
-      //               .isNotEmpty &&
-      //           context.watch<NotificationCubit>().state.notifications.any(
-      //             (element) => element.readAt == null,
-      //           )
-      //       ? [
-      //           BlocListener<NotificationCubit, NotificationState>(
-      //             listenWhen: (previous, current) =>
-      //                 previous.readAllStatus != current.readAllStatus,
-      //             listener: (context, state) {
-      //               if (state.readAllStatus == ReadAllStatus.success) {
-      //                 context.read<NotificationCubit>().refetchNotifications();
-      //               }
-      //             },
-      //             child: CupertinoButton(
-      //               padding: EdgeInsets.zero,
-      //               minimumSize: Size.zero,
-      //               onPressed: () {
-      //                 context.read<NotificationCubit>().readAllNotification();
-      //               },
-      //               child: const Row(
-      //                 children: [
-      //                   Icon(
-      //                     MingCute.checks_line,
-      //                     size: 18,
-      //                     color: AppColors.amberColor,
-      //                   ),
-      //                   SizedBox(width: 4),
-      //                   Text(
-      //                     'Tandai Baca Semua',
-      //                     style: TextStyle(
-      //                       fontSize: 12,
-      //                       fontWeight: FontWeight.w500,
-      //                       color: AppColors.amberColor,
-      //                       fontFamily: 'Jost',
-      //                     ),
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-      //         ]
-      //       : null,
-      // ),
       body: BlocBuilder<NotificationCubit, NotificationState>(
         builder: (context, state) {
           switch (state.listStatus) {
@@ -240,29 +181,32 @@ class _NotificationPageState extends State<NotificationPage> {
                                         0,
                                     index: index,
                                     dataLength: state.notifications.length,
-                                    onTap: () async {
-                                      final result = await Navigator.pushNamed(
+                                    onTap: () {
+                                      final notification =
+                                          state.notifications[index];
+                                      final notificationId =
+                                          notification.id ?? '';
+                                      final isUnread =
+                                          notification.readAt == null;
+
+                                      if (!isUnread &&
+                                          notificationId.isNotEmpty) {
+                                        context
+                                            .read<NotificationCubit>()
+                                            .markAsReadNotification(
+                                              notificationId,
+                                            );
+                                      }
+
+                                      Navigator.pushNamed(
                                         context,
                                         DetailNotificationPage.routeName,
                                         arguments: {
                                           'notificationCubit': context
                                               .read<NotificationCubit>(),
-                                          'notificationUuid':
-                                              state.notifications[index].id,
+                                          'notificationUuid': notificationId,
                                         },
                                       );
-
-                                      if (!context.mounted) return;
-
-                                      if (result != null &&
-                                          result == 'readed-notification') {
-                                        context
-                                            .read<NotificationCubit>()
-                                            .markAsReadNotification(
-                                              state.notifications[index].id ??
-                                                  '',
-                                            );
-                                      }
                                     },
                                   ),
                           );
