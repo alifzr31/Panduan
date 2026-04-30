@@ -17,6 +17,15 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.reader(Charsets.UTF_8).use { reader ->
+        localProperties.load(reader)
+    }
+}
+val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: "API_KEY_NOT_FOUND"
+
 android {
     namespace = "gov.bdg.panduan"
     compileSdk = 36
@@ -54,6 +63,8 @@ android {
         versionName = flutter.versionName
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     signingConfigs {
@@ -90,7 +101,7 @@ dependencies {
     implementation("androidx.window:window:1.5.1")
     implementation("androidx.window:window-java:1.5.1")
     implementation("androidx.multidex:multidex:2.0.1")
-    implementation(platform("com.google.firebase:firebase-bom:34.8.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-messaging")
 }

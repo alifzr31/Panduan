@@ -13,7 +13,14 @@ import FirebaseCore
   ) -> Bool {
     FirebaseApp.configure()
       
-    GMSServices.provideAPIKey("AIzaSyBXG9gmFQIjlZ0l-Y97AvKldfdw0Ar8ass")
+    // GMSServices.provideAPIKey("MAPS_API_KEY")
+    if let apiKey = Bundle.main.object(forInfoDictionaryKey: "GoogleMapsApiKey") as? String {
+        GMSServices.provideAPIKey(apiKey)
+    } else {
+        #if DEBUG
+        print("Awas: Google Maps API Key tidak ditemukan di Info.plist!")
+        #endif
+    }
       
     FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
         GeneratedPluginRegistrant.register(with: registry)

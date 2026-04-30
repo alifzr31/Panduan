@@ -81,7 +81,7 @@
             android:name="android.webkit.WebView.EnableSafeBrowsing"
             android:value="true" />
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBXG9gmFQIjlZ0l-Y97AvKldfdw0Ar8ass" />
+            android:value="${MAPS_API_KEY}" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/ic_notification" />
