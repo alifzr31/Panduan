@@ -94,52 +94,6 @@ class _MapCoordinatePageState extends State<MapCoordinatePage>
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
         ),
       ),
-      floatingActionButton:
-          !widget.viewOnly &&
-              context.watch<LocationCubit>().state.serviceEnabled &&
-              context.watch<LocationCubit>().state.permissionGranted
-          ? Padding(
-              padding: const EdgeInsets.only(bottom: 80),
-              child: BlocListener<LocationCubit, LocationState>(
-                listenWhen: (previous, current) =>
-                    previous.myLocationStatus != current.myLocationStatus,
-                listener: (context, state) {
-                  if (state.myLocationStatus == MyLocationStatus.loading) {
-                    context.loaderOverlay.show();
-                  }
-
-                  if (state.myLocationStatus == MyLocationStatus.success) {
-                    context.loaderOverlay.hide();
-
-                    _mapController?.animateCamera(
-                      CameraUpdate.newCameraPosition(
-                        CameraPosition(zoom: 18, target: state.myLocation),
-                      ),
-                    );
-                  }
-
-                  if (state.myLocationStatus == MyLocationStatus.error) {
-                    context.loaderOverlay.hide();
-                    showCustomToast(
-                      context,
-                      type: ToastificationType.error,
-                      title: 'Gagal Mendapatkan Lokasi',
-                      description: state.myLocationError,
-                    );
-                  }
-                },
-                child: FloatingActionButton(
-                  elevation: 2,
-                  backgroundColor: AppColors.pinkColor,
-                  foregroundColor: Colors.white,
-                  onPressed: () {
-                    context.read<LocationCubit>().fetchMyLocation();
-                  },
-                  child: const Icon(MingCute.location_2_fill),
-                ),
-              ),
-            )
-          : null,
       body: BlocBuilder<LocationCubit, LocationState>(
         builder: (context, state) {
           return !state.serviceEnabled && !widget.viewOnly
@@ -214,7 +168,61 @@ class _MapCoordinatePageState extends State<MapCoordinatePage>
                               }
                             },
                           ),
-                          if (!widget.viewOnly)
+                          if (!widget.viewOnly &&
+                              state.serviceEnabled &&
+                              state.permissionGranted) ...{
+                            BlocListener<LocationCubit, LocationState>(
+                              listenWhen: (previous, current) =>
+                                  previous.myLocationStatus !=
+                                  current.myLocationStatus,
+                              listener: (context, state) {
+                                if (state.myLocationStatus ==
+                                    MyLocationStatus.loading) {
+                                  context.loaderOverlay.show();
+                                }
+
+                                if (state.myLocationStatus ==
+                                    MyLocationStatus.success) {
+                                  context.loaderOverlay.hide();
+
+                                  _mapController?.animateCamera(
+                                    CameraUpdate.newCameraPosition(
+                                      CameraPosition(
+                                        zoom: 18,
+                                        target: state.myLocation,
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                if (state.myLocationStatus ==
+                                    MyLocationStatus.error) {
+                                  context.loaderOverlay.hide();
+                                  showCustomToast(
+                                    context,
+                                    type: ToastificationType.error,
+                                    title: 'Gagal Mendapatkan Lokasi',
+                                    description: state.myLocationError,
+                                  );
+                                }
+                              },
+                              child: Positioned(
+                                bottom: 30,
+                                left: 6,
+                                child: BaseButtonIcon(
+                                  bgColor: AppColors.pinkColor,
+                                  icon: MingCute.location_2_fill,
+                                  label: 'Dapatkan Lokasi Saya',
+                                  onPressed: () {
+                                    context
+                                        .read<LocationCubit>()
+                                        .fetchMyLocation();
+                                  },
+                                ),
+                              ),
+                            ),
+                          },
+                          if (!widget.viewOnly) ...{
                             const Center(
                               child: Icon(
                                 Icons.location_on,
@@ -222,6 +230,7 @@ class _MapCoordinatePageState extends State<MapCoordinatePage>
                                 color: Colors.red,
                               ),
                             ),
+                          },
                         ],
                       ),
                     ),
@@ -250,9 +259,11 @@ class _MapCoordinatePageState extends State<MapCoordinatePage>
                           child: SizedBox(
                             width: double.infinity,
                             child: BaseButtonIcon(
-                              icon: MingCute.map_pin_line,
+                              icon: widget.viewOnly
+                                  ? MingCute.navigation_line
+                                  : MingCute.map_pin_line,
                               label: widget.viewOnly
-                                  ? 'Lihat Rute'
+                                  ? 'Mulai Navigasi'
                                   : 'Pilih Titik',
                               onPressed: () async {
                                 if (widget.viewOnly) {
