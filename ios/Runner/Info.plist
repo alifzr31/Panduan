@@ -26,6 +26,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<true/>
+	<key>GoogleMapsApiKey</key>
+	<string>$(MAPS_API_KEY)</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>tel</string>
@@ -39,6 +41,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Panduan membutuhkan akses ke kamera untuk mengambil foto.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Aplikasi membutuhkan akses Face ID / Touch ID untuk mengamankan sesi login dan token anda.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Panduan membutuhkan akses lokasi untuk menyediakan fitur yang tepat.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
@@ -49,8 +53,27 @@
 	<string>Panduan membutuhkan akses mikrofon (jika merekam video).</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>App membutuhkan akses ke galeri untuk memilih foto.</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Aplikasi membutuhkan akses Face ID / Touch ID untuk mengamankan sesi login dan token anda.</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
+					<key>UISceneDelegateClassName</key>
+					<string>FlutterSceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -60,7 +83,7 @@
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string>LaunchScreen.storyboard</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIStatusBarStyle</key>
@@ -68,42 +91,17 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>UISupportsDocumentBrowser</key>
 	<true/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
-    <key>UIApplicationSceneManifest</key>
-     <dict>
-      <key>UIApplicationSupportsMultipleScenes</key>
-      <false/>
-      <key>UISceneConfigurations</key>
-      <dict>
-      <key>UIWindowSceneSessionRoleApplication</key>
-        <array>
-          <dict>
-            <key>UISceneClassName</key>
-            <string>UIWindowScene</string>
-            <key>UISceneDelegateClassName</key>
-            <string>FlutterSceneDelegate</string>
-            <key>UISceneConfigurationName</key>
-            <string>flutter</string>
-            <key>UISceneStoryboardFile</key>
-            <string>Main</string>
-          </dict>
-        </array>
-       </dict>
-     </dict>
-     <key>GoogleMapsApiKey</key>
-     <string>$(MAPS_API_KEY)</string>
 </dict>
 </plist>
