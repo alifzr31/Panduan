@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -71,12 +73,13 @@ class _DashboardPageState extends State<DashboardPage> {
       child: PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) {
-          if (!didPop) {
-            if (_dashboardKey.currentState?.isEndDrawerOpen ?? false) {
-              _dashboardKey.currentState?.closeEndDrawer();
-            } else {
-              SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-            }
+          if (didPop) return;
+
+          if (_dashboardKey.currentState?.isEndDrawerOpen ?? false) {
+            _dashboardKey.currentState?.closeEndDrawer();
+          } else {
+            SystemNavigator.pop();
+            exit(0);
           }
         },
         child: Scaffold(

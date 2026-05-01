@@ -315,7 +315,7 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: _hasAuth == null || _hasAuth == false,
       child: Scaffold(
         body: SafeArea(
           child: SizedBox(
