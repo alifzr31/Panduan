@@ -12,6 +12,7 @@ import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/views/map_coordinate/widgets/maplocation_handle.dart';
 import 'package:panduan/app/widgets/base_button.dart';
 import 'package:panduan/app/widgets/base_gmaps.dart';
+import 'package:panduan/app/widgets/base_skeletonizer.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
 import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -36,6 +37,7 @@ class MapCoordinatePage extends StatefulWidget {
 
 class _MapCoordinatePageState extends State<MapCoordinatePage>
     with WidgetsBindingObserver {
+  bool _isMapCreated = false;
   Completer<GoogleMapController> _googleMapController =
       Completer<GoogleMapController>();
   GoogleMapController? _mapController;
@@ -141,151 +143,163 @@ class _MapCoordinatePageState extends State<MapCoordinatePage>
                     }
                   },
                 )
-              : Column(
-                  children: [
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          BaseGmaps(
-                            lat: state.myLocation.latitude,
-                            long: state.myLocation.longitude,
-                            markers: widget.viewOnly ? state.marker : null,
-                            zoom: 18,
-                            onCameraMove: widget.viewOnly
-                                ? null
-                                : _onCameraMove,
-                            onMapCreated: (mapController) {
-                              if (!_googleMapController.isCompleted) {
-                                _googleMapController.complete(mapController);
-                                _mapController = mapController;
+              : BlocListener<LocationCubit, LocationState>(
+                  listenWhen: (previous, current) =>
+                      previous.myLocationStatus != current.myLocationStatus,
+                  listener: (context, state) {
+                    if (state.myLocationStatus == MyLocationStatus.loading) {
+                      context.loaderOverlay.show();
+                    }
 
-                                if (widget.viewOnly) {
-                                  context.read<LocationCubit>().createMarker(
-                                    widget.latitude ?? 0,
-                                    widget.longitude ?? 0,
-                                  );
-                                }
-                              }
-                            },
-                          ),
-                          if (!widget.viewOnly &&
-                              state.serviceEnabled &&
-                              state.permissionGranted) ...{
-                            BlocListener<LocationCubit, LocationState>(
-                              listenWhen: (previous, current) =>
-                                  previous.myLocationStatus !=
-                                  current.myLocationStatus,
-                              listener: (context, state) {
-                                if (state.myLocationStatus ==
-                                    MyLocationStatus.loading) {
-                                  context.loaderOverlay.show();
-                                }
+                    if (state.myLocationStatus == MyLocationStatus.success) {
+                      context.loaderOverlay.hide();
 
-                                if (state.myLocationStatus ==
-                                    MyLocationStatus.success) {
-                                  context.loaderOverlay.hide();
+                      _mapController?.animateCamera(
+                        CameraUpdate.newCameraPosition(
+                          CameraPosition(zoom: 18, target: state.myLocation),
+                        ),
+                      );
+                    }
 
-                                  _mapController?.animateCamera(
-                                    CameraUpdate.newCameraPosition(
-                                      CameraPosition(
-                                        zoom: 18,
-                                        target: state.myLocation,
-                                      ),
-                                    ),
-                                  );
-                                }
+                    if (state.myLocationStatus == MyLocationStatus.error) {
+                      context.loaderOverlay.hide();
+                      showCustomToast(
+                        context,
+                        type: ToastificationType.error,
+                        title: 'Gagal Mendapatkan Lokasi',
+                        description: state.myLocationError,
+                      );
+                    }
+                  },
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            BaseGmaps(
+                              lat: state.myLocation.latitude,
+                              long: state.myLocation.longitude,
+                              markers: widget.viewOnly ? state.marker : null,
+                              zoom: 18,
+                              onCameraMove: widget.viewOnly
+                                  ? null
+                                  : _onCameraMove,
+                              onMapCreated: (mapController) {
+                                if (!_googleMapController.isCompleted) {
+                                  _googleMapController.complete(mapController);
+                                  _mapController = mapController;
+                                  _isMapCreated = true;
+                                  setState(() {});
 
-                                if (state.myLocationStatus ==
-                                    MyLocationStatus.error) {
-                                  context.loaderOverlay.hide();
-                                  showCustomToast(
-                                    context,
-                                    type: ToastificationType.error,
-                                    title: 'Gagal Mendapatkan Lokasi',
-                                    description: state.myLocationError,
-                                  );
+                                  if (widget.viewOnly) {
+                                    context.read<LocationCubit>().createMarker(
+                                      widget.latitude ?? 0,
+                                      widget.longitude ?? 0,
+                                    );
+                                  }
                                 }
                               },
-                              child: Positioned(
-                                bottom: 30,
-                                left: 6,
+                            ),
+                            if (!_isMapCreated) ...{
+                              BaseSkeletonizer(
+                                child: Container(
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            },
+                            if (_isMapCreated) ...{
+                              if (!widget.viewOnly &&
+                                  state.serviceEnabled &&
+                                  state.permissionGranted) ...{
+                                Positioned(
+                                  bottom: 30,
+                                  left: 6,
+                                  child: BaseButtonIcon(
+                                    bgColor: AppColors.pinkColor,
+                                    icon: MingCute.location_2_fill,
+                                    label: 'Dapatkan Lokasi Saya',
+                                    onPressed: () {
+                                      context
+                                          .read<LocationCubit>()
+                                          .fetchMyLocation();
+                                    },
+                                  ),
+                                ),
+                              },
+                              if (!widget.viewOnly) ...{
+                                const Center(
+                                  child: Icon(
+                                    Icons.location_on,
+                                    size: 50,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              },
+                            },
+                          ],
+                        ),
+                      ),
+                      if (_isMapCreated)
+                        Container(
+                          width: double.infinity,
+                          clipBehavior: Clip.antiAlias,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 2,
+                                offset: Offset(0, 0),
+                                spreadRadius: 0.1,
+                              ),
+                            ],
+                          ),
+                          child: SafeArea(
+                            top: false,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: SizedBox(
+                                width: double.infinity,
                                 child: BaseButtonIcon(
-                                  bgColor: AppColors.pinkColor,
-                                  icon: MingCute.location_2_fill,
-                                  label: 'Dapatkan Lokasi Saya',
-                                  onPressed: () {
-                                    context
-                                        .read<LocationCubit>()
-                                        .fetchMyLocation();
+                                  icon: widget.viewOnly
+                                      ? MingCute.navigation_line
+                                      : MingCute.map_pin_line,
+                                  label: widget.viewOnly
+                                      ? 'Mulai Navigasi'
+                                      : 'Pilih Titik',
+                                  onPressed: () async {
+                                    if (widget.viewOnly) {
+                                      final latitude = widget.latitude ?? 0;
+                                      final longitude = widget.longitude ?? 0;
+                                      final url = Uri.parse(
+                                        'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&travelmode=driving',
+                                      );
+
+                                      try {
+                                        await launchUrl(
+                                          url,
+                                          mode: LaunchMode.externalApplication,
+                                        );
+                                      } catch (e) {
+                                        if (kDebugMode) print(e);
+                                      }
+                                    } else {
+                                      Navigator.pop(context, state.myLocation);
+                                    }
                                   },
                                 ),
                               ),
                             ),
-                          },
-                          if (!widget.viewOnly) ...{
-                            const Center(
-                              child: Icon(
-                                Icons.location_on,
-                                size: 50,
-                                color: Colors.red,
-                              ),
-                            ),
-                          },
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey,
-                            blurRadius: 2,
-                            offset: Offset(0, 0),
-                            spreadRadius: 0.1,
-                          ),
-                        ],
-                      ),
-                      child: SafeArea(
-                        top: false,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: BaseButtonIcon(
-                              icon: widget.viewOnly
-                                  ? MingCute.navigation_line
-                                  : MingCute.map_pin_line,
-                              label: widget.viewOnly
-                                  ? 'Mulai Navigasi'
-                                  : 'Pilih Titik',
-                              onPressed: () async {
-                                if (widget.viewOnly) {
-                                  final url = Uri.parse(
-                                    'https://www.google.com/maps/dir/?api=1&destination=${widget.latitude},${widget.longitude}&dir_action=driving',
-                                  );
-
-                                  try {
-                                    await launchUrl(url);
-                                  } catch (e) {
-                                    if (kDebugMode) print(e);
-                                  }
-                                } else {
-                                  Navigator.pop(context, state.myLocation);
-                                }
-                              },
-                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
         },
       ),
