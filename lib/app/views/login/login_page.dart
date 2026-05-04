@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,10 +15,12 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (didPop) {
-          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-        }
+        if (didPop) return;
+
+        SystemNavigator.pop();
+        exit(0);
       },
       child: Scaffold(
         body: SingleChildScrollView(

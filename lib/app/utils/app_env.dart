@@ -16,11 +16,14 @@ abstract class AppEnv {
   @EnviedField(varName: 'PANDUAN_SIGNATURE', obfuscate: true)
   static final String panduanSignature = _AppEnv.panduanSignature;
 
+  @EnviedField(varName: 'KEYSTORE_SHA256', obfuscate: true)
+  static final String keystoreSha256 = _AppEnv.keystoreSha256;
+
   @EnviedField(varName: 'PLAY_CONSOLE_SHA256', obfuscate: true)
   static final String playConsoleSha256 = _AppEnv.playConsoleSha256;
 
-  @EnviedField(varName: 'KEYSTORE_SHA256', obfuscate: true)
-  static final String keystoreSha256 = _AppEnv.keystoreSha256;
+  @EnviedField(varName: 'APP_STORE_ID', obfuscate: true)
+  static final String appStoreId = _AppEnv.appStoreId;
 
   @EnviedField(varName: 'WATCHER_MAIL', obfuscate: true)
   static final String watcherMail = _AppEnv.watcherMail;

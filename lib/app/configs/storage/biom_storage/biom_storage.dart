@@ -44,8 +44,7 @@ class BiomStorage {
           androidPromptInfo: AndroidPromptInfo(
             title: 'Panduan',
             subtitle: 'Masuk dengan biometrik',
-            description:
-                'Silahkan pindai sidik jari/wajah anda untuk melanjutkan',
+            description: 'Silahkan pindai sidik jari anda untuk melanjutkan',
             negativeButton: 'Batal',
           ),
           iosPromptInfo: IosPromptInfo(
