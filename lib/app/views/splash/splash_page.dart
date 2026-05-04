@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:open_settings_plus/core/open_settings_plus.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -37,7 +38,6 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  final LocalAuthentication _localAuthentication = LocalAuthentication();
   bool? _hasAuth;
   String? _appName;
   String? _appVersion;
@@ -50,7 +50,7 @@ class _SplashPageState extends State<SplashPage> {
       if (!mounted) return;
 
       if (_shouldUpdate(packageInfo)) {
-        final isLoggedIn = await _handleAuthFlow();
+        final isLoggedIn = await _refreshToken();
 
         if (!mounted) return;
 
@@ -58,13 +58,42 @@ class _SplashPageState extends State<SplashPage> {
         return;
       }
 
-      final isLoggedIn = await _handleAuthFlow();
+      final isLoggedIn = await _refreshToken();
 
       if (!mounted) return;
 
-      if (_hasAuth == false) return;
+      final prefs = await SharedPreferences.getInstance();
+      final biometricsEnabled = prefs.getBool('biometrics_enabled') ?? false;
 
-      _navigatePage(isLoggedIn: isLoggedIn);
+      if (!mounted) return;
+
+      if (biometricsEnabled) {
+        setState(() => _hasAuth = isLoggedIn);
+
+        if (_hasAuth == false) return;
+
+        _navigatePage(isLoggedIn: isLoggedIn);
+      } else {
+        if (isLoggedIn) {
+          final hasHardware = await BiomStorage().checkBiometricHardware();
+          final available = await BiomStorage().checkAvailableBiometrics();
+          final hasEnrolled = available.isNotEmpty;
+
+          if (!mounted) return;
+
+          if (hasHardware) {
+            if (hasEnrolled) {
+              _navigatePage(isLoggedIn: isLoggedIn);
+            } else {
+              _showBiometricsAlert(isLoggedIn: isLoggedIn);
+            }
+          } else {
+            _navigatePage(isLoggedIn: isLoggedIn);
+          }
+        } else {
+          _navigatePage(isLoggedIn: isLoggedIn);
+        }
+      }
     } catch (e) {
       if (kDebugMode) print(e);
       _navigatePage(isLoggedIn: false);
@@ -85,43 +114,20 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   bool _shouldUpdate(PackageInfo packageInfo) {
-    final currentBuild = int.tryParse(packageInfo.buildNumber) ?? 0;
-    final latestBuild = RemoteConfigService.instance.latestBuildNumber;
+    final currentBuildNumber = int.tryParse(packageInfo.buildNumber) ?? 0;
 
-    return currentBuild < latestBuild;
-  }
+    if (Platform.isAndroid) {
+      final latestBuildNumber = RemoteConfigService.instance.latestBuildNumber;
 
-  Future<bool> _handleAuthFlow() async {
-    final prefs = await SharedPreferences.getInstance();
-    final biometricsEnabled = prefs.getBool('biometrics_enabled') ?? false;
+      return currentBuildNumber < latestBuildNumber;
+    } else if (Platform.isIOS) {
+      final latestBuildNumberIOS =
+          RemoteConfigService.instance.latestBuildNumberIOS;
 
-    if (biometricsEnabled) {
-      final canAuthenticate = await _checkBiometrics();
-
-      if (!canAuthenticate) {
-        return await _handleBiometricFailure();
-      }
-
-      final success = await _refreshToken();
-
-      if (!mounted) return false;
-
-      setState(() => _hasAuth = success);
-
-      return success;
+      return currentBuildNumber < latestBuildNumberIOS;
     } else {
-      return await _refreshToken();
+      return false;
     }
-  }
-
-  Future<bool> _handleBiometricFailure() async {
-    final isLoggedIn = await _refreshToken();
-
-    if (!mounted) return false;
-
-    _showBiometricsAlert(isLoggedIn: isLoggedIn);
-
-    return isLoggedIn;
   }
 
   Future<bool> _refreshToken() async {
@@ -195,18 +201,6 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
-  Future<bool> _checkBiometrics() async {
-    try {
-      final canCheck = await BiomStorage().checkBiometricHardware();
-      final supported = await _localAuthentication.isDeviceSupported();
-      final available = await BiomStorage().checkAvailableBiometrics();
-
-      return available.isNotEmpty && (canCheck || supported);
-    } catch (_) {
-      return false;
-    }
-  }
-
   void _navigatePage({required bool isLoggedIn}) {
     if (!mounted) return;
 
@@ -237,6 +231,24 @@ class _SplashPageState extends State<SplashPage> {
   void _showBiometricsAlert({required bool isLoggedIn}) {
     if (!mounted) return;
 
+    String? alertMessage;
+    if (Platform.isAndroid) {
+      alertMessage =
+          'Perangkat anda mendukung keamanan biometrik tetapi anda belum mengaturnya. '
+          'Silahkan atur keamanan biometrik dengan cara menambahkan sidik jari '
+          'di pengaturan perangkat anda sebagai keamanan tambahan. Terima kasih!';
+    } else if (Platform.isIOS) {
+      alertMessage =
+          'Perangkat anda mendukung keamanan biometrik tetapi anda belum mengaturnya. '
+          'Silahkan atur keamanan biometrik dengan cara menambahkan Face ID '
+          'di pengaturan perangkat anda sebagai keamanan tambahan. Terima kasih!';
+    }
+
+    if (alertMessage == null) {
+      _navigatePage(isLoggedIn: isLoggedIn);
+      return;
+    }
+
     showAdaptiveDialog(
       barrierDismissible: false,
       context: context,
@@ -258,11 +270,7 @@ class _SplashPageState extends State<SplashPage> {
             color: Colors.black,
           ),
           title: const Text('Informasi Keamanan'),
-          content: const Text(
-            'Perangkat anda mendukung keamanan biometrik tetapi anda belum mengaturnya. '
-            'Silahkan atur keamanan biometrik dengan cara menambahkan sidik jari atau deteksi wajah '
-            'di pengaturan perangkat anda sebagai keamanan tambahan. Terima kasih!',
-          ),
+          content: Text(alertMessage ?? ''),
           actions: [
             BaseTextButton(
               size: 14,
@@ -315,7 +323,14 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: _hasAuth == null || _hasAuth == false,
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+
+        if (_hasAuth != null && _hasAuth == false) {
+          SystemNavigator.pop();
+        }
+      },
       child: Scaffold(
         body: SafeArea(
           child: SizedBox(
@@ -336,7 +351,9 @@ class _SplashPageState extends State<SplashPage> {
                           const SizedBox(height: 16),
                           BaseButtonIcon(
                             label: 'Masuk',
-                            icon: MingCute.fingerprint_line,
+                            icon: Platform.isAndroid
+                                ? MingCute.fingerprint_line
+                                : MingCute.faceid_line,
                             onPressed: _retryBiometric,
                           ),
                         },

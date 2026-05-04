@@ -336,8 +336,16 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
                       ),
                       title: 'Biometrik',
                       subtitle: _availableBiometrics.isNotEmpty
-                          ? 'Aktifkan keamanan biometrik (sidik jari/deteksi wajah)'
-                          : 'Tidak ada sidik jari/deteksi wajah terdaftar diperangkat anda',
+                          ? Platform.isAndroid
+                                ? 'Aktifkan keamanan biometrik sidik jari'
+                                : Platform.isIOS
+                                ? 'Aktifkan keamanan biometrik Face ID'
+                                : null
+                          : Platform.isAndroid
+                          ? 'Tidak ada sidik jari terdaftar diperangkat anda'
+                          : Platform.isIOS
+                          ? 'Tidak ada Face ID terdaftar diperangkat anda'
+                          : null,
                       subtitleColor: _availableBiometrics.isNotEmpty
                           ? Colors.grey.shade600
                           : Colors.red.shade600,
