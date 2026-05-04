@@ -78,7 +78,6 @@ class StorageService {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
 
-    //
     final isBiometricOn = sharedPreferences.getBool(_flagKey) ?? false;
 
     try {
@@ -110,7 +109,6 @@ class StorageService {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
 
-    //
     final enabledBiometric = sharedPreferences.getBool(_flagKey) ?? false;
 
     try {
