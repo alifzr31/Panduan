@@ -1,9 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform;
+
+import 'package:flutter/material.dart';
 import 'package:panduan/app/utils/app_colors.dart';
+import 'package:panduan/app/utils/app_env.dart';
 import 'package:panduan/app/views/dashboard/dashboard_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/widgets/base_button.dart';
-import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UpdateFooter extends StatelessWidget {
@@ -108,14 +110,27 @@ class UpdateFooter extends StatelessWidget {
             width: double.infinity,
             label: 'Perbarui Sekarang',
             onPressed: () async {
-              final url = Uri.parse(
-                'https://play.google.com/store/apps/details?id=$packageName',
-              );
+              late String url;
+
+              if (Platform.isAndroid) {
+                url =
+                    'https://play.google.com/store/apps/details?id=$packageName';
+              } else if (Platform.isIOS) {
+                url = 'https://apps.apple.com/app/id${AppEnv.appStoreId}';
+              } else {
+                return;
+              }
+
+              final Uri uri = Uri.parse(url);
 
               try {
-                await launchUrl(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                } else {
+                  debugPrint('Tidak dapat membuka URL: $url');
+                }
               } catch (e) {
-                if (kDebugMode) print(e);
+                debugPrint('Terjadi kesalahan saat membuka toko aplikasi: $e');
               }
             },
           ),
