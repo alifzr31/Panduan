@@ -443,7 +443,7 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                '$_appName $_appVersion',
+                '$_appName v$_appVersion',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
