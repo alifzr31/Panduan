@@ -25,7 +25,7 @@ class Image {
   }
 
   static Future<String> saveImage(Uint8List? imageBytes) async {
-    final directory = await getTemporaryDirectory();
+    final directory = await getApplicationDocumentsDirectory();
     final filePath = '${directory.path}/temporary_image.png';
     await File(filePath).writeAsBytes(imageBytes ?? []);
     return filePath;

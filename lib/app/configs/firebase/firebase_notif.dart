@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/local_notification/local_notif.dart';
@@ -54,7 +56,11 @@ class FirebaseNotif {
           title: message.notification?.title,
           body: message.notification?.body,
           payload: message.data.toString(),
-          imageUrl: message.notification?.android?.imageUrl,
+          imageUrl: Platform.isAndroid
+              ? message.notification?.android?.imageUrl
+              : Platform.isIOS
+              ? message.notification?.apple?.imageUrl
+              : null,
         );
       }
     });
@@ -81,8 +87,41 @@ class FirebaseNotif {
     });
   }
 
+  Future<String?> getApnsToken() async {
+    try {
+      String? apnsToken = await messaging.getAPNSToken();
+
+      if (apnsToken != null) return apnsToken;
+
+      await Future<void>.delayed(const Duration(seconds: 3));
+
+      apnsToken = await messaging.getAPNSToken();
+
+      if (apnsToken == null) {
+        if (kDebugMode) {
+          print('APNs Token tidak ditemukan. Push Notif iOS akan gagal.');
+        }
+      }
+
+      return apnsToken;
+    } catch (e) {
+      if (kDebugMode) print(e);
+      return null;
+    }
+  }
+
   Future<String?> getDeviceToken() async {
     try {
+      if (Platform.isIOS) {
+        final apnsToken = await getApnsToken();
+
+        if (apnsToken == null) {
+          if (kDebugMode) print('APNs token kosong');
+
+          return null;
+        }
+      }
+
       return await messaging.getToken();
     } catch (e) {
       if (kDebugMode) print(e);

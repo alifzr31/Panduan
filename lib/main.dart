@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -27,7 +29,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     title: message.notification?.title,
     body: message.notification?.body,
     payload: message.data.toString(),
-    imageUrl: message.notification?.android?.imageUrl,
+    imageUrl: Platform.isAndroid
+        ? message.notification?.android?.imageUrl
+        : Platform.isIOS
+        ? message.notification?.apple?.imageUrl
+        : null,
   );
 
   if (kDebugMode) print('BACKGROUND FIREBASE NOTIF : $message');
