@@ -25,6 +25,7 @@ import 'package:panduan/app/views/hp_registration/hpregistration_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/views/map_coordinate/mapcoordinate_page.dart';
 import 'package:panduan/app/views/notification/notification_page.dart';
+import 'package:panduan/app/views/pdfview/pdfview_page.dart';
 import 'package:panduan/app/views/splash/splash_page.dart';
 import 'package:panduan/app/views/spm_field/spmfield_page.dart';
 import 'package:panduan/app/views/update/update_page.dart';
@@ -211,6 +212,20 @@ class AppRouter {
           child: BlocProvider(
             create: (context) => sl<AssetCubit>(),
             child: WebviewPage(
+              fileName: args?['fileName'],
+              filePath: args?['filePath'],
+            ),
+          ),
+        );
+      case PdfViewPage.routeName:
+        final args = settings.arguments as Map<String, dynamic>?;
+
+        return customPageRouteBuilder(
+          settings,
+          bottomSafeArea: false,
+          child: BlocProvider(
+            create: (context) => sl<AssetCubit>(),
+            child: PdfViewPage(
               fileName: args?['fileName'],
               filePath: args?['filePath'],
             ),
