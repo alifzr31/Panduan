@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBZGz37j8h1brEjZeIa7rGijXY2egGbFjM',
-    appId: '1:1062921216274:ios:4b382a55173439bc4d13cb',
+    appId: '1:1062921216274:ios:bb49bdb93d69f98b4d13cb',
     messagingSenderId: '1062921216274',
     projectId: 'panduan-f06e3',
     storageBucket: 'panduan-f06e3.firebasestorage.app',
-    iosBundleId: 'gov.bdg.panduan',
+    iosBundleId: 'gov.bdg.panduanposyandu',
   );
 }

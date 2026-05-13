@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>gov.bdg.panduan</string>
+	<string>gov.bdg.panduanposyandu</string>
 	<key>PROJECT_ID</key>
 	<string>panduan-f06e3</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1062921216274:ios:4b382a55173439bc4d13cb</string>
+	<string>1:1062921216274:ios:bb49bdb93d69f98b4d13cb</string>
 </dict>
 </plist>
