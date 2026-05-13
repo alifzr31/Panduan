@@ -11,12 +11,14 @@ class AssetService extends DioClient {
     String? savePath,
     void Function(int, int)? onReceiveProgress,
   }) async {
+    if (savePath == null) return null;
+
     dio.options.baseUrl = AppEnv.basePublicUrl;
 
     try {
       await download(
         '/assets/serve',
-        savePath ?? '',
+        savePath,
         queryParams: {'path': path},
         onReceiveProgress: onReceiveProgress,
       );

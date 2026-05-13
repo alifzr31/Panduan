@@ -20,8 +20,8 @@ class AssetRepositoryImpl implements AssetRepository {
     String? fileName,
     void Function(int, int)? onReceiveProgress,
   }) async {
-    final directory = await getDownloadsDirectory();
-    final savePath = '${directory?.path}/$fileName';
+    final directory = await getApplicationDocumentsDirectory();
+    final savePath = '${directory.path}/$fileName';
 
     await _service.downloadAttachment(
       path: path,

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:panduan/app/repositories/asset_repository.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/app_strings.dart';
 
 part 'asset_state.dart';
 
@@ -16,7 +17,7 @@ class AssetCubit extends Cubit<AssetState> {
       emit(
         state.copyWith(
           downloadStatus: DownloadStatus.initial,
-          downloadProgress: null,
+          downloadProgress: 0,
           savePath: null,
           downloadError: null,
         ),
@@ -41,6 +42,16 @@ class AssetCubit extends Cubit<AssetState> {
           }
         },
       );
+
+      if (savePath == null) {
+        emit(
+          state.copyWith(
+            downloadStatus: DownloadStatus.error,
+            downloadError: AppStrings.failedToSaveFileMessage,
+          ),
+        );
+        return;
+      }
 
       emit(
         state.copyWith(
