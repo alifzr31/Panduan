@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:panduan/app/models/service_type.dart';
 import 'package:panduan/app/models/spm_attachment.dart';
 import 'package:panduan/app/utils/app_strings.dart';
+import 'package:path/path.dart' as p;
 
 class AppHelpers {
   static double getHeightDevice(BuildContext context) {
@@ -76,6 +77,27 @@ class AppHelpers {
 
   static Map<String, dynamic> addOnHeaders() {
     return {'Content-type': 'application/json', 'Accept': 'application/json'};
+  }
+
+  static bool isPdf(String filePath) {
+    final String extension = p.extension(filePath).toLowerCase();
+
+    return extension == '.pdf';
+  }
+
+  static bool isImage(String filePath) {
+    final String extension = p.extension(filePath).toLowerCase();
+
+    const List<String> imageExtensions = [
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.gif',
+      '.webp',
+      '.bmp',
+    ];
+
+    return imageExtensions.contains(extension);
   }
 
   static String rangeDateFormat(DateTime date) {

@@ -11,4 +11,6 @@ class AppStrings {
       'Terjadi kesalahan pada server, cobalah beberapa saat lagi.';
   static const String unknownErrorApiMessage =
       'Ups sepertinya terjadi kesalahan, silahkan coba lagi.';
+  static const String failedToSaveFileMessage =
+      'Gagal menyimpan file, silahkan coba lagi.';
 }
