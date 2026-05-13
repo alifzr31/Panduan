@@ -67,9 +67,9 @@ class _MapCoordinatePageState extends State<MapCoordinatePage>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _googleMapController = Completer();
     _mapController?.dispose();
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -282,10 +282,23 @@ class _MapCoordinatePageState extends State<MapCoordinatePage>
                                       );
 
                                       try {
-                                        await launchUrl(
-                                          url,
-                                          mode: LaunchMode.externalApplication,
-                                        );
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(
+                                            url,
+                                            mode:
+                                                LaunchMode.externalApplication,
+                                          );
+                                        } else {
+                                          if (!context.mounted) return;
+
+                                          showCustomToast(
+                                            context,
+                                            type: ToastificationType.error,
+                                            title: 'Gagal Mulai Navigasi',
+                                            description:
+                                                'Aplikasi pembaca maps tidak tersedia pada perangkat anda.',
+                                          );
+                                        }
                                       } catch (e) {
                                         if (kDebugMode) print(e);
                                       }
