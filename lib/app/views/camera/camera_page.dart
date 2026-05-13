@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -26,17 +29,17 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     try {
       final status = await Permission.camera.status;
 
-      if (status.isDenied || status.isPermanentlyDenied) {
-        setState(() {
-          _isGranted = false;
-        });
-      }
+      if (!mounted) return;
 
       if (status.isGranted) {
         setState(() {
           _isGranted = true;
         });
         await _openCamera(_cameraIndex);
+      } else {
+        setState(() {
+          _isGranted = false;
+        });
       }
     } catch (e) {
       if (kDebugMode) print(e);
@@ -48,23 +51,37 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     try {
       final cameras = await availableCameras();
 
-      if (cameras.isNotEmpty) {
-        _cameraController = CameraController(
-          cameras[selectedCamera],
-          ResolutionPreset.veryHigh,
-          enableAudio: false,
-        );
+      if (cameras.isEmpty) return;
 
-        await _cameraController?.setFlashMode(_currentFlashMode);
-        _cameraController?.initialize().then((_) {
-          setState(() {
-            _isLoading = false;
-          });
-        });
+      if (_cameraController != null) {
+        await _cameraController?.dispose();
       }
+
+      final newController = CameraController(
+        cameras[selectedCamera],
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+
+      _cameraController = newController;
+
+      await newController.initialize();
+
+      await newController.setFlashMode(_currentFlashMode);
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
     } catch (e) {
       if (kDebugMode) print(e);
-      rethrow;
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -74,7 +91,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         _cameraIndex = _cameraIndex == 0 ? 1 : 0;
       });
 
-      _openCamera(_cameraIndex);
+      await _openCamera(_cameraIndex);
     } catch (e) {
       if (kDebugMode) print(e);
       rethrow;
@@ -90,14 +107,34 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    _cameraController?.dispose();
     WidgetsBinding.instance.removeObserver(this);
+    _cameraController?.dispose();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      if (_cameraController == null ||
+          !(_cameraController?.value.isInitialized ?? false)) {
+        return;
+      }
+
+      final CameraController? oldController = _cameraController;
+
+      if (mounted) {
+        setState(() {
+          _cameraController = null;
+          _isLoading = true;
+        });
+      }
+
+      oldController?.dispose();
+    }
+
     if (state == AppLifecycleState.resumed) {
       _initCamera();
     }
@@ -136,70 +173,153 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
             )
           : Column(
               children: [
-                _isLoading && _cameraController == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : CameraPreview(_cameraController!),
-                Expanded(
-                  child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(16),
-                    child: SafeArea(
-                      top: false,
-                      child: Row(
-                        children: [
-                          BaseIconButton(
-                            icon: MingCute.camera_rotate_line,
+                _isLoading ||
+                        _cameraController == null ||
+                        !(_cameraController?.value.isInitialized ?? false)
+                    ? const Expanded(
+                        child: Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        ),
+                      )
+                    : Expanded(
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: AspectRatio(
+                                aspectRatio:
+                                    1 /
+                                    (_cameraController?.value.aspectRatio ?? 0),
+                                child: CameraPreview(_cameraController!),
+                              ),
+                            ),
+                            if (Platform.isIOS) ...{
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: SafeArea(
+                                  bottom: false,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: CupertinoButton(
+                                      padding: const EdgeInsets.all(2),
+                                      minimumSize: Size.zero,
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Tutup Kamera',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                fontFamily: 'Jost',
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            SizedBox(width: 4),
+                                            Icon(
+                                              MingCute.close_circle_fill,
+                                              size: 18,
+                                              color: Colors.black,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            },
+                          ],
+                        ),
+                      ),
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 48,
+                    horizontal: 16,
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: Row(
+                      children: [
+                        BaseIconButton(
+                          icon: MingCute.camera_rotate_line,
+                          size: 44,
+                          color: Colors.black,
+                          onPressed:
+                              (_isLoading ||
+                                  !(_cameraController?.value.isInitialized ??
+                                      false))
+                              ? null
+                              : _switchCamera,
+                        ),
+                        Expanded(
+                          child: BaseIconButton(
+                            icon: MingCute.camera_2_fill,
                             size: 44,
                             color: Colors.black,
-                            onPressed: _switchCamera,
-                          ),
-                          Expanded(
-                            child: BaseIconButton(
-                              icon: MingCute.camera_2_fill,
-                              size: 44,
-                              color: Colors.black,
-                              onPressed: () async {
-                                final picture = await _cameraController
-                                    ?.takePicture();
+                            onPressed:
+                                (_isLoading ||
+                                    !(_cameraController?.value.isInitialized ??
+                                        false))
+                                ? null
+                                : () async {
+                                    final picture = await _cameraController
+                                        ?.takePicture();
 
-                                if (context.mounted) {
-                                  Navigator.pop(context, {
-                                    'fileName': picture?.name,
-                                    'filePath': picture?.path,
-                                  });
-                                }
-                              },
-                            ),
+                                    if (context.mounted) {
+                                      Navigator.pop(context, {
+                                        'fileName': picture?.name,
+                                        'filePath': picture?.path,
+                                      });
+                                    }
+                                  },
                           ),
-                          if (_cameraIndex == 0) ...{
-                            BaseIconButton(
-                              icon: _currentFlashMode == FlashMode.off
-                                  ? Icons.flash_on
-                                  : Icons.flash_off,
-                              size: 44,
-                              color: Colors.black,
-                              onPressed: () {
-                                setState(() {
-                                  switch (_currentFlashMode) {
-                                    case FlashMode.off:
-                                      _currentFlashMode = FlashMode.torch;
-                                      break;
-                                    case FlashMode.torch:
-                                      _currentFlashMode = FlashMode.off;
-                                      break;
-                                    default:
-                                      _currentFlashMode = FlashMode.off;
-                                  }
-                                });
+                        ),
+                        if (_cameraIndex == 0) ...{
+                          BaseIconButton(
+                            icon: _currentFlashMode == FlashMode.off
+                                ? Icons.flash_on
+                                : Icons.flash_off,
+                            size: 44,
+                            color: Colors.black,
+                            onPressed:
+                                (_isLoading ||
+                                    !(_cameraController?.value.isInitialized ??
+                                        false))
+                                ? null
+                                : () {
+                                    setState(() {
+                                      switch (_currentFlashMode) {
+                                        case FlashMode.off:
+                                          _currentFlashMode = FlashMode.torch;
+                                          break;
+                                        case FlashMode.torch:
+                                          _currentFlashMode = FlashMode.off;
+                                          break;
+                                        default:
+                                          _currentFlashMode = FlashMode.off;
+                                      }
+                                    });
 
-                                _cameraController?.setFlashMode(
-                                  _currentFlashMode,
-                                );
-                              },
-                            ),
-                          },
-                        ],
-                      ),
+                                    _cameraController?.setFlashMode(
+                                      _currentFlashMode,
+                                    );
+                                  },
+                          ),
+                        },
+                      ],
                     ),
                   ),
                 ),
