@@ -6,6 +6,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:panduan/app/cubits/asset/asset_cubit.dart';
+import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_env.dart';
 import 'package:panduan/app/widgets/show_customtoast.dart';
@@ -41,6 +42,8 @@ class _WebviewPageState extends State<WebviewPage> {
           : url,
     );
 
+    final accessToken = context.read<AuthCubit>().accessToken;
+
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
@@ -66,7 +69,7 @@ class _WebviewPageState extends State<WebviewPage> {
           },
         ),
       )
-      ..loadRequest(uri);
+      ..loadRequest(uri, headers: {'Authorization': 'Bearer $accessToken'});
   }
 
   Future<void> _onOpenFile(String? savePath) async {
@@ -102,7 +105,7 @@ class _WebviewPageState extends State<WebviewPage> {
           widget.fileName,
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
         ),
-        actionsPadding: const EdgeInsets.only(right: 16),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16),
         actions: [
           BlocListener<AssetCubit, AssetState>(
             listenWhen: (previous, current) =>
@@ -121,9 +124,9 @@ class _WebviewPageState extends State<WebviewPage> {
                   description: 'File disimpan ke ${state.savePath}',
                 );
                 _onOpenFile(state.savePath).then((_) {
-                  if (context.mounted) {
-                    context.read<AssetCubit>().resetDownloadAttachmentState();
-                  }
+                  if (!context.mounted) return;
+
+                  context.read<AssetCubit>().resetDownloadAttachmentState();
                 });
               }
 
