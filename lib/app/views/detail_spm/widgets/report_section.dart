@@ -7,6 +7,7 @@ import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/views/detail_spm/components/attachment_card.dart';
 import 'package:panduan/app/views/detail_spm/widgets/reportmap_bottomsheet.dart';
+import 'package:panduan/app/views/pdfview/pdfview_page.dart';
 import 'package:panduan/app/views/webview/webview_page.dart';
 import 'package:panduan/app/widgets/base_button.dart';
 import 'package:panduan/app/widgets/base_iconbutton.dart';
@@ -253,14 +254,34 @@ class ReportSection extends StatelessWidget {
                     index: index,
                     dataLength: attachments.length,
                     onPressedShowFile: () {
-                      Navigator.pushNamed(
-                        context,
-                        WebviewPage.routeName,
-                        arguments: {
-                          'fileName': attachment.nameFile,
-                          'filePath': attachment.path,
-                        },
-                      );
+                      final filePath = attachment.path;
+                      final fileName = attachment.nameFile;
+
+                      if (filePath == null && fileName == null) {
+                        return;
+                      }
+
+                      if (AppHelpers.isImage(filePath ?? '')) {
+                        Navigator.pushNamed(
+                          context,
+                          WebviewPage.routeName,
+                          arguments: {
+                            'fileName': fileName,
+                            'filePath': filePath,
+                          },
+                        );
+                      } else if (AppHelpers.isPdf(filePath ?? '')) {
+                        Navigator.pushNamed(
+                          context,
+                          PdfViewPage.routeName,
+                          arguments: {
+                            'fileName': fileName,
+                            'filePath': filePath,
+                          },
+                        );
+                      } else {
+                        return;
+                      }
                     },
                   );
                 },

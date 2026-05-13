@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:panduan/app/models/attachment.dart';
 import 'package:panduan/app/utils/app_colors.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/views/detail_spm/components/attachment_card.dart';
 import 'package:panduan/app/views/map_coordinate/mapcoordinate_page.dart';
+import 'package:panduan/app/views/pdfview/pdfview_page.dart';
 import 'package:panduan/app/views/webview/webview_page.dart';
 import 'package:panduan/app/widgets/base_textbutton.dart';
 import 'package:panduan/app/widgets/show_custombottomsheet.dart';
@@ -169,16 +171,45 @@ class ActivityTracking extends StatelessWidget {
                                                   dataLength:
                                                       attachments?.length,
                                                   onPressedShow: () {
-                                                    Navigator.pushNamed(
-                                                      context,
-                                                      WebviewPage.routeName,
-                                                      arguments: {
-                                                        'fileName': attachment
-                                                            ?.nameFile,
-                                                        'filePath':
-                                                            attachment?.path,
-                                                      },
-                                                    );
+                                                    if (attachment == null) {
+                                                      return;
+                                                    }
+
+                                                    final filePath =
+                                                        attachment.path;
+                                                    final fileName =
+                                                        attachment.nameFile;
+
+                                                    if (filePath == null &&
+                                                        fileName == null) {
+                                                      return;
+                                                    }
+
+                                                    if (AppHelpers.isImage(
+                                                      filePath ?? '',
+                                                    )) {
+                                                      Navigator.pushNamed(
+                                                        context,
+                                                        WebviewPage.routeName,
+                                                        arguments: {
+                                                          'fileName': fileName,
+                                                          'filePath': filePath,
+                                                        },
+                                                      );
+                                                    } else if (AppHelpers.isPdf(
+                                                      filePath ?? '',
+                                                    )) {
+                                                      Navigator.pushNamed(
+                                                        context,
+                                                        PdfViewPage.routeName,
+                                                        arguments: {
+                                                          'fileName': fileName,
+                                                          'filePath': filePath,
+                                                        },
+                                                      );
+                                                    } else {
+                                                      return;
+                                                    }
                                                   },
                                                 );
                                               },

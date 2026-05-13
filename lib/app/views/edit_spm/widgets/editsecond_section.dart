@@ -3,7 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:panduan/app/models/attachment.dart';
 import 'package:panduan/app/models/spm_attachment.dart';
+import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/views/create_spm/widgets/second_section.dart';
+import 'package:panduan/app/views/pdfview/pdfview_page.dart';
 import 'package:panduan/app/views/webview/webview_page.dart';
 import 'package:panduan/app/widgets/base_button.dart';
 import 'package:panduan/app/widgets/base_formfield.dart';
@@ -181,21 +183,39 @@ class EditSecondSection extends StatelessWidget {
                                       child: BaseTextButton(
                                         text: 'Lihat File',
                                         onPressed: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            WebviewPage.routeName,
-                                            arguments: {
-                                              'fileName':
-                                                  hasFileMap[spmAttachments[index]
-                                                          .key]
-                                                      .toString()
-                                                      .split('/')
-                                                      .last,
-                                              'filePath':
-                                                  hasFileMap[spmAttachments[index]
-                                                      .key],
-                                            },
-                                          );
+                                          final fileName =
+                                              hasFileMap[spmAttachments[index]
+                                                      .key]
+                                                  .toString()
+                                                  .split('/')
+                                                  .last;
+                                          final filePath =
+                                              hasFileMap[spmAttachments[index]
+                                                  .key];
+
+                                          if (AppHelpers.isImage(filePath)) {
+                                            Navigator.pushNamed(
+                                              context,
+                                              WebviewPage.routeName,
+                                              arguments: {
+                                                'fileName': fileName,
+                                                'filePath': filePath,
+                                              },
+                                            );
+                                          } else if (AppHelpers.isPdf(
+                                            filePath,
+                                          )) {
+                                            Navigator.pushNamed(
+                                              context,
+                                              PdfViewPage.routeName,
+                                              arguments: {
+                                                'fileName': fileName,
+                                                'filePath': filePath,
+                                              },
+                                            );
+                                          } else {
+                                            return;
+                                          }
                                         },
                                       ),
                                     ),
