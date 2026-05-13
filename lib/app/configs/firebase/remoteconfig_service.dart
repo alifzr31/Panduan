@@ -12,10 +12,10 @@ class RemoteConfigService {
 
   static const _kDefault = {
     'ssl_pinning_actived': true,
-    'latest_version': '1.0.8',
-    'latest_build_number': 9,
-    'latest_version_ios': '1.0.8',
-    'latest_build_number_ios': 9,
+    'latest_version': '1.1.0',
+    'latest_build_number': 13,
+    'latest_version_ios': '1.1.0',
+    'latest_build_number_ios': 17,
     'mandatory_update': true,
     'update_description': 'Perbaikan bugs dan ptimalisasi performa aplikasi.',
   };
