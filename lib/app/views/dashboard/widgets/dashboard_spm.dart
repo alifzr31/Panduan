@@ -368,7 +368,8 @@ class _DashboardSpmState extends State<DashboardSpm> {
                                               );
 
                                           if (result != null) {
-                                            if (result == 'spm-deleted') {
+                                            if (result == 'spm-deleted' ||
+                                                result == 'spm-updated') {
                                               if (context.mounted) {
                                                 context
                                                     .read<DashboardCubit>()

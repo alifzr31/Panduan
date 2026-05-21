@@ -500,8 +500,20 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                       }
 
                       if (state.formStatus == FormStatus.success) {
+                        final isOpd = AppHelpers.hasPermission(
+                          context.read<AuthCubit>().state.userPermissions,
+                          permissionName: 'level-opd',
+                        );
+
                         context.loaderOverlay.hide();
-                        Navigator.pop(context, 'verified-spm');
+                        if (isOpd &&
+                            _selectedVerificationResult.value ==
+                                'RETURN_TO_TP_POSYANDU_KOTA') {
+                          Navigator.pop(context, 'verified-spm');
+                          Navigator.pop(context, 'spm-updated');
+                        } else {
+                          Navigator.pop(context, 'verified-spm');
+                        }
                         showCustomToast(
                           context,
                           type: ToastificationType.success,
