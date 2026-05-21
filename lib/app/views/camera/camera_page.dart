@@ -143,6 +143,15 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        titleSpacing: 0,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        title: const Text(
+          'Kamera',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+      ),
       body: !_isGranted
           ? CameraHandle(
               icon: MingCute.camera_2_fill,
