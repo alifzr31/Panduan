@@ -75,7 +75,11 @@ class SpmCard extends StatelessWidget {
                 'Posyandu ${healthPostName.capitalize()}, Kelurahan ${subDistrictName.capitalize()}, Kecamatan ${districtName.capitalize()}',
                 style: const TextStyle(fontSize: 14),
               ),
-              const SizedBox(height: 10),
+              // const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Divider(height: 1, color: Colors.grey.shade300),
+              ),
               Ink(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
