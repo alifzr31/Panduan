@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class UpdatePage extends StatelessWidget {
   const UpdatePage({
     required this.isLoggedIn,
+    required this.appName,
     required this.packageName,
     required this.currentVersion,
     required this.currentBuildNumber,
@@ -17,6 +18,7 @@ class UpdatePage extends StatelessWidget {
   });
 
   final bool isLoggedIn;
+  final String appName;
   final String packageName;
   final String currentVersion;
   final int currentBuildNumber;
@@ -42,6 +44,7 @@ class UpdatePage extends StatelessWidget {
             ),
             UpdateFooter(
               isLoggedIn: isLoggedIn,
+              appName: appName,
               packageName: packageName,
               currentVersion: currentVersion,
               currentBuildNumber: currentBuildNumber,

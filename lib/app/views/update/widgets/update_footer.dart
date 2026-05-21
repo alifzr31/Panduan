@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 class UpdateFooter extends StatelessWidget {
   const UpdateFooter({
     required this.isLoggedIn,
+    required this.appName,
     required this.packageName,
     required this.currentVersion,
     required this.currentBuildNumber,
@@ -22,6 +23,7 @@ class UpdateFooter extends StatelessWidget {
   });
 
   final bool isLoggedIn;
+  final String appName;
   final String packageName;
   final String currentVersion;
   final int currentBuildNumber;
@@ -116,7 +118,8 @@ class UpdateFooter extends StatelessWidget {
                 url =
                     'https://play.google.com/store/apps/details?id=$packageName';
               } else if (Platform.isIOS) {
-                url = 'https://apps.apple.com/app/id${AppEnv.appStoreId}';
+                url =
+                    'https://apps.apple.com/id/app/${appName.toLowerCase()}/id${AppEnv.appStoreId}';
               } else {
                 return;
               }

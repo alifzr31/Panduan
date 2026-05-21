@@ -217,6 +217,7 @@ class _SplashPageState extends State<SplashPage> {
       UpdatePage.routeName,
       arguments: {
         'isLoggedIn': isLoggedIn,
+        'appName': packageInfo.appName,
         'packageName': packageInfo.packageName,
         'currentVersion': packageInfo.version,
         'currentBuildNumber': int.tryParse(packageInfo.buildNumber) ?? 0,

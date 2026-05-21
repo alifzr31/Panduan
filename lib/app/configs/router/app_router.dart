@@ -48,6 +48,7 @@ class AppRouter {
           bottomSafeArea: false,
           child: UpdatePage(
             isLoggedIn: args['isLoggedIn'],
+            appName: args['appName'],
             packageName: args['packageName'],
             currentVersion: args['currentVersion'],
             currentBuildNumber: args['currentBuildNumber'],
