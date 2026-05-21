@@ -49,5 +49,6 @@ app.*.map.json
 command_list.txt
 /lib/app/utils/app_env.g.dart
 /lib/tes_page.dart
-ios/Runner/Env.xcconfig
-ios/APNs Key/AuthKey_3SWJT37ZL2.p8
+/ios/Runner/Env.xcconfig
+/ios/APNs Key/AuthKey_3SWJT37ZL2.p8
+/android/keystore.properties
