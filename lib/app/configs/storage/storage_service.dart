@@ -1,3 +1,4 @@
+import 'package:biometric_storage/biometric_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:panduan/app/configs/get_it/service_locator.dart';
 import 'package:panduan/app/configs/storage/biom_storage/biom_storage.dart';
@@ -97,6 +98,10 @@ class StorageService {
       } else {
         return await SecureStorage.readStorage(key: AppStrings.appToken);
       }
+    } on AuthException catch (e) {
+      if (kDebugMode) print(e.code);
+
+      rethrow;
     } catch (e) {
       if (kDebugMode) print('ERROR getInitialToken: $e');
       sl<AuthCubit>().clearTokens();

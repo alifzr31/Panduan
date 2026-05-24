@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
 
+import 'package:biometric_storage/biometric_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -93,6 +94,14 @@ class _SplashPageState extends State<SplashPage> {
         } else {
           _navigatePage(isLoggedIn: isLoggedIn);
         }
+      }
+    } on AuthException catch (e) {
+      if (kDebugMode) print('ERROR AUTH ON INIT: ${e.code}');
+
+      if (e.code == AuthExceptionCode.userCanceled) {
+        setState(() {
+          _hasAuth = false;
+        });
       }
     } catch (e) {
       if (kDebugMode) print(e);
@@ -306,13 +315,25 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _retryBiometric() async {
-    final success = await _refreshToken();
+    try {
+      final success = await _refreshToken();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() => _hasAuth = success);
+      setState(() => _hasAuth = success);
 
-    _navigatePage(isLoggedIn: success);
+      _navigatePage(isLoggedIn: success);
+    } on AuthException catch (e) {
+      if (kDebugMode) print('ERROR AUTH ON RETRY: ${e.code}');
+
+      if (e.code == AuthExceptionCode.userCanceled) {
+        setState(() {
+          _hasAuth = false;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) print(e);
+    }
   }
 
   @override

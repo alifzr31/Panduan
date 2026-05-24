@@ -116,11 +116,9 @@ class BiomStorage {
       final token = await authFile.read();
       return token;
     } on AuthException catch (e) {
-      if (kDebugMode) {
-        print('User membatalkan autentikasi: ${e.message}');
-      }
+      if (kDebugMode) print(e.code);
 
-      return null;
+      rethrow;
     } on PlatformException catch (e) {
       if (e.message?.contains('KeyPermanentlyInvalidated') == true ||
           e.code == 'auth_error') {
