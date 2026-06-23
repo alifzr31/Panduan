@@ -28,7 +28,7 @@ val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: "API_KEY_NOT_FOU
 
 android {
     namespace = "gov.bdg.panduan"
-    compileSdk = 36
+    compileSdk = 37
     ndkVersion = "29.0.14206865"
 
     compileOptions {
@@ -37,15 +37,12 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
-    }
-
     packaging {
         resources.excludes += "META-INF/LICENSE*"
         resources.excludes += "META-INF/NOTICE.txt"
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
 
     buildFeatures {
@@ -91,17 +88,23 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
 flutter {
     source = "../.."
 }
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-    implementation("com.google.android.material:material:1.13.0")
+    implementation("com.google.android.material:material:1.14.0")
     implementation("androidx.window:window:1.5.1")
     implementation("androidx.window:window-java:1.5.1")
     implementation("androidx.multidex:multidex:2.0.1")
-    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.14.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-messaging")
 }
