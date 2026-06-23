@@ -16,10 +16,14 @@ import 'package:panduan/app/configs/get_it/service_locator.dart' as di;
 import 'package:panduan/app/configs/local_notification/local_notif.dart';
 import 'package:panduan/app/configs/router/app_router.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
+import 'package:panduan/app/cubits/security/security_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
-import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/build_context_extension.dart';
+import 'package:panduan/app/views/block/block_page.dart';
 import 'package:panduan/app/views/splash/splash_page.dart';
+
+final _navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -42,6 +46,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   di.init();
+
+  await di.sl<SecurityCubit>().startRasp();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -71,43 +77,61 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: di.sl<AuthCubit>(),
-      child: GlobalLoaderOverlay(
-        overlayColor: Colors.black.withValues(alpha: 0.4),
-        disableBackButton: true,
-        overlayWholeScreen: true,
-        overlayHeight: AppHelpers.getHeightDevice(context),
-        overlayWidth: AppHelpers.getWidthDevice(context),
-        overlayWidgetBuilder: (progress) {
-          return Center(
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: Lottie.asset(
-                '${AppStrings.assetsLotties}/panduan-logo-loader.json',
-                width: 80,
-              ),
-            ),
-          );
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: di.sl<SecurityCubit>()),
+        BlocProvider.value(value: di.sl<AuthCubit>()),
+      ],
+      child: BlocListener<SecurityCubit, SecurityState>(
+        listenWhen: (previous, current) => previous.status != current.status,
+        listener: (context, state) {
+          switch (state.status) {
+            case Status.compromised:
+              _navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                BlockPage.routeName,
+                (route) => false,
+              );
+            default:
+              return;
+          }
         },
-        child: MaterialApp(
-          title: 'Panduan',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.blueColor),
-            scaffoldBackgroundColor: AppColors.backgroundColor,
-            fontFamily: 'Jost',
-            useMaterial3: true,
-            applyElevationOverlayColor: false,
-          ),
-          initialRoute: SplashPage.routeName,
-          onGenerateRoute: (settings) {
-            return AppRouter.onGenerateRoute(settings);
+        child: GlobalLoaderOverlay(
+          overlayColor: Colors.black.withValues(alpha: 0.4),
+          disableBackButton: true,
+          overlayWholeScreen: true,
+          overlayHeight: context.deviceHeight,
+          overlayWidth: context.deviceWidth,
+          overlayWidgetBuilder: (progress) {
+            return Center(
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Lottie.asset(
+                  '${AppStrings.assetsLotties}/panduan-logo-loader.json',
+                  width: 80,
+                ),
+              ),
+            );
           },
+          child: MaterialApp(
+            title: 'Panduan',
+            navigatorKey: _navigatorKey,
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: AppColors.blueColor),
+              scaffoldBackgroundColor: AppColors.backgroundColor,
+              fontFamily: 'Jost',
+              useMaterial3: true,
+              applyElevationOverlayColor: false,
+            ),
+            initialRoute: SplashPage.routeName,
+            onGenerateRoute: (settings) {
+              return AppRouter.onGenerateRoute(settings);
+            },
+          ),
         ),
       ),
     );

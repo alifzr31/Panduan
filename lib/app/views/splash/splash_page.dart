@@ -17,10 +17,13 @@ import 'package:panduan/app/configs/firebase/remoteconfig_service.dart';
 import 'package:panduan/app/configs/storage/biom_storage/biom_storage.dart';
 import 'package:panduan/app/configs/storage/storage_service.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
+import 'package:panduan/app/cubits/security/security_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_env.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/build_context_extension.dart';
+import 'package:panduan/app/views/block/block_page.dart';
 import 'package:panduan/app/views/dashboard/dashboard_page.dart';
 import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/views/update/update_page.dart';
@@ -43,13 +46,40 @@ class _SplashPageState extends State<SplashPage> {
   String? _appName;
   String? _appVersion;
 
-  Future<void> _initSplash() async {
+  void _initSplash() async {
     try {
       final packageInfo = await _getPackageInfo();
       await RemoteConfigService.instance.init();
 
+      await Future.delayed(const Duration(milliseconds: 1500));
+
       if (!mounted) return;
 
+      final securityState = context.read<SecurityCubit>().state;
+
+      switch (securityState.status) {
+        case Status.compromised:
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            BlockPage.routeName,
+            (route) => false,
+          );
+          break;
+        case Status.safe:
+          _proccedSplash(packageInfo);
+          break;
+        default:
+          break;
+      }
+    } catch (e) {
+      if (kDebugMode) print(e);
+
+      rethrow;
+    }
+  }
+
+  Future<void> _proccedSplash(PackageInfo packageInfo) async {
+    try {
       if (_shouldUpdate(packageInfo)) {
         final isLoggedIn = await _refreshToken();
 
@@ -356,7 +386,7 @@ class _SplashPageState extends State<SplashPage> {
       child: Scaffold(
         body: SafeArea(
           child: SizedBox(
-            height: AppHelpers.getHeightDevice(context),
+            height: context.deviceHeight,
             width: double.infinity,
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -390,20 +420,20 @@ class _SplashPageState extends State<SplashPage> {
                       children: [
                         Text(
                           '$_appName Versi $_appVersion',
-                          textAlign: TextAlign.center,
+                          textAlign: .center,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
+                            fontWeight: .w500,
                             color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                         Text(
-                          'Pemerintah Kota Bandung',
-                          textAlign: TextAlign.center,
+                          '© ${DateTime.now().year} Pemerintah Kota Bandung',
+                          textAlign: .center,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
+                            fontWeight: .w500,
                             color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
