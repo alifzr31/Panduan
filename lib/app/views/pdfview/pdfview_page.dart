@@ -53,7 +53,7 @@ class _PdfViewPageState extends State<PdfViewPage> {
     super.initState();
     context.read<AssetCubit>().downloadAttachment(
       path: widget.filePath,
-      fileName: widget.fileName,
+      fileName: '${widget.fileName}.pdf',
     );
   }
 
@@ -143,7 +143,7 @@ class _PdfViewPageState extends State<PdfViewPage> {
                   onPressed: () {
                     context.read<AssetCubit>().downloadAttachment(
                       path: widget.filePath,
-                      fileName: widget.fileName,
+                      fileName: '${widget.fileName}.pdf',
                     );
                   },
                   child: Container(

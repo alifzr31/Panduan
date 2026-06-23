@@ -36,11 +36,7 @@ class _WebviewPageState extends State<WebviewPage> {
   void _initWebView() {
     final url = '${AppEnv.basePublicUrl}/assets/serve?path=${widget.filePath}';
 
-    final uri = Uri.parse(
-      widget.fileName.split('.').last == 'pdf'
-          ? 'https://docs.google.com/gview?embedded=true&url=$url'
-          : url,
-    );
+    final uri = Uri.parse(url);
 
     final accessToken = context.read<AuthCubit>().accessToken;
 
