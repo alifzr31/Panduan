@@ -7,6 +7,13 @@ class SpmHpCountCard extends StatelessWidget {
   const SpmHpCountCard({
     required this.healthPostName,
     required this.total,
+    required this.educationCount,
+    required this.healthCount,
+    required this.puCount,
+    required this.prCount,
+    required this.socialCount,
+    required this.trantibumCount,
+    required this.lainnya,
     this.index,
     this.dataLength,
     super.key,
@@ -14,6 +21,13 @@ class SpmHpCountCard extends StatelessWidget {
 
   final String healthPostName;
   final int total;
+  final int educationCount;
+  final int healthCount;
+  final int puCount;
+  final int prCount;
+  final int socialCount;
+  final int trantibumCount;
+  final int lainnya;
   final int? index;
   final int? dataLength;
 
@@ -29,64 +43,194 @@ class SpmHpCountCard extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(10),
-        child: Row(
+        child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.softBlueColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Center(
-                child: Icon(
-                  MingCute.building_5_line,
-                  size: 24,
-                  color: AppColors.blueColor,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Posyandu ${healthPostName.capitalize()}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.softBlueColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      MingCute.building_5_line,
+                      size: 24,
+                      color: AppColors.blueColor,
                     ),
                   ),
-                  Text(
-                    'Aktif',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Posyandu',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      Text(
+                        healthPostName.capitalize(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 10),
+                Material(
+                  clipBehavior: Clip.antiAlias,
+                  shape: const StadiumBorder(),
+                  color: AppColors.pinkColor,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 6,
+                      ),
+                      child: Text(
+                        '$total SPM',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            Material(
-              clipBehavior: Clip.antiAlias,
-              shape: const StadiumBorder(),
-              color: AppColors.pinkColor,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 4,
-                    horizontal: 6,
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Divider(height: 1),
+            ),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text('Pendidikan:', style: TextStyle(fontSize: 12)),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '$educationCount SPM',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text('Kesehatan:', style: TextStyle(fontSize: 12)),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '$healthCount SPM',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                const Expanded(
                   child: Text(
-                    '$total SPM',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
+                    'Pekerjaan Umum:',
+                    style: TextStyle(fontSize: 12),
                   ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                Text(
+                  '$puCount SPM',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Perumahan Rakyat:',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '$prCount SPM',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text('Sosial:', style: TextStyle(fontSize: 12)),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '$socialCount SPM',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Trantibum Linmas:',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '$trantibumCount SPM',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text('Lainnya:', style: TextStyle(fontSize: 12)),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '$lainnya SPM',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

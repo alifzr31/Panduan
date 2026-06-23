@@ -84,11 +84,25 @@ class HomeSpmFieldCounter extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                SpmFieldCounterCard(
-                  count: state.spmFieldCount?.lainnya ?? 0,
-                  name: 'Lainnya',
-                  barColor: AppColors.tealColor,
-                  onTapSpmFieldCounter: onTapSpmFieldCounter,
+                Row(
+                  children: [
+                    Expanded(
+                      child: SpmFieldCounterCard(
+                        count: state.spmFieldCount?.lainnya ?? 0,
+                        name: 'Lainnya',
+                        barColor: AppColors.tealColor,
+                        onTapSpmFieldCounter: onTapSpmFieldCounter,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: SpmFieldCounterCard(
+                        count: state.spmFieldCount?.total ?? 0,
+                        name: 'Total',
+                        barColor: AppColors.greyColor,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );

@@ -9,14 +9,17 @@ import 'package:panduan/app/models/spm_field_count.dart';
 import 'package:panduan/app/models/spm_hp_count.dart';
 import 'package:panduan/app/models/spm_subdistrict_count.dart';
 import 'package:panduan/app/repositories/dashboard_repository.dart';
+import 'package:panduan/app/repositories/recapitulation_repository.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 
 part 'dashboard_state.dart';
 
 class DashboardCubit extends Cubit<DashboardState> {
-  DashboardCubit(this._repository) : super(const DashboardState());
+  DashboardCubit(this._dashboardRepository, this._recapitulationRepository)
+    : super(const DashboardState());
 
-  final DashboardRepository _repository;
+  final DashboardRepository _dashboardRepository;
+  final RecapitulationRepository _recapitulationRepository;
 
   int _currentSpmPage = 1;
   int _currentHealthPostPage = 1;
@@ -35,6 +38,7 @@ class DashboardCubit extends Cubit<DashboardState> {
       await fetchSpmFieldCount(startDate: startDate, endDate: endDate);
       await fetchSpmDistrictCount(startDate: startDate, endDate: endDate);
       await fetchSpmSubDistrictCount(startDate: startDate, endDate: endDate);
+      await fetchSpmHpCount(startDate: startDate, endDate: endDate);
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-opd',
@@ -77,6 +81,7 @@ class DashboardCubit extends Cubit<DashboardState> {
       refetchSpmFieldCount(startDate: startDate, endDate: endDate);
       refetchSpmDistrictCount(startDate: startDate, endDate: endDate);
       refetchSpmSubDistrictCount(startDate: startDate, endDate: endDate);
+      refetchSpmHpCount(startDate: startDate, endDate: endDate);
     } else if (AppHelpers.hasPermission(
       userPermissions ?? const [],
       permissionName: 'level-opd',
@@ -115,7 +120,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     );
 
     try {
-      final unreadNotificationCount = await _repository
+      final unreadNotificationCount = await _dashboardRepository
           .fetchUnreadNotificationCount();
 
       emit(
@@ -156,7 +161,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     emit(state.copyWith(spmCountStatus: SpmCountStatus.loading));
 
     try {
-      final spmCount = await _repository.fetchSpmCount(
+      final spmCount = await _dashboardRepository.fetchSpmCount(
         startDate: startDate,
         endDate: endDate,
       );
@@ -202,7 +207,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     );
 
     try {
-      final spmFieldCount = await _repository.fetchSpmFieldCount(
+      final spmFieldCount = await _dashboardRepository.fetchSpmFieldCount(
         startDate: startDate,
         endDate: endDate,
       );
@@ -251,10 +256,8 @@ class DashboardCubit extends Cubit<DashboardState> {
     );
 
     try {
-      final spmDistrictCounts = await _repository.fetchSpmDistrictCount(
-        startDate: startDate,
-        endDate: endDate,
-      );
+      final spmDistrictCounts = await _recapitulationRepository
+          .fetchSpmDistrictCount(startDate: startDate, endDate: endDate);
 
       emit(
         state.copyWith(
@@ -303,10 +306,8 @@ class DashboardCubit extends Cubit<DashboardState> {
     );
 
     try {
-      final spmSubDistrictCounts = await _repository.fetchSpmSubDistrictCount(
-        startDate: startDate,
-        endDate: endDate,
-      );
+      final spmSubDistrictCounts = await _recapitulationRepository
+          .fetchSpmSubDistrictCount(startDate: startDate, endDate: endDate);
 
       emit(
         state.copyWith(
@@ -355,7 +356,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     );
 
     try {
-      final spmHpCounts = await _repository.fetchSpmHpCount(
+      final spmHpCounts = await _recapitulationRepository.fetchSpmHpCount(
         startDate: startDate,
         endDate: endDate,
       );
@@ -413,7 +414,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     );
 
     try {
-      final spm = await _repository.fetchSpm(
+      final spm = await _dashboardRepository.fetchSpm(
         page: _currentSpmPage,
         keyword: keyword,
         month: month,
@@ -548,7 +549,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     );
 
     try {
-      final healthPosts = await _repository.fetchHealthPosts(
+      final healthPosts = await _dashboardRepository.fetchHealthPosts(
         page: _currentHealthPostPage,
         keyword: keyword,
         districtCode: districtCode,

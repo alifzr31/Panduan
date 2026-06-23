@@ -35,7 +35,7 @@ class HomeSpmFieldRecapitulation extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Rekapitulasi SPM',
+                      'Rekapitulasi Bidang SPM',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -46,23 +46,23 @@ class HomeSpmFieldRecapitulation extends StatelessWidget {
                             context.read<AuthCubit>().state.userPermissions,
                             permissionName: 'level-walikota',
                           )
-                          ? 'Data SPM berdasarkan bidang di Kota Bandung'
+                          ? 'Rekapitulasi SPM berdasarkan bidang di Kota Bandung'
                           : AppHelpers.hasPermission(
                               context.read<AuthCubit>().state.userPermissions,
                               permissionName: 'level-opd',
                             )
-                          ? 'Data SPM berdasarkan bidang di ${context.read<AuthCubit>().state.profile?.opd?.name}'
+                          ? 'Rekapitulasi SPM berdasarkan bidang di ${context.read<AuthCubit>().state.profile?.opd?.name}'
                           : AppHelpers.hasPermission(
                               context.read<AuthCubit>().state.userPermissions,
                               permissionName: 'level-kecamatan',
                             )
-                          ? 'Data SPM berdasarkan bidang di Kecamatan ${context.read<AuthCubit>().state.profile?.district?.name?.capitalize()}'
+                          ? 'Rekapitulasi SPM berdasarkan bidang di Kecamatan ${context.read<AuthCubit>().state.profile?.district?.name?.capitalize()}'
                           : AppHelpers.hasPermission(
                               context.read<AuthCubit>().state.userPermissions,
                               permissionName: 'level-kelurahan',
                             )
-                          ? 'Data SPM berdasarkan bidang di Kelurahan ${context.read<AuthCubit>().state.profile?.subDistrict?.name?.capitalize()}'
-                          : 'Data SPM berdasarkan bidang di Posyandu ${context.read<AuthCubit>().state.profile?.healthPost?.name?.capitalize()}',
+                          ? 'Rekapitulasi SPM berdasarkan bidang di Kelurahan ${context.read<AuthCubit>().state.profile?.subDistrict?.name?.capitalize()}'
+                          : 'Rekapitulasi SPM berdasarkan bidang di Posyandu ${context.read<AuthCubit>().state.profile?.healthPost?.name?.capitalize()}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,

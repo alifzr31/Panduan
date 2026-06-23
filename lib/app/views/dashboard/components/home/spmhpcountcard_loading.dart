@@ -14,7 +14,7 @@ class SpmHpCountCardLoading extends StatelessWidget {
         shrinkWrap: true,
         padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: 3,
+        itemCount: 5,
         itemBuilder: (context, index) {
           return Card(
             elevation: 0,
@@ -26,54 +26,197 @@ class SpmHpCountCardLoading extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.all(10),
-              child: Row(
+              child: Column(
                 children: [
-                  Skeleton.keep(
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.softBlueColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          MingCute.building_5_line,
-                          size: 24,
-                          color: AppColors.blueColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'xxxxxxxxxxxxxxxxxxx',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                  Row(
+                    children: [
+                      Skeleton.keep(
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.softBlueColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              MingCute.building_5_line,
+                              size: 24,
+                              color: AppColors.blueColor,
+                            ),
                           ),
                         ),
-                        Text(
-                          'Aktif',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'xxxxxxxxxx',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            Text(
+                              'xxxxxxxxxxxxxxxxxx',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 10),
+                      Material(
+                        clipBehavior: Clip.antiAlias,
+                        shape: const StadiumBorder(),
+                        color: Colors.grey.shade300,
+                        child: Container(
+                          height: 25,
+                          width: 62,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  Material(
-                    clipBehavior: Clip.antiAlias,
-                    shape: const StadiumBorder(),
-                    color: Colors.grey.shade300,
-                    child: Container(height: 25, width: 62, color: Colors.red),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Divider(height: 1),
+                  ),
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'xxxxxxxxxxxxx',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '99 SPM',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'xxxxxxxxxxxxx',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '99 SPM',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'xxxxxxxxxxxxx',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '99 SPM',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'xxxxxxxxxxxxx',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '99 SPM',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'xxxxxxxxxxxxx',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '99 SPM',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'xxxxxxxxxxxxx',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '99 SPM',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'xxxxxxxxxxxxx',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '99 SPM',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

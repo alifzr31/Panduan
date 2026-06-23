@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panduan/app/views/dashboard/widgets/home/home_districtrecapitulation.dart';
+import 'package:panduan/app/views/dashboard/widgets/home/home_healthpostrecapitulation.dart';
 import 'package:panduan/app/views/dashboard/widgets/home/home_spmfieldcounter.dart';
 import 'package:panduan/app/views/dashboard/widgets/home/home_subdistrictrecapitulation.dart';
 
@@ -22,6 +23,8 @@ class HomeWalikota extends StatelessWidget {
         HomeDistrictRecapitulation(selectedRangeDates: selectedRangeDates),
         const SizedBox(height: 16),
         HomeSubDistrictRecapitulation(selectedRangeDates: selectedRangeDates),
+        const SizedBox(height: 16),
+        HomeHealthPostRecapitulation(selectedRangeDates: selectedRangeDates),
       ],
     );
   }
