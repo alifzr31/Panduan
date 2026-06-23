@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panduan/app/utils/app_colors.dart';
-import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/build_context_extension.dart';
 
 void showCustomBottomSheet(
   BuildContext context, {
@@ -39,7 +39,7 @@ void showCustomBottomSheet(
                   child: Center(
                     child: Container(
                       height: 8,
-                      width: AppHelpers.getHeightDevice(context) * 0.13,
+                      width: context.deviceHeight * 0.13,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade400,
                         borderRadius: BorderRadius.circular(20),
@@ -83,7 +83,7 @@ Future<Object?> showDynamicHeightBottomSheet(
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            double maxHeight = AppHelpers.getHeightDevice(context) * 0.6;
+            double maxHeight = context.deviceHeight * 0.6;
 
             return Stack(
               children: [
@@ -94,7 +94,7 @@ Future<Object?> showDynamicHeightBottomSheet(
                   child: Center(
                     child: Container(
                       height: 8,
-                      width: AppHelpers.getWidthDevice(context) * 0.13,
+                      width: context.deviceWidth * 0.13,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade400,
                         borderRadius: BorderRadius.circular(20),

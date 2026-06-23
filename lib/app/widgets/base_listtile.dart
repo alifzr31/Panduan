@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class BaseListTile extends StatelessWidget {
   const BaseListTile({
     required this.title,
+    this.titleSize = 14,
     this.titleColor = Colors.black,
     this.subtitle,
+    this.subtitleSize = 12,
     this.subtitleColor,
     this.leading,
     this.trailing,
@@ -13,8 +15,10 @@ class BaseListTile extends StatelessWidget {
   });
 
   final String title;
+  final double titleSize;
   final Color titleColor;
   final String? subtitle;
+  final double subtitleSize;
   final Color? subtitleColor;
   final Widget? leading;
   final Widget? trailing;
@@ -31,7 +35,7 @@ class BaseListTile extends StatelessWidget {
       title: Text(
         title,
         style: TextStyle(
-          fontSize: 14,
+          fontSize: titleSize,
           fontWeight: FontWeight.w500,
           color: titleColor,
         ),
@@ -40,7 +44,7 @@ class BaseListTile extends StatelessWidget {
           ? null
           : Text(
               subtitle ?? '',
-              style: TextStyle(fontSize: 12, color: subtitleColor),
+              style: TextStyle(fontSize: subtitleSize, color: subtitleColor),
             ),
       trailing: trailing,
     );

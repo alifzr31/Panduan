@@ -1,3 +1,5 @@
+import 'dart:convert' show base64;
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -7,16 +9,19 @@ import 'package:panduan/app/utils/app_strings.dart';
 import 'package:path/path.dart' as p;
 
 class AppHelpers {
-  static double getHeightDevice(BuildContext context) {
-    return MediaQuery.of(context).size.height;
-  }
+  static String covertSigningToBase64(String hashSigning) {
+    if (!hashSigning.contains(':') && hashSigning.length < 64) {
+      return hashSigning;
+    }
 
-  static double getWidthDevice(BuildContext context) {
-    return MediaQuery.of(context).size.width;
-  }
+    final cleanHex = hashSigning.replaceAll(':', '');
 
-  static double getBottomViewPaddingDevice(BuildContext context) {
-    return MediaQuery.of(context).viewPadding.bottom;
+    List<int> bytes = [];
+    for (int i = 0; i < cleanHex.length; i += 2) {
+      bytes.add(int.parse(cleanHex.substring(i, i + 2), radix: 16));
+    }
+
+    return base64.encode(bytes);
   }
 
   static CancelToken createCancelToken(
@@ -407,5 +412,58 @@ class AppHelpers {
     final include = includeAttachmentMap[fieldKey] ?? {};
 
     return spmAttachments.where((e) => include.contains(e.key)).toList();
+  }
+
+  static bool showExpiredSpmWarning({
+    required String status,
+    required List<String> userPermissions,
+  }) {
+    return (status == 'RETURN_TO_KADER' &&
+            (AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'level-posyandu',
+                ) &&
+                AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'user-submission-verification',
+                ))) ||
+        ((status == 'NEED_VERIFICATION_SUB_DISTRICT' ||
+                status == 'RETURN_TO_SUB_DISTRICT') &&
+            (AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'level-kelurahan',
+                ) &&
+                AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'user-submission-verification',
+                ))) ||
+        (status == 'NEED_APPROVAL_DISTRICT' &&
+            (AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'level-kecamatan',
+                ) &&
+                AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'user-submission-verification',
+                ))) ||
+        ((status == 'FORWARD_TO_TP_POSYANDU_KOTA' ||
+                status == 'RETURN_TO_TP_POSYANDU_KOTA') &&
+            (AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'level-walikota',
+                ) &&
+                AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'user-submission-verification',
+                ))) ||
+        (status == 'NEED_VERIFICATION_OPD' &&
+            (AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'level-opd',
+                ) &&
+                AppHelpers.hasPermission(
+                  userPermissions,
+                  permissionName: 'user-submission-verification',
+                )));
   }
 }

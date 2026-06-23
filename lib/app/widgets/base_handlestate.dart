@@ -11,6 +11,7 @@ class BaseHandleState extends StatelessWidget {
     required this.errorMessage,
     this.iconWidth = 100,
     this.errorMessageSize = 14,
+    this.showRefetchButton = true,
     this.iconButtonSize = 18,
     this.labelButtonSize = 14,
     this.onRefetch,
@@ -21,6 +22,7 @@ class BaseHandleState extends StatelessWidget {
   final String errorMessage;
   final double iconWidth;
   final double errorMessageSize;
+  final bool showRefetchButton;
   final double iconButtonSize;
   final double labelButtonSize;
   final void Function()? onRefetch;
@@ -47,27 +49,29 @@ class BaseHandleState extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 10),
-          CupertinoButton(
-            minimumSize: Size.zero,
-            padding: EdgeInsets.zero,
-            onPressed: onRefetch,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(MingCute.refresh_2_line, size: iconButtonSize),
-                const SizedBox(width: 4),
-                Text(
-                  'Muat Ulang',
-                  style: TextStyle(
-                    fontSize: labelButtonSize,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Jost',
+          if (showRefetchButton) ...{
+            const SizedBox(height: 10),
+            CupertinoButton(
+              minimumSize: Size.zero,
+              padding: EdgeInsets.zero,
+              onPressed: onRefetch,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(MingCute.refresh_2_line, size: iconButtonSize),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Muat Ulang',
+                    style: TextStyle(
+                      fontSize: labelButtonSize,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Jost',
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          },
         ],
       ),
     );
