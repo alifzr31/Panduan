@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:panduan/app/utils/app_colors.dart';
+import 'package:panduan/app/utils/number_extension.dart';
 import 'package:panduan/app/utils/string_extension.dart';
 
 class SpmSubDistrictCountCard extends StatelessWidget {
@@ -96,7 +97,7 @@ class SpmSubDistrictCountCard extends StatelessWidget {
                         horizontal: 6,
                       ),
                       child: Text(
-                        '$total SPM',
+                        '${total.thousandFormat()} SPM',
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -119,7 +120,7 @@ class SpmSubDistrictCountCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$educationCount SPM',
+                  '${educationCount.thousandFormat()} SPM',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -135,7 +136,7 @@ class SpmSubDistrictCountCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$healthCount SPM',
+                  '${healthCount.thousandFormat()} SPM',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -154,7 +155,7 @@ class SpmSubDistrictCountCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$puCount SPM',
+                  '${puCount.thousandFormat()} SPM',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -173,7 +174,7 @@ class SpmSubDistrictCountCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$prCount SPM',
+                  '${prCount.thousandFormat()} SPM',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -189,7 +190,7 @@ class SpmSubDistrictCountCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$socialCount SPM',
+                  '${socialCount.thousandFormat()} SPM',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -208,7 +209,7 @@ class SpmSubDistrictCountCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$trantibumCount SPM',
+                  '${trantibumCount.thousandFormat()} SPM',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -224,7 +225,7 @@ class SpmSubDistrictCountCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$lainnya SPM',
+                  '${lainnya.thousandFormat()} SPM',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,

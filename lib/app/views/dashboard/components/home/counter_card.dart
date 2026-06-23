@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panduan/app/utils/number_extension.dart';
 
 class CounterCard extends StatelessWidget {
   const CounterCard({
@@ -14,7 +15,7 @@ class CounterCard extends StatelessWidget {
   final Color iconColor;
   final Color bgIconColor;
   final String title;
-  final String count;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +50,7 @@ class CounterCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    count,
+                    count.thousandFormat(),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

@@ -27,7 +27,7 @@ class HomeSpmCounter extends StatelessWidget {
                         iconColor: AppColors.blueColor,
                         bgIconColor: AppColors.softBlueColor,
                         title: 'Total SPM',
-                        count: state.spmCount?.total?.toString() ?? '',
+                        count: state.spmCount?.total ?? 0,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -48,17 +48,13 @@ class HomeSpmCounter extends StatelessWidget {
                               context.read<AuthCubit>().state.userPermissions,
                               permissionName: 'level-opd',
                             )
-                            ? state.spmCount?.processByOpd?.toString() ?? ''
+                            ? state.spmCount?.processByOpd ?? 0
                             : AppHelpers.hasPermission(
                                 context.read<AuthCubit>().state.userPermissions,
                                 permissionName: 'level-kecamatan',
                               )
-                            ? state.spmCount?.needApprovalDistrict
-                                      ?.toString() ??
-                                  ''
-                            : state.spmCount?.processBySubDistrict
-                                      ?.toString() ??
-                                  '',
+                            ? state.spmCount?.needApprovalDistrict ?? 0
+                            : state.spmCount?.processBySubDistrict ?? 0,
                       ),
                     ),
                   ],
@@ -89,9 +85,8 @@ class HomeSpmCounter extends StatelessWidget {
                               context.read<AuthCubit>().state.userPermissions,
                               permissionName: 'level-opd',
                             )
-                            ? state.spmCount?.finishByOpd?.toString() ?? ''
-                            : state.spmCount?.needVerificationOpd?.toString() ??
-                                  '',
+                            ? state.spmCount?.finishByOpd ?? 0
+                            : state.spmCount?.needVerificationOpd ?? 0,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -106,16 +101,13 @@ class HomeSpmCounter extends StatelessWidget {
                               context.read<AuthCubit>().state.userPermissions,
                               permissionName: 'level-opd',
                             )
-                            ? state.spmCount?.declineByOpd?.toString() ?? ''
+                            ? state.spmCount?.declineByOpd ?? 0
                             : AppHelpers.hasPermission(
                                 context.read<AuthCubit>().state.userPermissions,
                                 permissionName: 'level-kecamatan',
                               )
-                            ? state.spmCount?.declineByDistrict?.toString() ??
-                                  ''
-                            : state.spmCount?.declineBySubDistrict
-                                      ?.toString() ??
-                                  '',
+                            ? state.spmCount?.declineByDistrict ?? 0
+                            : state.spmCount?.declineBySubDistrict ?? 0,
                       ),
                     ),
                   ],

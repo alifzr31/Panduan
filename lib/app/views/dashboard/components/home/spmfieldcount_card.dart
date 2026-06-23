@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panduan/app/utils/number_extension.dart';
 
 class SpmFieldCountCard extends StatelessWidget {
   const SpmFieldCountCard({
@@ -47,7 +48,7 @@ class SpmFieldCountCard extends StatelessWidget {
                     horizontal: 6,
                   ),
                   child: Text(
-                    '$count SPM',
+                    '${count.thousandFormat()} SPM',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,

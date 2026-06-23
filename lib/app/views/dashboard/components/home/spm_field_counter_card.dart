@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/number_extension.dart';
 
 class SpmFieldCounterCard extends StatelessWidget {
   const SpmFieldCounterCard({
@@ -47,7 +48,7 @@ class SpmFieldCounterCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          count.toString(),
+                          count.thousandFormat(),
                           textAlign: TextAlign.end,
                           style: const TextStyle(
                             fontSize: 16,
