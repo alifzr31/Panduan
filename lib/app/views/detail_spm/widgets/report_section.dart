@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/models/attachment.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
@@ -25,6 +27,8 @@ class ReportSection extends StatelessWidget {
     required this.serviceCategoryName,
     required this.serviceType,
     required this.status,
+    required this.isExpired,
+    required this.respondTime,
     required this.reportDescription,
     required this.latitude,
     required this.longitude,
@@ -42,6 +46,8 @@ class ReportSection extends StatelessWidget {
   final String serviceCategoryName;
   final String serviceType;
   final String status;
+  final bool isExpired;
+  final String? respondTime;
   final String reportDescription;
   final String? latitude;
   final String? longitude;
@@ -306,6 +312,67 @@ class ReportSection extends StatelessWidget {
                 ),
               ),
             ),
+            if (isExpired) ...{
+              if (AppHelpers.showExpiredSpmWarning(
+                status: status,
+                userPermissions: context
+                    .read<AuthCubit>()
+                    .state
+                    .userPermissions,
+              )) ...{
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade600,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    crossAxisAlignment: .center,
+                    children: [
+                      Icon(
+                        MingCute.warning_line,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            'SPM telah melebihi batas waktu (3 hari)',
+                            textAlign: .center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(
+                        MingCute.warning_line,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
+              },
+            },
+            if (respondTime != null) ...{
+              const SizedBox(height: 6),
+              Align(
+                alignment: .centerLeft,
+                child: Text(
+                  'Waktu Respon: $respondTime',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
+            },
           ],
         ),
       ),

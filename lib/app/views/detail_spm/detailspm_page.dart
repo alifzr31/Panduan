@@ -240,6 +240,8 @@ class _DetailSpmPageState extends State<DetailSpmPage> {
                               state.detailSpm?.serviceCategory?.name ?? '',
                           serviceType: state.detailSpm?.type ?? '',
                           status: state.detailSpm?.status ?? '',
+                          isExpired: state.detailSpm?.isExpired ?? false,
+                          respondTime: state.detailSpm?.totalRespondTime,
                           reportDescription: state.detailSpm?.description ?? '',
                           latitude: state.detailSpm?.latitude,
                           longitude: state.detailSpm?.longitude,

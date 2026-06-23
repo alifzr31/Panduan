@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:icons_plus/icons_plus.dart';
+import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/string_extension.dart';
 
@@ -11,6 +14,8 @@ class SpmCard extends StatelessWidget {
     required this.subDistrictName,
     required this.districtName,
     required this.status,
+    required this.isExpired,
+    required this.respondTime,
     this.index,
     this.dataLength,
     this.onTap,
@@ -24,6 +29,8 @@ class SpmCard extends StatelessWidget {
   final String subDistrictName;
   final String districtName;
   final String status;
+  final bool isExpired;
+  final String? respondTime;
   final int? index;
   final int? dataLength;
   final void Function()? onTap;
@@ -43,7 +50,6 @@ class SpmCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
@@ -64,18 +70,25 @@ class SpmCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 2),
-              Text(
-                'Bidang ${fieldName.capitalize()}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+              Align(
+                alignment: .centerLeft,
+                child: Column(
+                  crossAxisAlignment: .start,
+                  children: [
+                    Text(
+                      'Bidang ${fieldName.capitalize()}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      'Posyandu ${healthPostName.capitalize()}, Kelurahan ${subDistrictName.capitalize()}, Kecamatan ${districtName.capitalize()}',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
                 ),
               ),
-              Text(
-                'Posyandu ${healthPostName.capitalize()}, Kelurahan ${subDistrictName.capitalize()}, Kecamatan ${districtName.capitalize()}',
-                style: const TextStyle(fontSize: 14),
-              ),
-              // const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Divider(height: 1, color: Colors.grey.shade300),
@@ -101,6 +114,64 @@ class SpmCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (isExpired) ...{
+                if (AppHelpers.showExpiredSpmWarning(
+                  status: status,
+                  userPermissions: context
+                      .read<AuthCubit>()
+                      .state
+                      .userPermissions,
+                )) ...{
+                  const SizedBox(height: 6),
+                  Ink(
+                    padding: const .symmetric(vertical: 4, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade600,
+                      borderRadius: .circular(20),
+                    ),
+                    child: const Row(
+                      crossAxisAlignment: .center,
+                      children: [
+                        Icon(
+                          MingCute.warning_line,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              'SPM telah melebihi batas waktu (3 hari)',
+                              textAlign: .center,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(
+                          MingCute.warning_line,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                },
+              },
+              if (respondTime != null) ...{
+                const SizedBox(height: 6),
+                Align(
+                  alignment: .centerLeft,
+                  child: Text(
+                    'Waktu Respon: $respondTime',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              },
             ],
           ),
         ),

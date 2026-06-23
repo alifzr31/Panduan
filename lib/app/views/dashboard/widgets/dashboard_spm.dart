@@ -356,6 +356,10 @@ class _DashboardSpmState extends State<DashboardSpm> {
                                             state.spm[index].district?.name ??
                                             '',
                                         status: state.spm[index].status ?? '',
+                                        isExpired:
+                                            state.spm[index].isExpired ?? false,
+                                        respondTime:
+                                            state.spm[index].totalRespondTime,
                                         index: index,
                                         dataLength: state.spm.length,
                                         onTap: () async {
@@ -370,25 +374,24 @@ class _DashboardSpmState extends State<DashboardSpm> {
                                           if (result != null) {
                                             if (result == 'spm-deleted' ||
                                                 result == 'spm-updated') {
-                                              if (context.mounted) {
-                                                context
-                                                    .read<DashboardCubit>()
-                                                    .refetchSpm(
-                                                      keyword: _spmKeyword,
-                                                      month:
-                                                          _selectedMonth.value,
-                                                      year: _selectedYear.value,
-                                                      districtCode:
-                                                          _selectedDistrictCode,
-                                                      subDistrictCode:
-                                                          _selectedSubDistrictCode,
-                                                      healthPostUuid:
-                                                          _selectedHealthPostUuid,
-                                                      spmFieldName:
-                                                          _selectedSpmField,
-                                                      statuses: _selectedStatus,
-                                                    );
-                                              }
+                                              if (!context.mounted) return;
+
+                                              context
+                                                  .read<DashboardCubit>()
+                                                  .refetchSpm(
+                                                    keyword: _spmKeyword,
+                                                    month: _selectedMonth.value,
+                                                    year: _selectedYear.value,
+                                                    districtCode:
+                                                        _selectedDistrictCode,
+                                                    subDistrictCode:
+                                                        _selectedSubDistrictCode,
+                                                    healthPostUuid:
+                                                        _selectedHealthPostUuid,
+                                                    spmFieldName:
+                                                        _selectedSpmField,
+                                                    statuses: _selectedStatus,
+                                                  );
                                             }
                                           }
                                         },
