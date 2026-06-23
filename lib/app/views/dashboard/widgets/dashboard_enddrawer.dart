@@ -14,6 +14,7 @@ import 'package:panduan/app/configs/local_notification/local_notif.dart';
 import 'package:panduan/app/configs/storage/biom_storage/biom_storage.dart';
 import 'package:panduan/app/configs/storage/storage_service.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
+import 'package:panduan/app/cubits/landing_page/landing_page_cubit.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/views/change_password/changepassword_page.dart';
@@ -281,6 +282,57 @@ class _DashboardEndDrawerState extends State<DashboardEndDrawer> {
                         ],
                       );
                     },
+                  ),
+                  BlocListener<LandingPageCubit, LandingPageState>(
+                    listenWhen: (previous, current) =>
+                        previous.status != current.status,
+                    listener: (context, state) {
+                      switch (state.status) {
+                        case Status.loading:
+                          context.loaderOverlay.show();
+                        case Status.error:
+                          context.loaderOverlay.hide();
+                          showCustomToast(
+                            context,
+                            type: ToastificationType.error,
+                            title: 'User Manual Gagal Dibuka',
+                            description: state.error,
+                          );
+                        case Status.success:
+                          context.loaderOverlay.hide();
+
+                          if (state.userManualUrl == null) {
+                            showCustomToast(
+                              context,
+                              type: ToastificationType.info,
+                              title: 'User Manual Tidak Tersedia',
+                              description:
+                                  'Mohon maaf saat ini user manual tidak tersedia, silahkan coba beberapa saat lagi.',
+                            );
+                          }
+
+                          context.read<LandingPageCubit>().openUserManualUrl(
+                            state.userManualUrl ?? '',
+                          );
+                        default:
+                          return;
+                      }
+                    },
+                    child: BaseListTile(
+                      leading: const Icon(
+                        MingCute.book_2_line,
+                        size: 22,
+                        color: AppColors.blueColor,
+                      ),
+                      title: 'User Manual',
+                      onTap: () {
+                        context.read<LandingPageCubit>().fetchUserManualUrl();
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Divider(height: 1, color: Colors.grey.shade300),
                   ),
                   BaseListTile(
                     leading: const Icon(
