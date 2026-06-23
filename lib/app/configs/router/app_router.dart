@@ -9,10 +9,13 @@ import 'package:panduan/app/cubits/detail_spm/detailspm_cubit.dart';
 import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
 import 'package:panduan/app/cubits/health_post/health_post_cubit.dart';
 import 'package:panduan/app/cubits/hp_registration/hp_registration_cubit.dart';
+import 'package:panduan/app/cubits/landing_page/landing_page_cubit.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
-import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/cubits/notification/notification_cubit.dart';
+import 'package:panduan/app/cubits/recapitulation/recapitulation_cubit.dart';
+import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
+import 'package:panduan/app/views/block/block_page.dart';
 import 'package:panduan/app/views/camera/camera_page.dart';
 import 'package:panduan/app/views/change_password/changepassword_page.dart';
 import 'package:panduan/app/views/create_spm/createspm_page.dart';
@@ -26,6 +29,7 @@ import 'package:panduan/app/views/login/login_page.dart';
 import 'package:panduan/app/views/map_coordinate/mapcoordinate_page.dart';
 import 'package:panduan/app/views/notification/notification_page.dart';
 import 'package:panduan/app/views/pdfview/pdfview_page.dart';
+import 'package:panduan/app/views/recapitulation/recapitulation_page.dart';
 import 'package:panduan/app/views/splash/splash_page.dart';
 import 'package:panduan/app/views/spm_field/spmfield_page.dart';
 import 'package:panduan/app/views/update/update_page.dart';
@@ -39,6 +43,12 @@ class AppRouter {
           settings,
           bottomSafeArea: false,
           child: const SplashPage(),
+        );
+      case BlockPage.routeName:
+        return customPageRouteBuilder(
+          settings,
+          bottomSafeArea: false,
+          child: const BlockPage(),
         );
       case UpdatePage.routeName:
         final args = settings.arguments as Map<String, dynamic>;
@@ -68,8 +78,11 @@ class AppRouter {
         return customPageRouteBuilder(
           settings,
           bottomSafeArea: false,
-          child: BlocProvider(
-            create: (context) => sl<DashboardCubit>(),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => sl<DashboardCubit>()),
+              BlocProvider(create: (context) => sl<LandingPageCubit>()),
+            ],
             child: const DashboardPage(),
           ),
         );
@@ -97,6 +110,19 @@ class AppRouter {
             child: const HealthPostPage(),
           ),
         );
+      case RecapitulationPage.routeName:
+        final args = settings.arguments as Map<String, dynamic>?;
+        final recapitulationLevel =
+            args?['recapitulationLevel'] as String? ?? '';
+
+        return customPageRouteBuilder(
+          settings,
+          bottomSafeArea: false,
+          child: BlocProvider(
+            create: (context) => sl<RecapitulationCubit>(),
+            child: RecapitulationPage(recapitulationLevel: recapitulationLevel),
+          ),
+        );
       case CameraPage.routeName:
         return customPageRouteBuilder(
           settings,
@@ -113,6 +139,7 @@ class AppRouter {
             create: (context) => sl<HpRegistrationCubit>(),
             child: HpRegistrationPage(
               healthPostId: args?['healthPostId'],
+              healthPostUuid: args?['healthPostUuid'],
               healthPostCode: args?['healthPostCode'],
             ),
           ),

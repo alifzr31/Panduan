@@ -8,9 +8,12 @@ import 'package:panduan/app/cubits/detail_spm/detailspm_cubit.dart';
 import 'package:panduan/app/cubits/edit_spm/editspm_cubit.dart';
 import 'package:panduan/app/cubits/health_post/health_post_cubit.dart';
 import 'package:panduan/app/cubits/hp_registration/hp_registration_cubit.dart';
+import 'package:panduan/app/cubits/landing_page/landing_page_cubit.dart';
 import 'package:panduan/app/cubits/location/location_cubit.dart';
+import 'package:panduan/app/cubits/recapitulation/recapitulation_cubit.dart';
 import 'package:panduan/app/cubits/region/region_cubit.dart';
 import 'package:panduan/app/cubits/notification/notification_cubit.dart';
+import 'package:panduan/app/cubits/security/security_cubit.dart';
 import 'package:panduan/app/cubits/spm/spm_cubit.dart';
 import 'package:panduan/app/repositories/activity_repository.dart';
 import 'package:panduan/app/repositories/asset_repository.dart';
@@ -21,8 +24,11 @@ import 'package:panduan/app/repositories/detailspm_repository.dart';
 import 'package:panduan/app/repositories/editspm_repository.dart';
 import 'package:panduan/app/repositories/healthpost_repository.dart';
 import 'package:panduan/app/repositories/hpregistration_repository.dart';
+import 'package:panduan/app/repositories/landing_page_repository.dart';
+import 'package:panduan/app/repositories/recapitulation_repository.dart';
 import 'package:panduan/app/repositories/region_repository.dart';
 import 'package:panduan/app/repositories/notification_repository.dart';
+import 'package:panduan/app/repositories/security_repository.dart';
 import 'package:panduan/app/repositories/spm_repository.dart';
 import 'package:panduan/app/services/activity_service.dart';
 import 'package:panduan/app/services/asset_service.dart';
@@ -33,16 +39,31 @@ import 'package:panduan/app/services/detailspm_service.dart';
 import 'package:panduan/app/services/editspm_service.dart';
 import 'package:panduan/app/services/healthpost_service.dart';
 import 'package:panduan/app/services/hpregistration_service.dart';
+import 'package:panduan/app/services/landing_page_service.dart';
+import 'package:panduan/app/services/recapitulation_service.dart';
 import 'package:panduan/app/services/region_service.dart';
 import 'package:panduan/app/services/notification_service.dart';
+import 'package:panduan/app/services/security_service.dart';
 import 'package:panduan/app/services/spm_service.dart';
 
 final sl = GetIt.instance;
 
 void init() {
+  sl.registerLazySingleton(() => SecurityService());
+  sl.registerLazySingleton<SecurityRepository>(
+    () => SecurityRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => SecurityCubit(sl()));
+
   sl.registerLazySingleton(() => AuthService());
   sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()));
   sl.registerLazySingleton(() => AuthCubit(sl()));
+
+  sl.registerLazySingleton(() => LandingPageService());
+  sl.registerLazySingleton<LandingPageRepository>(
+    () => LandingPageRepositoryImpl(sl()),
+  );
+  sl.registerFactory(() => LandingPageCubit(sl()));
 
   sl.registerLazySingleton(() => RegionService());
   sl.registerLazySingleton<RegionRepository>(() => RegionRepositoryImpl(sl()));
@@ -54,7 +75,13 @@ void init() {
   sl.registerLazySingleton<DashboardRepository>(
     () => DashboardRepositoryImpl(sl()),
   );
-  sl.registerFactory(() => DashboardCubit(sl()));
+  sl.registerFactory(() => DashboardCubit(sl(), sl()));
+
+  sl.registerLazySingleton(() => RecapitulationService());
+  sl.registerLazySingleton<RecapitulationRepository>(
+    () => RecapitulationRepositoryImpl(sl()),
+  );
+  sl.registerFactory(() => RecapitulationCubit(sl()));
 
   sl.registerLazySingleton(() => NotificationService());
   sl.registerLazySingleton<NotificationRepository>(
