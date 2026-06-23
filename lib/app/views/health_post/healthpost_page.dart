@@ -311,6 +311,9 @@ class _HealthPostPageState extends State<HealthPostPage> {
                                               arguments: {
                                                 'healthPostId':
                                                     state.healthPosts[index].id,
+                                                'healthPostUuid': state
+                                                    .healthPosts[index]
+                                                    .uuid,
                                                 'healthPostCode':
                                                     state
                                                         .healthPosts[index]

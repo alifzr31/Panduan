@@ -6,12 +6,15 @@ import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/views/hp_registration/components/hpregistration_loading.dart';
+import 'package:panduan/app/views/pdfview/pdfview_page.dart';
+import 'package:panduan/app/views/webview/webview_page.dart';
 import 'package:panduan/app/widgets/base_handlestate.dart';
 import 'package:panduan/app/widgets/base_textbutton.dart';
 
 class HpRegistrationPage extends StatefulWidget {
   const HpRegistrationPage({
     required this.healthPostId,
+    required this.healthPostUuid,
     required this.healthPostCode,
     super.key,
   });
@@ -19,6 +22,7 @@ class HpRegistrationPage extends StatefulWidget {
   static const String routeName = '/hpRegistration';
 
   final int healthPostId;
+  final String healthPostUuid;
   final String healthPostCode;
 
   @override
@@ -304,8 +308,50 @@ class _HpRegistrationPageState extends State<HpRegistrationPage> {
                                                                 BaseTextButton(
                                                                   text:
                                                                       'Lihat File',
-                                                                  onPressed:
-                                                                      () {},
+                                                                  onPressed: () {
+                                                                    final fileName =
+                                                                        component
+                                                                            ?.componentItems?[idx]
+                                                                            .title;
+                                                                    final filePath =
+                                                                        component
+                                                                            ?.componentItems?[idx]
+                                                                            .filePath;
+
+                                                                    if (AppHelpers.isImage(
+                                                                      filePath ??
+                                                                          '',
+                                                                    )) {
+                                                                      Navigator.pushNamed(
+                                                                        context,
+                                                                        WebviewPage
+                                                                            .routeName,
+                                                                        arguments: {
+                                                                          'fileName':
+                                                                              fileName,
+                                                                          'filePath':
+                                                                              filePath,
+                                                                        },
+                                                                      );
+                                                                    } else if (AppHelpers.isPdf(
+                                                                      filePath ??
+                                                                          '',
+                                                                    )) {
+                                                                      Navigator.pushNamed(
+                                                                        context,
+                                                                        PdfViewPage
+                                                                            .routeName,
+                                                                        arguments: {
+                                                                          'fileName':
+                                                                              fileName,
+                                                                          'filePath':
+                                                                              filePath,
+                                                                        },
+                                                                      );
+                                                                    } else {
+                                                                      return;
+                                                                    }
+                                                                  },
                                                                 ),
                                                               },
                                                             ],
