@@ -27,6 +27,7 @@ class SpmDistrictCount extends Equatable {
   final int? perumahanRakyat;
   final int? trantibumLinmas;
   final int? sosial;
+  final int? lainnya;
   final int? total;
 
   const SpmDistrictCount({
@@ -38,6 +39,7 @@ class SpmDistrictCount extends Equatable {
     this.perumahanRakyat,
     this.trantibumLinmas,
     this.sosial,
+    this.lainnya,
     this.total,
   });
 
@@ -51,6 +53,7 @@ class SpmDistrictCount extends Equatable {
     perumahanRakyat,
     trantibumLinmas,
     sosial,
+    lainnya,
     total,
   ];
 
@@ -64,6 +67,7 @@ class SpmDistrictCount extends Equatable {
         perumahanRakyat: json["perumahan_rakyat"],
         trantibumLinmas: json["trantibum_linmas"],
         sosial: json["sosial"],
+        lainnya: json["lainnya"],
         total: json["total"],
       );
 
@@ -76,6 +80,7 @@ class SpmDistrictCount extends Equatable {
     "perumahan_rakyat": perumahanRakyat,
     "trantibum_linmas": trantibumLinmas,
     "sosial": sosial,
+    "lainnya": lainnya,
     "total": total,
   };
 }

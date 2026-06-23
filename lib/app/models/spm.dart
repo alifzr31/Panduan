@@ -32,6 +32,8 @@ class Spm extends Equatable {
   final String? longitude;
   final String? receiptNumber;
   final String? status;
+  final bool? isExpired;
+  final String? totalRespondTime;
   final User? user;
   final ActionBy? healthPost;
   final List<Opd>? opd;
@@ -53,6 +55,8 @@ class Spm extends Equatable {
     this.longitude,
     this.receiptNumber,
     this.status,
+    this.isExpired,
+    this.totalRespondTime,
     this.user,
     this.healthPost,
     this.opd,
@@ -76,6 +80,8 @@ class Spm extends Equatable {
     longitude,
     receiptNumber,
     status,
+    isExpired,
+    totalRespondTime,
     user,
     healthPost,
     opd,
@@ -100,6 +106,8 @@ class Spm extends Equatable {
     longitude: json["longitude"],
     receiptNumber: json["receipt_number"],
     status: json["status"],
+    isExpired: json["is_expired"],
+    totalRespondTime: json["total_respond_time"],
     user: json["user"] == null ? null : User.fromJson(json["user"]),
     healthPost: json["health_post"] == null
         ? null
@@ -144,6 +152,8 @@ class Spm extends Equatable {
     "longitude": longitude,
     "receipt_number": receiptNumber,
     "status": status,
+    "is_expired": isExpired,
+    "total_respond_time": totalRespondTime,
     "user": user?.toJson(),
     "health_post": healthPost?.toJson(),
     "opd": opd == null ? [] : List<dynamic>.from(opd!.map((x) => x.toJson())),
