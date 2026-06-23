@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/build_context_extension.dart';
 import 'package:panduan/app/views/login/widgets/login_form.dart';
 
 class LoginPage extends StatelessWidget {
@@ -25,9 +25,7 @@ class LoginPage extends StatelessWidget {
       child: Scaffold(
         body: SingleChildScrollView(
           child: SizedBox(
-            height:
-                AppHelpers.getHeightDevice(context) -
-                AppHelpers.getBottomViewPaddingDevice(context),
+            height: context.deviceHeight - context.deviceViewPadding.bottom,
             width: double.infinity,
             child: SafeArea(
               bottom: false,
@@ -118,23 +116,14 @@ class LoginPage extends StatelessWidget {
                       bottom: 0,
                       left: 0,
                       right: 0,
-                      child: Column(
-                        children: [
-                          Text(
-                            'Dipersembahkan oleh :',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          SvgPicture.asset(
-                            '${AppStrings.assetsImages}/diskom-logo.svg',
-                            width: 100,
-                          ),
-                        ],
+                      child: Text(
+                        '© ${DateTime.now().year} Pemerintah Kota Bandung',
+                        textAlign: .center,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: .w500,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ),
                   ],

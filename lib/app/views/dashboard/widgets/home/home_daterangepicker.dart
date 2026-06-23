@@ -2,7 +2,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:panduan/app/utils/app_colors.dart';
-import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/build_context_extension.dart';
 
 class HomeDateRangepicker extends StatelessWidget {
   const HomeDateRangepicker({
@@ -56,7 +56,7 @@ class HomeDateRangepicker extends StatelessWidget {
                 ),
               ),
             ),
-            dialogSize: Size(AppHelpers.getWidthDevice(context), 400),
+            dialogSize: Size(context.deviceWidth, 400),
             borderRadius: BorderRadius.circular(12),
             value: selectedRangeDates,
           );

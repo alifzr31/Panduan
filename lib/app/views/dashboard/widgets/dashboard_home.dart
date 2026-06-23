@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
 import 'package:panduan/app/cubits/dashboard/dashboard_cubit.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/build_context_extension.dart';
 import 'package:panduan/app/views/dashboard/widgets/home/home_daterangepicker.dart';
 import 'package:panduan/app/views/dashboard/widgets/home/home_header.dart';
 import 'package:panduan/app/views/dashboard/widgets/home/home_kecamatan.dart';
@@ -141,11 +142,8 @@ class _DashboardHomeState extends State<DashboardHome> {
                         case ProfileStatus.error:
                           return SizedBox(
                             height:
-                                AppHelpers.getHeightDevice(context) -
-                                (200 +
-                                    AppHelpers.getBottomViewPaddingDevice(
-                                      context,
-                                    )),
+                                context.deviceHeight -
+                                (200 + context.deviceViewPadding.bottom),
                             width: double.infinity,
                             child: BaseHandleState(
                               handleType: HandleType.error,

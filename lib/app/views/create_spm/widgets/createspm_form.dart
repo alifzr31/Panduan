@@ -10,6 +10,7 @@ import 'package:panduan/app/models/spm_attachment.dart';
 import 'package:panduan/app/models/subdistrict.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
+import 'package:panduan/app/utils/build_context_extension.dart';
 import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/views/create_spm/widgets/first_section.dart';
 import 'package:panduan/app/views/create_spm/widgets/second_section.dart';
@@ -166,7 +167,7 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                             height: 6,
                             width: _currentPage == 0
                                 ? 0
-                                : (AppHelpers.getWidthDevice(context) - 42) / 2,
+                                : (context.deviceWidth - 42) / 2,
                             decoration: BoxDecoration(
                               color: AppColors.greenColor,
                               borderRadius: BorderRadius.circular(2),

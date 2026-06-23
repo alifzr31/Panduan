@@ -18,6 +18,7 @@ import 'package:panduan/app/models/subdistrict.dart';
 import 'package:panduan/app/utils/app_colors.dart';
 import 'package:panduan/app/utils/app_helpers.dart';
 import 'package:panduan/app/utils/app_strings.dart';
+import 'package:panduan/app/utils/build_context_extension.dart';
 import 'package:panduan/app/utils/string_extension.dart';
 import 'package:panduan/app/views/edit_spm/widgets/editfirst_section.dart';
 import 'package:panduan/app/views/edit_spm/widgets/editsecond_section.dart';
@@ -575,7 +576,7 @@ class _EditSpmFormState extends State<EditSpmForm> {
                             height: 6,
                             width: _currentPage == 0
                                 ? 0
-                                : (AppHelpers.getWidthDevice(context) - 42) / 2,
+                                : (context.deviceWidth - 42) / 2,
                             decoration: BoxDecoration(
                               color: AppColors.greenColor,
                               borderRadius: BorderRadius.circular(2),

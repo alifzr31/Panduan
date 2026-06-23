@@ -7,14 +7,14 @@ class SpmFieldCounterCard extends StatelessWidget {
     required this.count,
     required this.name,
     required this.barColor,
-    required this.onTapSpmFieldCounter,
+    this.onTapSpmFieldCounter,
     super.key,
   });
 
   final int count;
   final String name;
   final Color barColor;
-  final void Function(String value) onTapSpmFieldCounter;
+  final void Function(String value)? onTapSpmFieldCounter;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,9 @@ class SpmFieldCounterCard extends StatelessWidget {
         borderRadius: BorderRadiusGeometry.circular(10),
       ),
       child: InkWell(
-        onTap: () => onTapSpmFieldCounter(name),
+        onTap: onTapSpmFieldCounter == null
+            ? null
+            : () => onTapSpmFieldCounter!(name),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
