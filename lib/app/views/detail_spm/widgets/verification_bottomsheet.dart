@@ -48,7 +48,7 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
   final _selectedServiceType = ValueNotifier<String?>(null);
   late final List<String> _verificationResults;
   final _selectedVerificationResult = ValueNotifier<String?>(null);
-  final _selectedOpd = ValueNotifier<String?>(null);
+  final _selectedOpds = ValueNotifier<Set<String>>({});
   final _noteController = TextEditingController();
   double? _latitude;
   double? _longitude;
@@ -161,7 +161,7 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
   void dispose() {
     _selectedServiceType.dispose();
     _selectedVerificationResult.dispose();
-    _selectedOpd.dispose();
+    _selectedOpds.dispose();
     _noteController.dispose();
     _coordinateController.dispose();
     for (var i = 0; i < _attachmentKeyControllers.length; i++) {
@@ -236,7 +236,7 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                       }).toList(),
                       onChanged: (value) {
                         setState(() {
-                          _selectedOpd.value = null;
+                          _selectedOpds.value.clear();
                           _selectedVerificationResult.value = value;
                         });
 
@@ -266,20 +266,103 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                               ? 'Pilih OPD tujuan'
                               : 'Mohon tunggu...',
                           mandatory: true,
-                          value: _selectedOpd,
+                          multiValue: _selectedOpds,
                           items: state.opd.map((e) {
                             return DropdownItem(
+                              closeOnTap: false,
                               value: e.uuid,
-                              child: Text(e.name ?? ''),
+                              child: ValueListenableBuilder(
+                                valueListenable: _selectedOpds,
+                                builder: (context, value, child) {
+                                  final isSelected = value.contains(e.uuid);
+
+                                  return Row(
+                                    children: [
+                                      Icon(
+                                        isSelected
+                                            ? MingCute.checkbox_fill
+                                            : MingCute.square_line,
+                                        size: 18,
+                                        color: isSelected
+                                            ? AppColors.blueColor
+                                            : null,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Flexible(
+                                        child: Text(
+                                          e.name ?? '',
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
                             );
                           }).toList(),
+                          selectedItemBuilder: (context) {
+                            return state.opd.map((e) {
+                              return ValueListenableBuilder<Set<String>>(
+                                valueListenable: _selectedOpds,
+                                builder: (context, value, child) {
+                                  return ListView(
+                                    padding: .zero,
+                                    scrollDirection: .horizontal,
+                                    physics: const ClampingScrollPhysics(),
+
+                                    children: value.map((selectedUuid) {
+                                      final matchedOpd = state.opd.firstWhere(
+                                        (element) =>
+                                            element.uuid == selectedUuid,
+                                        orElse: () => e,
+                                      );
+                                      final opdName = matchedOpd.name ?? '';
+
+                                      return Padding(
+                                        padding: const .only(right: 4.0),
+                                        child: Material(
+                                          shape: const StadiumBorder(
+                                            side: BorderSide(
+                                              color: AppColors.blueColor,
+                                            ),
+                                          ),
+                                          clipBehavior: Clip.antiAlias,
+                                          color: AppColors.softBlueColor,
+                                          child: Center(
+                                            child: Padding(
+                                              padding: const .symmetric(
+                                                vertical: 2,
+                                                horizontal: 10,
+                                              ),
+                                              child: Text(
+                                                opdName,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: .w500,
+                                                  color: AppColors.blueColor,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              );
+                            }).toList();
+                          },
                           onChanged: (value) {
-                            setState(() {
-                              _selectedOpd.value = value;
-                            });
+                            final isSelected = _selectedOpds.value.contains(
+                              value,
+                            );
+
+                            _selectedOpds.value = isSelected
+                                ? ({..._selectedOpds.value}..remove(value))
+                                : {..._selectedOpds.value, value!};
                           },
                           validator: (value) {
-                            if (_selectedOpd.value == null) {
+                            if (_selectedOpds.value.isEmpty) {
                               return 'Silahkan pilih OPD tujuan';
                             }
 
@@ -557,9 +640,9 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
                                           : 'FORWARD_TO_OPD'
                                     : _selectedVerificationResult.value,
                                 description: _noteController.text,
-                                opdUuids: _selectedOpd.value == null
+                                opdUuids: _selectedOpds.value.isEmpty
                                     ? null
-                                    : [_selectedOpd.value ?? ''],
+                                    : [..._selectedOpds.value],
                                 latitude: _latitude,
                                 longitude: _longitude,
                                 attachmentKeys: _attachmentKeyControllers.map((
