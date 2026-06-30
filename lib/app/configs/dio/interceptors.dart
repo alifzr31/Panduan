@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:panduan/app/configs/dio/exceptions.dart';
 import 'package:panduan/app/configs/get_it/service_locator.dart';
 import 'package:panduan/app/configs/storage/storage_service.dart';
 import 'package:panduan/app/cubits/auth/auth_cubit.dart';
@@ -36,7 +35,7 @@ class DioInterceptors extends InterceptorsWrapper {
 
     if (request.extra['isRetry'] == true) {
       sl<AuthCubit>().logoutSession();
-      return handler.reject(err);
+      return handler.next(err);
     }
 
     if (isRefreshing) {
@@ -78,9 +77,7 @@ class DioInterceptors extends InterceptorsWrapper {
         requestQueue.clear();
         sl<AuthCubit>().logoutSession();
 
-        return handler.reject(
-          UnauthorizedException(err.requestOptions, err.response),
-        );
+        return handler.next(err);
       }
 
       final response = await refreshDio.post(
@@ -131,17 +128,13 @@ class DioInterceptors extends InterceptorsWrapper {
         requestQueue.clear();
         sl<AuthCubit>().logoutSession();
 
-        return handler.reject(
-          UnauthorizedException(err.requestOptions, err.response),
-        );
+        return handler.next(err);
       }
     } catch (e) {
       requestQueue.clear();
       sl<AuthCubit>().logoutSession();
 
-      return handler.reject(
-        UnauthorizedException(err.requestOptions, err.response),
-      );
+      return handler.next(err);
     } finally {
       isRefreshing = false;
     }
@@ -153,38 +146,26 @@ class DioInterceptors extends InterceptorsWrapper {
     // print('ERROR STATUS DATA: ${err.response?.data}');
 
     if (err.error is SocketException) {
-      return handler.reject(
-        DeadlineExceededException(err.requestOptions, err.response),
-      );
+      return handler.next(err);
     } else {
       switch (err.type) {
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.connectionError:
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
-          return handler.reject(
-            DeadlineExceededException(err.requestOptions, err.response),
-          );
+          return handler.next(err);
         case DioExceptionType.badResponse:
           switch (err.response?.statusCode) {
             case 400:
-              return handler.reject(
-                BadRequestException(err.requestOptions, err.response),
-              );
+              return handler.next(err);
             case 401:
               return _onUnauthorized(err, handler);
             case 404:
-              return handler.reject(
-                NotFoundException(err.requestOptions, err.response),
-              );
+              return handler.next(err);
             case 409:
-              return handler.reject(
-                ConflictException(err.requestOptions, err.response),
-              );
+              return handler.next(err);
             case 500:
-              return handler.reject(
-                InternalServerErrorException(err.requestOptions, err.response),
-              );
+              return handler.next(err);
           }
           break;
         case DioExceptionType.badCertificate:
