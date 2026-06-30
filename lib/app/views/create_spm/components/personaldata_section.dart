@@ -69,6 +69,15 @@ class PersonalDataSection extends StatelessWidget {
 
             if (state.residentStatus == ResidentStatus.success) {
               context.loaderOverlay.hide();
+              if (state.resident == null) {
+                showCustomToast(
+                  context,
+                  type: ToastificationType.info,
+                  title: 'Data Penduduk Tidak Ditemukan',
+                  description:
+                      'Silahkan lengkapi data pelapor karena data kependudukannya tidak ditemukan.',
+                );
+              }
               onFindResident(state.resident);
             }
 
@@ -155,7 +164,7 @@ class PersonalDataSection extends StatelessWidget {
                 }),
                 onChanged: onSelectedRt,
                 validator: (value) {
-                  if (selectedRt == null) {
+                  if (value == null) {
                     return 'Silahkan pilih RT';
                   }
 
@@ -175,7 +184,7 @@ class PersonalDataSection extends StatelessWidget {
                 }),
                 onChanged: onSelectedRw,
                 validator: (value) {
-                  if (selectedRw == null) {
+                  if (value == null) {
                     return 'Silahkan pilih RW';
                   }
 

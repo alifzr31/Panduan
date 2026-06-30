@@ -47,7 +47,7 @@ class EditServiceSection extends StatelessWidget {
                   : const [],
               onChanged: onSelectedServiceCategory,
               validator: (value) {
-                if (selectedServiceCategory == null) {
+                if (value == null) {
                   return 'Silahkan pilih kategori layanan';
                 }
 

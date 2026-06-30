@@ -122,7 +122,7 @@ class EditPersonalDataSection extends StatelessWidget {
                 }),
                 onChanged: onSelectedRt,
                 validator: (value) {
-                  if (selectedRt == null) {
+                  if (value == null) {
                     return 'Silahkan pilih RT';
                   }
 
@@ -142,7 +142,7 @@ class EditPersonalDataSection extends StatelessWidget {
                 }),
                 onChanged: onSelectedRw,
                 validator: (value) {
-                  if (selectedRw == null) {
+                  if (value == null) {
                     return 'Silahkan pilih RW';
                   }
 
