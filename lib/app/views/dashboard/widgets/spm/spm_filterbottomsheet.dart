@@ -388,43 +388,6 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                   }).toList(),
                   selectedItemBuilder: (context) {
                     return _listStatus.map((e) {
-                      // return ValueListenableBuilder(
-                      //   valueListenable: _selectedStatus,
-                      //   builder: (context, value, child) {
-                      //     return SingleChildScrollView(
-                      //       scrollDirection: Axis.horizontal,
-                      //       child: Row(
-                      //         children: [
-                      //           Material(
-                      //             shape: const StadiumBorder(),
-                      //             clipBehavior: Clip.antiAlias,
-                      //             color: AppColors.softBlueColor,
-                      //             child: Center(
-                      //               child: Padding(
-                      //                 padding: const EdgeInsets.symmetric(
-                      //                   vertical: 2,
-                      //                   horizontal: 10,
-                      //                 ),
-                      //                 child: Text(
-                      //                   AppHelpers.statusLabel(
-                      //                     value.toList()[index],
-                      //                   ),
-                      //                   style: const TextStyle(
-                      //                     fontSize: 14,
-                      //                     fontWeight: FontWeight.w500,
-                      //                     color: AppColors.blueColor,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //           if (index != (_selectedStatus.length - 1))
-                      //             const SizedBox(width: 4),
-                      //         ],
-                      //       ),
-                      //     );
-                      //   },
-                      // );
                       return ValueListenableBuilder(
                         valueListenable: _selectedStatus,
                         builder: (context, value, child) {
@@ -436,7 +399,11 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                               return Row(
                                 children: [
                                   Material(
-                                    shape: const StadiumBorder(),
+                                    shape: const StadiumBorder(
+                                      side: BorderSide(
+                                        color: AppColors.blueColor,
+                                      ),
+                                    ),
                                     clipBehavior: Clip.antiAlias,
                                     color: AppColors.softBlueColor,
                                     child: Center(
@@ -471,9 +438,11 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                   onChanged: (value) {
                     final isSelected = _selectedStatus.value.contains(value);
 
-                    _selectedStatus.value = isSelected
-                        ? ({..._selectedStatus.value}..remove(value))
-                        : {..._selectedStatus.value, value!};
+                    setState(() {
+                      _selectedStatus.value = isSelected
+                          ? ({..._selectedStatus.value}..remove(value))
+                          : {..._selectedStatus.value, value!};
+                    });
                   },
                 ),
               ],
@@ -496,27 +465,36 @@ class _SpmFilterBottomsheetState extends State<SpmFilterBottomsheet> {
                     width: double.infinity,
                     bgColor: AppColors.amberColor,
                     label: 'Terapkan Filter',
-                    onPressed: () {
-                      setState(() {
-                        _isFiltered =
-                            _selectedDistrict.value != null ||
+                    onPressed:
+                        _selectedDistrict.value != null ||
                             _selectedSubDistrict.value != null ||
                             _selectedHealthPostUuid.value != null ||
                             _selectedSpmField.value != null ||
-                            _selectedStatus.value.isNotEmpty;
-                      });
+                            _selectedStatus.value.isNotEmpty
+                        ? () {
+                            setState(() {
+                              _isFiltered =
+                                  _selectedDistrict.value != null ||
+                                  _selectedSubDistrict.value != null ||
+                                  _selectedHealthPostUuid.value != null ||
+                                  _selectedSpmField.value != null ||
+                                  _selectedStatus.value.isNotEmpty;
+                            });
 
-                      final data = {
-                        'selectedDistrictCode': _selectedDistrict.value?.code,
-                        'selectedSubDistrictCode':
-                            _selectedSubDistrict.value?.code,
-                        'selectedHealthPostUuid': _selectedHealthPostUuid.value,
-                        'selectedSpmField': _selectedSpmField.value,
-                        'selectedStatus': _selectedStatus.value,
-                      };
+                            final data = {
+                              'selectedDistrictCode':
+                                  _selectedDistrict.value?.code,
+                              'selectedSubDistrictCode':
+                                  _selectedSubDistrict.value?.code,
+                              'selectedHealthPostUuid':
+                                  _selectedHealthPostUuid.value,
+                              'selectedSpmField': _selectedSpmField.value,
+                              'selectedStatus': _selectedStatus.value,
+                            };
 
-                      Navigator.pop(context, data);
-                    },
+                            Navigator.pop(context, data);
+                          }
+                        : null,
                   ),
                   if (_isFiltered) ...{
                     const SizedBox(height: 8),
