@@ -218,18 +218,33 @@ class _CreateSpmFormState extends State<CreateSpmForm> {
                   },
                   nikController: _nikController,
                   onFindResident: (resident) {
+                    if (resident == null) {
+                      _fullNameController.clear();
+                      _addressController.clear();
+                      _phoneController.clear();
+                      _selectedRt.value = null;
+                      _selectedRw.value = null;
+                      _districtController.clear();
+                      _selectedDistrict = null;
+                      _subDistrictController.clear();
+                      _selectedSubDistrict = null;
+                      _phoneController.clear();
+                      setState(() {});
+                      return;
+                    }
+
                     _fullNameController.text =
-                        resident?.fullName?.capitalize() ?? '';
-                    _addressController.text = resident?.address ?? '';
-                    _phoneController.text = resident?.phone ?? '';
+                        resident.fullName?.capitalize() ?? '';
+                    _addressController.text = resident.address ?? '';
+                    _phoneController.text = resident.phone ?? '';
                     setState(() {
-                      _selectedRt.value = resident?.rt;
-                      _selectedRw.value = resident?.rw;
+                      _selectedRt.value = resident.rt;
+                      _selectedRw.value = resident.rw;
                     });
 
                     final regionCubit = context.read<RegionCubit>();
-                    final residentDistrictCode = resident?.district?.code;
-                    final residentSubDistrictCode = resident?.subDistrict?.code;
+                    final residentDistrictCode = resident.district?.code;
+                    final residentSubDistrictCode = resident.subDistrict?.code;
 
                     _selectedSubDistrict = null;
 

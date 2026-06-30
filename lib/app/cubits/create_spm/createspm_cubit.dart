@@ -51,12 +51,21 @@ class CreateSpmCubit extends Cubit<CreateSpmState> {
         ),
       );
     } on DioException catch (e) {
-      emit(
-        state.copyWith(
-          residentStatus: ResidentStatus.error,
-          residentError: AppHelpers.errorHandlingApiMessage(e),
-        ),
-      );
+      if (e.response?.statusCode == 400 && !e.response?.data['status']) {
+        emit(
+          state.copyWith(
+            residentStatus: ResidentStatus.success,
+            residentError: e.response?.data['message'],
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            residentStatus: ResidentStatus.error,
+            residentError: AppHelpers.errorHandlingApiMessage(e),
+          ),
+        );
+      }
     }
   }
 
