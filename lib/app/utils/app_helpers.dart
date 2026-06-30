@@ -240,28 +240,29 @@ class AppHelpers {
       case "FINISH_BY_DISTRICT":
       case "FINISH_BY_SUB_DISTRICT":
       case "FINISH_BY_OPD":
-        return Colors.green.shade500;
+        return Colors.green.shade600;
       case "VERIFICATION_SUB_DISTRICT":
       case "NEED_VERIFICATION_SUB_DISTRICT":
+      case "NEED_APPROVAL_DISTRICT":
       case "FORWARD_TO_TP_POSYANDU_KOTA":
       case "FORWARD_TO_DISTRICT":
       case "FORWARD_TO_OPD":
       case "NEED_VERIFICATION_OPD":
-        return Colors.amber.shade500;
+        return Colors.amber.shade600;
       case "PROCESS_BY_DISTRICT":
       case "PROCESS_BY_SUB_DISTRICT":
       case "PROCESS_BY_OPD":
-        return Colors.blue.shade500;
+        return Colors.blue.shade600;
       case "DECLINE_BY_SUB_DISTRICT":
       case "DECLINE_BY_DISTRICT":
       case "DECLINE_BY_OPD":
-        return Colors.red.shade500;
+        return Colors.red.shade600;
       case "RETURN_TO_TP_POSYANDU_KOTA":
       case "RETURN_TO_SUB_DISTRICT":
       case "RETURN_TO_KADER":
-        return Colors.orange.shade500;
+        return Colors.orange.shade600;
       default:
-        return Colors.grey.shade500;
+        return Colors.grey.shade600;
     }
   }
 
